@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: production
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MariaDBDialect
+  datasource:
+    url: jdbc:mariadb://35.206.125.156:3306/movetum
+    username: develop
+    password: 1234
+    driver-class-name: org.mariadb.jdbc.Driver
