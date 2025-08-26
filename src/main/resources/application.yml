@@ -2,4 +2,4 @@ spring:
   application:
     name: jober-server
   profiles:
-    active: production
+    active: develop
