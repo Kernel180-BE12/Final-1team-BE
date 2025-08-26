@@ -1,3 +1,5 @@
 spring:
   application:
     name: jober-server
+  profiles:
+    active: develop

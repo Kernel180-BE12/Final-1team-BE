@@ -1,0 +1,123 @@
+Configuration:
+  name: develop
+
+  properties:
+    property:
+      - name: "log-path"
+        value: "./logs"
+      - name: "charset-UTF-8"
+        value: "UTF-8"
+      - name: "console-layout-pattern"
+        value: "%highlight{[%-5level]} [%X{id}] %d{MM-dd HH:mm:ss} [%t] %msg%n"
+      - name: "file-layout-pattern"
+        value: "[%X{id}] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+      - name: "info-log"
+        value: ${log-path}/base/info.log
+      - name: "error-log"
+        value: ${log-path}/base/error.log
+      - name: "auth-log"
+        value: ${log-path}/base/auth.log
+      - name: "json-log"
+        value: ${log-path}/base/json-info.log
+      - name: "archive-path"
+        value: ${log-path}/archive
+
+  Appenders:
+    Console:
+      name: console-appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: ${console-layout-pattern}
+
+    RollingFile:
+      name: rolling-file-appender
+      fileName: ${log-path}/rolling-file.log
+      filePattern: "${archive-path}/rolling-file.%d{yyyy-MM-dd-HH}_%i.gz"
+      PatternLayout:
+        charset: ${charset-UTF-8}
+        pattern: ${file-layout-pattern}
+      Policies:
+        SizeBasedTriggeringPolicy:
+          size: "5MB"
+        TimeBasedTriggeringPolicy:
+          interval: "1"
+      DefaultRollOverStrategy:
+        max: "20"
+        fileIndex: "max"
+
+    File:
+      - name: file-info-appender
+        fileName: ${info-log}
+        PatternLayout:
+          pattern: ${file-layout-pattern}
+      - name: file-error-appender
+        fileName: ${error-log}
+        PatternLayout:
+          pattern: ${file-layout-pattern}
+      - name: file-auth-appender
+        fileName: ${auth-log}
+        PatternLayout:
+          pattern: ${file-layout-pattern}
+      - name: file-json-info-appender
+        fileName: ${json-log}
+        PatternLayout:
+          pattern: ${file-layout-pattern}
+
+  Loggers:
+    Root:
+      level: INFO
+      AppenderRef:
+        - ref: console-appender
+        - ref: rolling-file-appender
+
+    Logger:
+      # 애플리케이션 핵심
+      - name: com.movement.mvp
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+          - ref: console-appender
+          - ref: file-info-appender
+          - ref: file-error-appender
+
+      # Spring Security
+      - name: org.springframework.security
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+          - ref: console-appender
+          - ref: file-auth-appender
+
+      # 웹 요청
+      - name: org.springframework.web
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+          - ref: console-appender
+          - ref: file-info-appender
+
+      # 트랜잭션
+      - name: org.springframework.transaction
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+          - ref: console-appender
+          - ref: file-info-appender
+
+      # Hibernate SQL/바인딩 (개발에서만)
+      - name: org.hibernate.SQL
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+          - ref: console-appender
+          - ref: file-info-appender
+      - name: org.hibernate.orm.jdbc.bind
+        additivity: "false"
+        level: TRACE     # ⚠️ 민감정보 노출 가능 → 필요 시에만 잠깐 켜세요
+        AppenderRef:
+          - ref: console-appender
+          - ref: file-info-appender
+
+      # HikariCP (개발 확인용)
+      - name: com.zaxxer.hikari
+        level: INFO

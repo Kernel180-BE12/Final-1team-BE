@@ -1,0 +1,29 @@
+spring:
+  config:
+    activate:
+      on-profile: develop
+  jpa:
+    hibernate:
+      ddl-auto: create
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/jober;
+    username: sa
+    password: 1234
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+
+logging:
+  config: classpath:log4j2-develop.yml
+  level:
+    org.springframework.security: DEBUG
+    com.movement.mvp: DEBUG
+    org.springframework.web.multipart: DEBUG
