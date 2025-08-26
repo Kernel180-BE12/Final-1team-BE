@@ -22,16 +22,16 @@ public class Space {
     private String adminName;
     private String adminNum;
     // 이 아래로 꼭 필요할지?
-    private String faxNum;
-    private String email;
-    private String url;
-    private String businessType;
-    private String corporateRegistrationNo;
-    private String businessRegistrationNo;
-    private String signatureImgUrl;
-    private LocalDate businessOpenDate;
-    private String businessCategory;
-    private String businessItem;
-    private String taxEmail;
+//    private String faxNum;
+//    private String email;
+//    private String url;
+//    private String businessType;
+//    private String corporateRegistrationNo;
+//    private String businessRegistrationNo;
+//    private String signatureImgUrl;
+//    private LocalDate businessOpenDate;
+//    private String businessCategory;
+//    private String businessItem;
+//    private String taxEmail;
 
 }

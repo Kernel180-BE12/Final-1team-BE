@@ -9,5 +9,4 @@ import java.util.List;
 
 public interface SpaceRepository extends JpaRepository<Space,Long> {
 
-    List<Space> findByMemberId(Long memberId);
 }

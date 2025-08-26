@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// 등록, 수정 등에 사용
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,9 +15,9 @@ public class SpaceRequestDto {
     private String adminName;
     private String adminNum;
     // 이 밑으로 과연 필요할지?
-    private String faxNum;
-    private String spaceEmail;
-    private String spaceUrl;
+//    private String faxNum;
+//    private String spaceEmail;
+//    private String spaceUrl;
 
 
 }

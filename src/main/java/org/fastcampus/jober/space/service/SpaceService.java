@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.SpaceRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
+import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SpaceService {
     private final SpaceRepository spaceRepository;
+    private final SpaceMemberRepository spaceMemberRepository;
 
     @Transactional
     public SpaceResponseDto createSpace(SpaceRequestDto dto) {
@@ -50,18 +52,9 @@ public class SpaceService {
         return toResponseDto(existingSpace);
     }
 
-    @Transactional
-    public void deleteSpace(Long id) {
-        if (!spaceRepository.existsById(id)) {
-            throw new IllegalArgumentException("존재하지 않는 스페이스입니다.");
-        }
-        spaceRepository.deleteById(id);
-    }
-
-    @Transactional
-    public List<SpaceResponseDto> findMySpace(Long memberId) {
+    public List<SpaceResponseDto> findById(Long memberId) {
         // 유저 아이디로 객체 조회한 목록
-        List<Space> spaces = spaceRepository.findByMemberId(memberId);
+        List<Space> spaces = spaceRepository.findById(memberId);
         // 저장된 객체들 dto로 변경해서 담을 리스트
         List<SpaceResponseDto> result = new ArrayList<>();
 
@@ -72,7 +65,7 @@ public class SpaceService {
         return result;
     }
 
-    // entity -> dto 변환 메서드
+    // entity -> dto 변환 메서드 => 엔티티에 넣기
     private SpaceResponseDto toResponseDto(Space space) {
         return new SpaceResponseDto(
                 space.getId(),
