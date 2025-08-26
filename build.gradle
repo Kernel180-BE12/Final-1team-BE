@@ -51,7 +51,7 @@ dependencies {
 }
 
 configurations {
-    all {
+    configureEach {
         // 기본 Logback 제거
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         exclude group: 'ch.qos.logback', module: 'logback-classic'

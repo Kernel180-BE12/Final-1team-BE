@@ -2,8 +2,10 @@ package org.fastcampus.jober.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.*;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -50,16 +52,16 @@ public class GlobalExceptionHandler {
         if (ex instanceof MethodArgumentNotValidException e) {
             details = e.getBindingResult().getFieldErrors().stream()
                     .collect(Collectors.toMap(
-                            err -> err.getField(),
-                            err -> err.getDefaultMessage(),
-                            (a, b) -> a // 중복키 무시
+                            FieldError::getField,
+                            DefaultMessageSourceResolvable::getDefaultMessage,
+                            (a, _) -> a // 중복키 무시
                     ));
         } else if (ex instanceof BindException e) {
             details = e.getBindingResult().getFieldErrors().stream()
                     .collect(Collectors.toMap(
-                            err -> err.getField(),
-                            err -> err.getDefaultMessage(),
-                            (a, b) -> a
+                            FieldError::getField,
+                            DefaultMessageSourceResolvable::getDefaultMessage,
+                            (a, _) -> a
                     ));
         }
         log.debug("[VALIDATION] {}", ex.getMessage());
