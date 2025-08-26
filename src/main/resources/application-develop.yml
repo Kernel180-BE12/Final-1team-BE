@@ -14,3 +14,16 @@ spring:
     url: jdbc:h2:~/jober;
     username: sa
     password: 1234
+
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+
+logging:
+  config: classpath:log4j2-develop.yml
+  level:
+    org.springframework.security: DEBUG
+    com.movement.mvp: DEBUG
+    org.springframework.web.multipart: DEBUG

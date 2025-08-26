@@ -1,0 +1,33 @@
+spring:
+  config:
+    activate:
+      on-profile: production
+  datasource:
+    url: jdbc:mysql://15.164.102.187:3306/jober
+      ?useUnicode=true
+      &characterEncoding=utf8
+      &useSSL=false
+      &allowPublicKeyRetrieval=true
+    username: server
+    password: joberteam1
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
+logging:
+  config: classpath:log4j2-production.yml
+  level:
+    org.springframework.security: INFO
+    com.movement.mvp: INFO
+    org.springframework.web.multipart: INFO
