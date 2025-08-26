@@ -3,3 +3,6 @@ spring:
     name: jober-server
   profiles:
     active: develop
+
+server:
+  port: 8080
