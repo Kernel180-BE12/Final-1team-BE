@@ -1,4 +1,4 @@
-package org.fastcampus.jober.aop.logging;
+package org.fastcampus.jober.aop;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
