@@ -49,11 +49,10 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             # 2) 이미지 태그 계산
-            if [ "${{ github.ref_type }}" = "tag" ]; then
-              TAG="${{ github.ref_name }}"
-            else
-              TAG="latest"
+            if [ "${{ github.ref_type }}" != "tag" ]; then
+              echo "Deploy runs on tag push or manual with input.tag"; exit 1
             fi
+            TAG="${{ github.ref_name }}"
 
             # 2-1) compose 변수 주입 (compose에서 image: ghcr.io/${REPO_LC}/user-service:${TAG} 사용 시 필요)
             export REPO_LC="${{ env.REPO_LC }}"
