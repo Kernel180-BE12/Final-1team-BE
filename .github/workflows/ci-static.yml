@@ -1,0 +1,57 @@
+name: CI (Static)
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  spotlessCheck:
+    name: Gradle Spotless Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+        working-directory: mvp
+
+      - name: Run Spotless Check
+        run: ./gradlew spotlessCheck
+        working-directory: mvp
+
+  build:
+    name: Build (JDK ${{ matrix.java-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [ '21', '24' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '${{ matrix.java-version }}'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+        working-directory: mvp
+
+      - name: Run Gradle Build
+        run: ./gradlew build -x check
+        working-directory: mvp
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
