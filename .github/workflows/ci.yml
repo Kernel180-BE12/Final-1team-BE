@@ -129,4 +129,4 @@ jobs:
       - name: Analyze image layers
         run: |
           echo "=== Image Layer Analysis ==="
-          docker history ghcr.io/${{ env.REPO_LC }}/user-service:latest --human --no-trunc
+          docker history ghcr.io/${{ env.REPO_LC }}/user-service:${{ github.ref_name }} --human --no-trunc
