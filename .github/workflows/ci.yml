@@ -96,3 +96,44 @@ jobs:
           scan-ref: .
           format: sarif
           output: trivy-results.sarif
+
+  docker:
+    name: Build Spring Boot Docker Image and push to registry
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs:
+      - build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts (JAR)
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: apps/user-service/build/libs/
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set repo lowercase
+        run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/user-service
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_LC }}/user-service:${{ github.ref_name }}
+            ghcr.io/${{ env.REPO_LC }}/user-service:${{ github.sha }}
+
+      - name: Analyze image layers
+        run: |
+          echo "=== Image Layer Analysis ==="
+          docker history ghcr.io/${{ env.REPO_LC }}/user-service:latest --human --no-trunc
