@@ -24,11 +24,11 @@ jobs:
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
-        working-directory: mvp
+        working-directory: Final-1team-BE
 
       - name: Run Spotless Check
         run: ./gradlew spotlessCheck
-        working-directory: mvp
+        working-directory: Final-1team-BE
 
   build:
     name: Build (JDK ${{ matrix.java-version }})
@@ -48,10 +48,10 @@ jobs:
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
-        working-directory: mvp
+        working-directory: Final-1team-BE
 
       - name: Run Gradle Build
         run: ./gradlew build -x check
-        working-directory: mvp
+        working-directory: Final-1team-BE
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
