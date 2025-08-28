@@ -19,7 +19,7 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '24'
           distribution: 'temurin'
 
       - name: Grant execute permission for Gradle wrapper
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: [ '21', '24' ]
+        java-version: [ '24' ]
 
     steps:
       - uses: actions/checkout@v4
