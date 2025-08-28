@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     name: Deploy to AWS EC2
-    runs-on: ubuntu-24.04  # 고정 런너
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -21,26 +21,31 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ubuntu
+          username: ${{ secrets.SERVER_USER }} # 예: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker/production/docker-compose.yml"
-          target: "~/app/docker/production"   # ✅ 실제 작업 디렉토리와 일치시키기
+          target: "~/app/docker/production"   # 작업 디렉토리와 일치
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_HOST }} 
-          username: ${{ secrets.SERVER_USER }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }} # 예: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
           # port: 22
           script: |
             set -euo pipefail
 
-            # 0) 작업 디렉토리 보강 (복사 경로와 일치)
+            # 0) 작업 디렉토리 보강
             mkdir -p ~/app/docker/production
             cd ~/app/docker/production
 
-            # 1) 레지스트리 로그인 (GHCR)
+            # 존재 확인 (디버그)
+            echo "== PWD: $(pwd)"
+            ls -al
+            test -f docker-compose.yml || { echo "ERROR: docker-compose.yml not found"; exit 1; }
+
+            # 1) GHCR 로그인
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             # 2) 이미지 태그 계산
@@ -50,14 +55,15 @@ jobs:
               TAG="latest"
             fi
 
-            # 2-1) docker-compose 변수 주입 (compose 파일이 image: ghcr.io/${REPO_LC}/user-service:${TAG} 를 사용할 때 필요)
+            # 2-1) compose 변수 주입 (compose에서 image: ghcr.io/${REPO_LC}/user-service:${TAG} 사용 시 필요)
             export REPO_LC="${{ env.REPO_LC }}"
             export TAG="$TAG"
-            # 원하면 .env로도 주입 가능:
+            # 또는 .env로 주입하려면 다음 줄 활성화:
             # printf "REPO_LC=%s\nTAG=%s\n" "${{ env.REPO_LC }}" "$TAG" > .env
 
-            # 3) 이미지 풀 (선택) + Compose 재기동
+            # 3) 이미지 풀 (선택) + 재기동
             IMAGE="ghcr.io/${{ env.REPO_LC }}/user-service:${TAG}"
+            echo "Pulling IMAGE=${IMAGE}"
             docker pull "$IMAGE" || true
 
             docker compose down --remove-orphans || true
@@ -68,7 +74,7 @@ jobs:
             docker compose ps
             docker compose logs --tail=200
 
-            # 5) 디스크 정리(댕글링 이미지)
+            # 5) 디스크 정리
             docker image prune -f
 
       - name: Send Discord notification - Success
