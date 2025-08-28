@@ -36,11 +36,11 @@ jobs:
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
-        working-directory: mvp
+        working-directory: Final-1team-BE
 
       - name: Run Spotless Check
         run: ./gradlew spotlessCheck
-        working-directory: mvp
+        working-directory: Final-1team-BE
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
@@ -65,15 +65,15 @@ jobs:
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
-        working-directory: mvp
+        working-directory: Final-1team-BE
 
       - name: Run Gradle Build
         run: ./gradlew build -x test
-        working-directory: mvp
+        working-directory: Final-1team-BE
 
       - name: Run Tests
         run: ./gradlew test
-        working-directory: mvp
+        working-directory: Final-1team-BE
 
       - name: Upload build artifacts
         if: matrix.java-version == '21' && github.ref == 'refs/heads/main' && github.event_name == 'push'
