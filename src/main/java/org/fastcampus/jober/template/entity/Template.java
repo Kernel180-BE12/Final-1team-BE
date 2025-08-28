@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.fastcampus.jober.template.entity.enums.ChannelType;
+import org.fastcampus.jober.template.entity.enums.PurposeType;
+import org.fastcampus.jober.template.entity.enums.Status;
 
 import java.time.LocalDateTime;
 
@@ -24,13 +27,13 @@ public class Template {
     private String title; //템플릿 제목
 
     @Enumerated(EnumType.STRING)
-    private String purposeType; //목적구분
+    private PurposeType purposeType; //목적구분
 
     @Enumerated(EnumType.STRING)
-    private String channelType;//채널타입
+    private ChannelType channelType;//채널타입
 
     @Enumerated(EnumType.STRING)
-    private String status; //상태
+    private Status status; //상태
 
     private Long latestVersionId; //최신버전id(fk)
 
