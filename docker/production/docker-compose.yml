@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  user-service:
+    image: ghcr.io/${REPO_LC}/user-service:${TAG}   # ← 여기서 TAG 변수 사용
+    container_name: user-service
+    restart: always
+
+    ports:
+      - "8080:8080"
+
+
+    # 로그 확인을 위한 옵션 (원하면 volume 연결)
+    # volumes:
+    #   - ./logs:/app/logs
