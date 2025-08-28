@@ -17,14 +17,16 @@ jobs:
       - name: Set repo lowercase
         run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
-      - name: Copy docker compose files to EC2
+      - name: Copy docker compose file to EC2 (flatten path)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }} # 예: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker/production/docker-compose.yml"
-          target: "~/app/docker/production"   # 작업 디렉토리와 일치
+          target: "~/app/docker/production"
+          strip_components: 2   # <-- docker/production 제거하고 파일만 target에 둠
+          overwrite: true
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -32,48 +34,40 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }} # 예: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
-          # port: 22
           script: |
             set -euo pipefail
 
-            # 0) 작업 디렉토리 보강
+            # 보장: 작업 디렉토리/파일 존재 확인
             mkdir -p ~/app/docker/production
-            cd ~/app/docker/production
+            ls -al ~/app/docker/production
+            test -f ~/app/docker/production/docker-compose.yml || { echo "ERROR: compose file missing"; exit 1; }
 
-            # 존재 확인 (디버그)
-            echo "== PWD: $(pwd)"
-            ls -al
-            test -f docker-compose.yml || { echo "ERROR: docker-compose.yml not found"; exit 1; }
-
-            # 1) GHCR 로그인
+            # GHCR 로그인
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            # 2) 이미지 태그 계산
+            # 배포 태그(태그 푸시만 동작한다는 가정)
             if [ "${{ github.ref_type }}" != "tag" ]; then
-              echo "Deploy runs on tag push or manual with input.tag"; exit 1
+              echo "Deploy runs only on tag push."; exit 1
             fi
             TAG="${{ github.ref_name }}"
 
-            # 2-1) compose 변수 주입 (compose에서 image: ghcr.io/${REPO_LC}/user-service:${TAG} 사용 시 필요)
-            export REPO_LC="${{ env.REPO_LC }}"
-            export TAG="$TAG"
-            # 또는 .env로 주입하려면 다음 줄 활성화:
-            # printf "REPO_LC=%s\nTAG=%s\n" "${{ env.REPO_LC }}" "$TAG" > .env
+            # compose 변수 주입 (.env로 고정)
+            printf "REPO_LC=%s\nTAG=%s\n" "${{ env.REPO_LC }}" "$TAG" > ~/app/docker/production/.env
+            cat ~/app/docker/production/.env
 
-            # 3) 이미지 풀 (선택) + 재기동
             IMAGE="ghcr.io/${{ env.REPO_LC }}/user-service:${TAG}"
             echo "Pulling IMAGE=${IMAGE}"
-            docker pull "$IMAGE" || true
+            docker pull "$IMAGE" || { echo "manifest not found: $IMAGE"; exit 1; }
 
-            docker compose down --remove-orphans || true
-            docker compose up -d --pull always --wait || docker compose up -d --pull always
+            # 절대경로로 compose 실행 (CWD 영향 제거)
+            docker compose -f ~/app/docker/production/docker-compose.yml down --remove-orphans || true
+            docker compose -f ~/app/docker/production/docker-compose.yml up -d --pull always --wait || \
+            docker compose -f ~/app/docker/production/docker-compose.yml up -d --pull always
 
-            # 4) 상태/로그 확인
             sleep 5
-            docker compose ps
-            docker compose logs --tail=200
+            docker compose -f ~/app/docker/production/docker-compose.yml ps
+            docker compose -f ~/app/docker/production/docker-compose.yml logs --tail=200
 
-            # 5) 디스크 정리
             docker image prune -f
 
       - name: Send Discord notification - Success
