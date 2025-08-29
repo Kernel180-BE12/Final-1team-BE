@@ -5,17 +5,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-/** Space 조회 응답 DTO **/
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class SpaceResponseDto {
-
+    private Long id;
     private String spaceName;
-    private List<Member> members;
-    private List<BigSendDto> bigSends;
+    private String adminName;
+    private String adminNum;
+    private String spaceEmail;
+    private String spaceUrl;
+    private String createAt;
+    private String updateAt;
+
 }
