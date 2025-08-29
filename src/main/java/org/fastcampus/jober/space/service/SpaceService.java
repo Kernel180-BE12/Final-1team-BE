@@ -2,7 +2,13 @@ package org.fastcampus.jober.space.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.fastcampus.jober.error.BusinessException;
+import org.fastcampus.jober.error.ErrorCode;
+import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceRequestDto;
+import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
@@ -18,60 +24,56 @@ public class SpaceService {
     private final SpaceRepository spaceRepository;
     private final SpaceMemberRepository spaceMemberRepository;
 
-    @Transactional
-    public SpaceResponseDto createSpace(SpaceRequestDto dto) {
-        // dto -> entity 변환
-        Space space = Space.builder()
-                .name(dto.getSpaceName())
-                .adminName(dto.getAdminName())
-                .adminNum(dto.getAdminNum())
-                .build();
+    public void createSpace(SpaceCreateRequestDto dto) {
+        if (dto.getSpaceName() == null || dto.getSpaceName().isBlank()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "스페이스 이름은 필수입니다.");
+        }
 
-        Space savedSpace = spaceRepository.save(space);
-
-        return toResponseDto(savedSpace);
+        Space space = dto.toEntity();
+        spaceRepository.save(space);
     }
 
-    @Transactional
-    public SpaceResponseDto updateSpace(Long id, SpaceRequestDto dto) {
-        if (!spaceRepository.existsById(id)) {
-            throw new IllegalArgumentException("존재하지 않는 스페이스입니다.");
+    public SpaceResponseDto updateSpace(Long id, SpaceUpdateRequestDto dto
+            , Authentication authentication) {
+
+        if (dto.getSpaceName() == null || dto.getSpaceName().isBlank()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "스페이스 이름은 필수입니다.");
         }
 
         // 데이터 조회
-        Space existingSpace = spaceRepository.findById(id).get();
+        Space existingSpace = spaceRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "존재하지 않는 스페이스입니다."));
+
+        // 수정 권한 체크
+        String currentUser = authentication.name();
+        if (!existingSpace.getAdminName().equals(currentUser)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "스페이스 수정 권한이 없습니다.");
+        }
 
         // 데이터 업데이트
-        existingSpace.setName(dto.getSpaceName());
-        existingSpace.setAdminName(dto.getAdminName());
-        existingSpace.setAdminNum(dto.getAdminNum());
+        existingSpace.updateSpaceInfo(dto.getSpaceName(), dto.getAdminName(), dto.getAdminNum());
 
-        // 저장
         Space updatedSpace = spaceRepository.save(existingSpace);
-
-        return toResponseDto(existingSpace);
+        return updatedSpace.toResponseDto();
     }
-
-    public List<SpaceResponseDto> findById(Long memberId) {
-        // 유저 아이디로 객체 조회한 목록
-        List<Space> spaces = spaceRepository.findById(memberId);
-        // 저장된 객체들 dto로 변경해서 담을 리스트
-        List<SpaceResponseDto> result = new ArrayList<>();
-
-        for (Space space : spaces) {
-            SpaceResponseDto dto = toResponseDto(space);
-            result.add(dto);
-        }
-        return result;
-    }
-
-    // entity -> dto 변환 메서드 => 엔티티에 넣기
-    private SpaceResponseDto toResponseDto(Space space) {
-        return new SpaceResponseDto(
-                space.getId(),
-                space.getName(),
-                List.of(),  // members
-                List.of()   // bigSends
-        );
-    }
+//
+//    // 특정 유저의 스페이스 목록 조회
+//    public List<SpaceResponseDto> findById(Long userId) {
+//        // 유저 아이디로 객체 조회한 목록
+//        List<Space> spaces = spaceRepository.findById(userId);
+//        // 저장된 객체들 dto로 변경해서 담을 리스트
+//        List<SpaceResponseDto> result = new ArrayList<>();
+//
+//        for (Space space : spaces) {
+//            SpaceResponseDto dto =
+//            result.add(dto);
+//        }
+//        return result;
+//    }
+//
+//    // 스페이스의 멤버목록 조회
+//    public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
+//        spaceMemberRepository.findById(spaceId);
+//        List<SpaceMemberResponseDto> result = new ArrayList<>();
+//    }
 }
