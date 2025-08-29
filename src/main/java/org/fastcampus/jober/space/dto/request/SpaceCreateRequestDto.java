@@ -1,7 +1,12 @@
 package org.fastcampus.jober.space.dto.request;
 
+import lombok.*;
 import org.fastcampus.jober.space.entity.Space;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SpaceCreateRequestDto {
     private String spaceName;
     private String adminName;
@@ -9,7 +14,7 @@ public class SpaceCreateRequestDto {
 
     public Space toEntity() {
         return Space.builder()
-                .name(this.spaceName)
+                .spaceName(this.spaceName)
                 .adminName(this.adminName)
                 .adminNum(this.adminNum)
                 .build();
