@@ -1,14 +1,18 @@
 package org.fastcampus.jober.space.controller;
 
-import org.apache.coyote.Response;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceRequestDto;
+import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
-import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.space.service.SpaceService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,44 +20,67 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// 각 예외처리 추가 예정
+@Tag(name = "Spaces", description = "스페이스 관련 API")
 @Controller
-@RequestMapping("/space")
+@RequestMapping("/spaces")
+@AllArgsConstructor
 public class SpaceController {
     private SpaceService spaceService;
 
-    public SpaceController(SpaceService spaceService) {
-        this.spaceService = spaceService;
+    @Operation(
+            summary = "스페이스 생성",
+            description = "새로운 스페이스를 생성합니다."
+    )
+    @ApiResponse(responseCode = "201", description = "스페이스 생성 성공")
+    @PostMapping
+    public ResponseEntity<Void> createSpace(@RequestBody SpaceCreateRequestDto dto) {
+        spaceService.createSpace(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/add-space")
-    public ResponseEntity<SpaceResponseDto> addSpace(@RequestBody SpaceRequestDto dto) {
-        SpaceResponseDto result = spaceService.createSpace(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
-    }
+    @Operation(
+            summary = "스페이스 수정",
+            description = "스페이스 정보를 수정합니다. (권한이 있는 사용자만 가능)"
+    )
+    @ApiResponse(responseCode = "200", description = "스페이스 수정 성공")
+    @ApiResponse(responseCode = "403", description = "권한 없음")
+    @ApiResponse(responseCode = "404", description = "스페이스 없음")
+    @PatchMapping("/{id}")
+    public ResponseEntity<SpaceResponseDto> updateSpace(
+            @PathVariable Long id,
+            @RequestBody SpaceUpdateRequestDto dto,
+            Authentication authentication) {
 
-    @PutMapping("/update-space")
-    public ResponseEntity<SpaceResponseDto> updateSpace(Long id, @RequestBody SpaceRequestDto dto) {
-        SpaceResponseDto result = spaceService.updateSpace(id, dto);
+        SpaceResponseDto result = spaceService.updateSpace(id, dto, authentication);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @PostMapping
-    public ResponseEntity<SpaceMemberResponseDto> addSpaceMember(
-            Long spaceId, @RequestBody SpaceMemberRequestDto dto) {
-        spaceService.addSpaceMember(spaceId, dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
-    }
-
-    @DeleteMapping
-    public ResponseEntity<SpaceMemberResponseDto> deleteSpaceMember(
-            Long spaceId, @RequestBody SpaceMemberRequestDto dto) {
-
-    }
-
-    @GetMapping
-    public ResponseEntity<List<SpaceResponseDto>> findAllSpace(Long memberId) {
-
-    }
+//    @PostMapping("/{spaceId}/members")
+//    public ResponseEntity<Void> addSpaceMember(
+//            @PathVariable Long spaceId, @RequestBody SpaceMemberRequestDto dto) {
+//       spaceService.addSpaceMember(spaceId, dto.getUserId());
+//       return ResponseEntity.status(HttpStatus.CREATED).build();
+//    }
+//
+//    @DeleteMapping("/{spaceId}/members/{userId}")
+//    public ResponseEntity<Void> deleteSpaceMember(
+//            @PathVariable Long spaceId,
+//            @PathVariable Long userId) {
+//        spaceService.deleteSpaceMember(spaceId, userId);
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//    }
+//
+//    @GetMapping("/user/{userId}")
+//    public ResponseEntity<List<SpaceResponseDto>> getUserSpace(@PathVariable Long userId) {
+//        List<SpaceResponseDto> result = SpaceService.getUserSpace(userId);
+//        return ResponseEntity.status(HttpStatus.OK).body(result);
+//    }
+//
+//    // 스페이스의 멤버 조회
+//    @GetMapping("/{spaceId}/members")
+//    public ResponseEntity<List<SpaceMemberResponseDto>> getSpaceMembers(@PathVariable Long spaceId) {
+//        List<SpaceMemberResponseDto> result = spaceService.getSpaceMembers(spaceId);
+//        return ResponseEntity.ok(result);
+//    }
 
 }
