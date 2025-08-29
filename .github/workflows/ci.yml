@@ -67,7 +67,7 @@ jobs:
         working-directory: .
 
       - name: Upload build artifacts
-        if: matrix.java-version == '21' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: matrix.java-version == '24' && github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
@@ -123,7 +123,7 @@ jobs:
           file: ./docker/production/Dockerfile 
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_LC }}/user-service:${{ github.ref_name }}
+            ghcr.io/${{ env.REPO_LC }}/user-service:latest
             ghcr.io/${{ env.REPO_LC }}/user-service:${{ github.sha }}
 
       - name: Analyze image layers

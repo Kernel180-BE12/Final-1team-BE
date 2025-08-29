@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     name: Deploy to AWS EC2
-    runs-on: ubuntu-24.04  # ubuntu-latest → ubuntu-24.04 로 고정
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -17,60 +17,54 @@ jobs:
       - name: Set repo lowercase
         run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
-      - name: Copy docker compose files to EC2
+      - name: Copy docker compose file to EC2 (flatten path)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ubuntu
+          username: ${{ secrets.SERVER_USER }} # 예: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker/production/docker-compose.yml"
-          target: "~/app"
+          target: "~/app/docker/production"
+          strip_components: 2   # <-- docker/production 제거하고 파일만 target에 둠
+          overwrite: true
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ubuntu               # 레포/환경에 따라 변경 가능 (예: ec2-user)
+          username: ${{ secrets.SERVER_USER }} # 예: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
-          # port: 22                     # SSH 포트가 다르면 추가
           script: |
             set -euo pipefail
 
-            # 0) 작업 디렉토리 보강 (복사 경로와 일치해야 함)
+            # 보장: 작업 디렉토리/파일 존재 확인
             mkdir -p ~/app/docker/production
-            cd ~/app/docker/production
+            ls -al ~/app/docker/production
+            test -f ~/app/docker/production/docker-compose.yml || { echo "ERROR: compose file missing"; exit 1; }
 
-            # 1) 레지스트리 로그인 (GHCR)
-            #    조직/권한 구조에 따라 GITHUB_TOKEN 대신 PAT(예: GHCR_TOKEN) 쓰는 게 더 안정적일 수 있음
+            # GHCR 로그인
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            # 2) 이미지/태그 계산
-            #    tag push로 트리거되면 해당 태그를, 수동 실행(workflow_dispatch)이면 latest를 사용
-            if [ "${{ github.ref_type }}" = "tag" ]; then
-              TAG="${{ github.ref_name }}"
-            else
-              TAG="latest"
-            fi
+            # 배포 태그(태그 푸시만 동작한다는 가정)
+            TAG="latest"
 
-            # 레포 경로(소문자)는 이전 step에서 $GITHUB_ENV로 주입됨
+            # compose 변수 주입 (.env로 고정)
+            printf "REPO_LC=%s\nTAG=%s\n" "${{ env.REPO_LC }}" "$TAG" > ~/app/docker/production/.env
+            cat ~/app/docker/production/.env
+
             IMAGE="ghcr.io/${{ env.REPO_LC }}/user-service:${TAG}"
+            echo "Pulling IMAGE=${IMAGE}"
+            docker pull "$IMAGE" || { echo "manifest not found: $IMAGE"; exit 1; }
 
-            # 3) 이미지 풀 (명시적 pull + compose의 --pull always 조합으로 안전)
-            docker pull "$IMAGE" || true
+            # 절대경로로 compose 실행 (CWD 영향 제거)
+            docker compose -f ~/app/docker/production/docker-compose.yml down --remove-orphans || true
+            docker compose -f ~/app/docker/production/docker-compose.yml up -d --pull always --wait || \
+            docker compose -f ~/app/docker/production/docker-compose.yml up -d --pull always
 
-            # 4) Compose 재기동
-            #    - 고아 컨테이너 정리(--remove-orphans)
-            #    - 최신 이미지 강제 확인(--pull always)
-            #    - 헬스체크가 있다면 준비될 때까지 대기(--wait, Compose v2.22+)
-            docker compose down --remove-orphans || true
-            docker compose up -d --pull always --wait || docker compose up -d --pull always
-
-            # 5) 상태/로그 확인
             sleep 5
-            docker compose ps
-            docker compose logs --tail=200
+            docker compose -f ~/app/docker/production/docker-compose.yml ps
+            docker compose -f ~/app/docker/production/docker-compose.yml logs --tail=200
 
-            # 6) 디스크 정리(댕글링 이미지)
             docker image prune -f
 
       - name: Send Discord notification - Success
