@@ -1,23 +1,28 @@
 package org.fastcampus.jober.space.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Getter;
+import org.fastcampus.jober.user.entity.Users;
 
 @Entity
+@Getter
 public class SpaceMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String authority;
-    private String status;
+    private Authority authority;
+    private InviteStatus inviteStatus;
     private String tag;
-    private String documentPermission;
-    private Long spaceId;
-    private Long userId;
 
-    // 상민님이 넣으셨다는데 뭔지 잘 모르겠고 우리가 구현할 땐 필요 없을듯
-//    private String inviteMethod;
+    // 관리자, 참여문서 관리자, 권한해제 3개인데 이걸 구현해야 할까........
+//    private String documentPermission;
+
+    @ManyToOne
+    @JoinColumn(name = "space_id")
+    private Space space;
+
+    @ManyToOne
+    @JoinColumn(name = "id")
+    private Users user;
 
 }
