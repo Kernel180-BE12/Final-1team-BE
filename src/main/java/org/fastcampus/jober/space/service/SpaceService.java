@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SpaceService {
     private final SpaceRepository spaceRepository;
-    private final SpaceMemberRepository spaceMemberRepository;
     private final SpaceMapper spaceMapper; // Mapper 주입
 
     @Transactional
