@@ -24,6 +24,10 @@ spring:
 springdoc:
   swagger-ui:
     enabled: true
+    csrf:
+      enabled: true
+      cookie-name: XSRF-TOKEN     # CookieCsrfTokenRepository의 기본 쿠키명
+      header-name: X-XSRF-TOKEN
 
 logging:
   config: classpath:log4j2-production.yml
