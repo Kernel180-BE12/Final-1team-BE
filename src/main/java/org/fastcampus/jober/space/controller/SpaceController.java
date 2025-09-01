@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.fastcampus.jober.space.dto.response.SpaceGetResponseDtd;
 import org.fastcampus.jober.user.entity.Users;
 import org.springframework.security.core.Authentication;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
@@ -64,9 +63,9 @@ public class SpaceController {
     public ResponseEntity<SpaceResponseDto> updateSpace(
             @PathVariable Long id,
             @RequestBody SpaceUpdateRequestDto dto,
-            Authentication authentication) {
+            Users user) {
 
-        SpaceResponseDto result = spaceService.updateSpace(id, dto, authentication);
+        SpaceResponseDto result = spaceService.updateSpace(id, dto, user);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
