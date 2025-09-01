@@ -55,7 +55,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf
                         .csrfTokenRequestHandler(requestHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions")
+                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**")
                 ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
                 .addFilterAfter(new CsrfCookieFilter(),
                         BasicAuthenticationFilter.class)
@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
                                 "/h2-console/**",
-                                "/swagger-ui.html", "/admin/sessions")
+                                "/swagger-ui.html", "/admin/sessions/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
