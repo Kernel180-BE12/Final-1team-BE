@@ -18,11 +18,11 @@ public class SpaceMember {
 //    private String documentPermission;
 
     @ManyToOne
-    @JoinColumn(name = "space_id")
+    @JoinColumn(name = "spaceId")
     private Space space;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "userId")
     private Users user;
 
 }
