@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Space Contact", description = "스페이스 연락처 관리 API")
 @RestController
-@RequestMapping("/api/space")
+@RequestMapping("/space")
 @RequiredArgsConstructor
 public class SpaceContactController {
 
@@ -24,7 +24,7 @@ public class SpaceContactController {
    * @return 추가된 연락처 정보와 등록 시간을 포함한 응답
    */
   @Operation(summary = "연락처 추가", description = "스페이스에 여러 연락처를 추가합니다.")
-  @PostMapping("/add-contact")
+  @PostMapping("/contact")
   public ResponseEntity<ContactResponseDto> addContacts(
       @RequestBody ContactRequestDto requestDto) {
     ContactResponseDto response = spaceContactService.addContacts(requestDto);
