@@ -66,7 +66,7 @@ class SpaceContactIntegrationTest {
         .build();
 
     // when & then
-    mockMvc.perform(post("/api/space/add-contact")
+    mockMvc.perform(post("/space/contact")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
         .andExpect(status().isOk())
@@ -106,11 +106,11 @@ class SpaceContactIntegrationTest {
         .build();
 
     // when & then
-    mockMvc.perform(post("/api/space/add-contact")
+    mockMvc.perform(post("/space/contact")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.contacts.length()").value(2)); // 기존 1개 + 새로 추가된 1개
+        .andExpect(jsonPath("$.contacts.length()").value(1)); // 새로 추가된 연락처만 반환
 
     // 데이터베이스 검증 - 기존 연락처가 유지되고 새로운 연락처가 추가됨
     assertThat(spaceContactsRepository.findBySpaceId(1L)).hasSize(2);
@@ -128,7 +128,7 @@ class SpaceContactIntegrationTest {
         .build();
 
     // when & then
-    mockMvc.perform(post("/api/space/add-contact")
+    mockMvc.perform(post("/space/contact")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
         .andExpect(status().isOk())

@@ -74,7 +74,7 @@ class SpaceContactControllerTest {
         .thenReturn(responseDto);
 
     // when & then
-    mockMvc.perform(post("/api/space/add-contact")
+    mockMvc.perform(post("/space/contact")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestDto)))
         .andExpect(status().isOk())
@@ -94,7 +94,7 @@ class SpaceContactControllerTest {
         .build();
 
     // when & then
-    mockMvc.perform(post("/api/space/add-contact")
+    mockMvc.perform(post("/space/contact")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
         .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
