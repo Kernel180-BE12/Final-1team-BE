@@ -2,7 +2,6 @@ package org.fastcampus.jober.space.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
-import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.entity.SpaceContacts;
 import org.fastcampus.jober.space.repository.SpaceContactsRepository;
 import org.junit.jupiter.api.BeforeEach;
