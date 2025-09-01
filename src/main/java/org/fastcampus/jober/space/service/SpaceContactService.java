@@ -8,7 +8,6 @@ import org.fastcampus.jober.space.repository.SpaceContactsRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,35 +29,16 @@ public class SpaceContactService {
    */
   @Transactional
   public ContactResponseDto addContacts(ContactRequestDto requestDto) {
-    // 새로운 연락처들 저장 (기존 연락처는 유지)
-    List<SpaceContacts> contacts = requestDto.getContacts().stream()
-        .map(contactInfo -> SpaceContacts.builder()
-            .name(contactInfo.getName())
-            .phoneNum(contactInfo.getPhoneNum())
-            .email(contactInfo.getEmail())
-            .spaceId(requestDto.getSpaceId())
-            .build())
+    // DTO를 엔티티로 변환하고 유효성 검증
+    List<SpaceContacts> contacts = requestDto.toEntities().stream()
+        .peek(SpaceContacts::validateContactInfo)
         .collect(Collectors.toList());
 
+    // 연락처 저장
     List<SpaceContacts> savedContacts = spaceContactsRepository.saveAll(contacts);
 
-    // 전체 연락처 목록 조회 (기존 + 새로 추가된 연락처)
-    List<SpaceContacts> allContacts = spaceContactsRepository.findBySpaceId(requestDto.getSpaceId());
-
     // 응답 DTO 생성
-    List<ContactResponseDto.ContactInfo> contactInfos = allContacts.stream()
-        .map(contact -> ContactResponseDto.ContactInfo.builder()
-            .id(contact.getId())
-            .name(contact.getName())
-            .phoneNum(contact.getPhoneNum())
-            .email(contact.getEmail())
-            .build())
-        .collect(Collectors.toList());
-
-    return ContactResponseDto.builder()
-        .spaceId(requestDto.getSpaceId())
-        .contacts(contactInfos)
-        .registeredAt(LocalDateTime.now())
-        .build();
+    return ContactResponseDto.fromEntities(savedContacts, requestDto.getSpaceId());
   }
+  
 }
