@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SpaceResponseDto {
-    private Long id;
+    private Long spaceId;
     private String spaceName;
     private String adminName;
     private String adminNum;
