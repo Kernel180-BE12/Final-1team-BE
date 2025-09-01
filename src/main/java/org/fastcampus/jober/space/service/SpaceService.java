@@ -2,12 +2,10 @@ package org.fastcampus.jober.space.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-//import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
-import org.fastcampus.jober.space.dto.response.SpaceGetResponseDtd;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.mapper.SpaceMapper;
@@ -15,11 +13,6 @@ import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.entity.Users;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.Authentication;
-
-import java.nio.file.AccessDeniedException;
-import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -46,17 +39,15 @@ public class SpaceService {
     }
 
     @Transactional
-    public SpaceResponseDto updateSpace(Long id, SpaceUpdateRequestDto dto, Authentication authentication) {
-
-        // 권한 체크
-//        Space AuthoritySpaceCheck = spaceMemberRepository.findBySpaceIdAndUserIdAndAuthority(
-//                id, authentication.getId, authentication.getAuthority)
-//                .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "권한이 없습니다."));
+    public SpaceResponseDto updateSpace(Long id, SpaceUpdateRequestDto dto, Users user) {
 
         // 데이터 조회
         Space existingSpace = spaceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "존재하지 않는 스페이스입니다."));
 
+        if (!existingSpace.getAdmin().getUserId().equals(user.getUserId())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "스페이스 수정은 관리자만 가능합니다.");
+        }
 
         spaceMapper.updateSpaceFromDto(dto, existingSpace);
 
@@ -66,11 +57,11 @@ public class SpaceService {
         return spaceMapper.toResponseDto(updatedSpace);
     }
 
-    public void deleteSpace(Long id, Users users) {
+    public void deleteSpace(Long id, Users user) {
         Space existingSpace = spaceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAD_REQUEST, "존재하지 않는 스페이스입니다."));
 
-        if (!existingSpace.getAdmin().equals(users.getId())) {
+        if (!existingSpace.getAdmin().getUserId().equals(user.getUserId())) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "스페이스 삭제는 관리자만 가능합니다.");
         }
 
