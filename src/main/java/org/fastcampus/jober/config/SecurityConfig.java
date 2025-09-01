@@ -26,6 +26,11 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 import static org.fastcampus.jober.common.EndpointGroup.PUBLIC;
 import static org.fastcampus.jober.common.EndpointGroup.USER;
@@ -38,7 +43,7 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
-    // 세션 모니터링용
+    // 세션 모니터링 + 관리용
     @Bean
     public SessionRegistry sessionRegistry() { return new SessionRegistryImpl(); }
 
@@ -51,11 +56,50 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var conf = new CorsConfiguration();
+        // ★ 배포 환경에선 와일드카드(*) 대신 '정확한 오리진'만 허용
+        conf.setAllowedOrigins(List.of("http://localhost:3000", "https://your-frontend.com"));
+        conf.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        conf.setAllowedHeaders(List.of("Content-Type","Authorization","X-XSRF-TOKEN"));
+        conf.setAllowCredentials(true); // 쿠키/인증 포함 요청이면 필수
+        // 필요 시 응답 헤더 노출
+        conf.setExposedHeaders(List.of("Location"));
+        // 프리플라이트 캐시 시간
+        conf.setMaxAge(3600L);
+
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", conf);
+        return source;
+    }
+
+    @Bean
+    OpenApiCustomizer logoutPathDoc() {
+        return openApi -> {
+            var pathItem = new PathItem().post(
+                    new Operation()
+                            .addTagsItem("User")
+                            .summary("로그아웃")
+                            .description("Security LogoutFilter가 처리합니다.")
+                            .addParametersItem(new HeaderParameter()
+                                    .name("X-XSRF-TOKEN").required(false).description("CSRF 보호용 토큰(쿠키와 동일값)")
+                                    .schema(new StringSchema()))
+                            .responses(new ApiResponses()
+                                    .addApiResponse("200", new ApiResponse().description("성공"))
+                                    .addApiResponse("403", new ApiResponse().description("CSRF 미설정/불일치")))
+            );
+            openApi.path("/user/logout", pathItem);
+        };
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
-        http.csrf(csrf -> csrf
+        http
+                .cors(_ -> {})
+                .csrf(csrf -> csrf
                         .csrfTokenRequestHandler(requestHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**")
@@ -101,24 +145,5 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    OpenApiCustomizer logoutPathDoc() {
-        return openApi -> {
-            var pathItem = new PathItem().post(
-                    new Operation()
-                            .addTagsItem("User")
-                            .summary("로그아웃")
-                            .description("Security LogoutFilter가 처리합니다.")
-                            .addParametersItem(new HeaderParameter()
-                                    .name("X-XSRF-TOKEN").required(false).description("CSRF 보호용 토큰(쿠키와 동일값)")
-                                    .schema(new StringSchema()))
-                            .responses(new ApiResponses()
-                                    .addApiResponse("200", new ApiResponse().description("성공"))
-                                    .addApiResponse("403", new ApiResponse().description("CSRF 미설정/불일치")))
-            );
-            openApi.path("/user/logout", pathItem);
-        };
     }
 }
