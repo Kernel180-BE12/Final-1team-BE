@@ -27,6 +27,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
+import static org.fastcampus.jober.common.EndpointGroup.PUBLIC;
+import static org.fastcampus.jober.common.EndpointGroup.USER;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -62,15 +65,10 @@ public class SecurityConfig {
                 // 2) H2 콘솔은 frame으로 열리므로 sameOrigin 필요
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,
-                                "/user/register",
-                                "/user/login")
-                        .permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
-                                "/h2-console/**",
-                                "/swagger-ui.html", "/admin/sessions/**")
-                        .permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(PUBLIC.getPatterns()).permitAll()
+                        .requestMatchers(HttpMethod.POST, USER.getPatterns()).permitAll()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)  // 폼 로그인 사용 안 함(우리는 JSON 엔드포인트 사용)
                 .httpBasic(AbstractHttpConfigurer::disable) // 테스트용/간단 API에서는 유용하지만, 여기선 세션 기반을 쓰므로 꺼둠
