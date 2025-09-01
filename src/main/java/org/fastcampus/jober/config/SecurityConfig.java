@@ -16,6 +16,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,7 +55,7 @@ public class SecurityConfig {
                 .addFilterAfter(new CsrfCookieFilter(),
                         BasicAuthenticationFilter.class)
                 // 2) H2 콘솔은 frame으로 열리므로 sameOrigin 필요
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST,
                                 "/user/register",
@@ -73,7 +74,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
-                        .logoutSuccessHandler((req, res, auth) -> {
+                        .logoutSuccessHandler((_, res, _) -> {
                             res.setContentType("application/json");
                             res.setStatus(200);
                             res.getWriter().write("{\"success\":true}");

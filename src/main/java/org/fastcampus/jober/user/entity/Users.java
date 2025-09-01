@@ -48,15 +48,15 @@ public class Users {
                 null);
     }
 
-    public static Users forUpdate(Users existing, String updatedBy) {
-        return new Users(
-                existing.username,
-                existing.password,
-                existing.name,
-                existing.email,
-                existing.registeredAt,
-                LocalDateTime.now(),
-                updatedBy
-        );
-    }
+//    public static Users forUpdate(Users existing, String updatedBy) {
+//        return new Users(
+//                existing.username,
+//                existing.password,
+//                existing.name,
+//                existing.email,
+//                existing.registeredAt,
+//                LocalDateTime.now(),
+//                updatedBy
+//        );
+//    }
 }

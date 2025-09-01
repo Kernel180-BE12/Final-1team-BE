@@ -17,7 +17,7 @@ public class PasswordHashing {
         return encoder.encode(rawPassword);
     }
 
-    public static boolean matches(String rawPassword, String encoded) {
-        return encoder.matches(rawPassword, encoded);
-    }
+//    public static boolean matches(String rawPassword, String encoded) {
+//        return encoder.matches(rawPassword, encoded);
+//    }
 }
