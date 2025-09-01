@@ -17,6 +17,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +35,10 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
+    // 세션 모니터링용
+    @Bean
+    public SessionRegistry sessionRegistry() { return new SessionRegistryImpl(); }
+
     @Bean
     public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -46,11 +52,10 @@ public class SecurityConfig {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
-        return http
-                .csrf(csrf -> csrf
+        http.csrf(csrf -> csrf
                         .csrfTokenRequestHandler(requestHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/h2-console/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions")
                 ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
                 .addFilterAfter(new CsrfCookieFilter(),
                         BasicAuthenticationFilter.class)
@@ -63,7 +68,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
                                 "/h2-console/**",
-                                "/swagger-ui.html")
+                                "/swagger-ui.html", "/admin/sessions")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
@@ -80,7 +85,16 @@ public class SecurityConfig {
                             res.getWriter().write("{\"success\":true}");
                         })
                 )
-                .build();
+                .sessionManagement(session -> session
+                        // 필요시 세션 정책도 지정:
+                        // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionConcurrency(concurrency -> concurrency
+                                .maximumSessions(-1)               // 제한 없음
+                                .sessionRegistry(sessionRegistry()) // SessionRegistry 빈 사용
+                        )
+                );
+
+        return http.build();
     }
 
     @Bean

@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final SessionRegistry sessionRegistry;
 
     @PostMapping("/register")
     @Operation(
@@ -61,9 +63,11 @@ public class UserController {
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
 
-        HttpSession session = request.getSession(true);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+        // 세션 고정 공격 방지
         request.changeSessionId();
+
+        HttpSession session = request.getSession(false);
+        sessionRegistry.registerNewSession(session.getId(), auth.getPrincipal());
 
         UserDetails principal = (UserDetails) auth.getPrincipal();
         String username = principal.getUsername();
