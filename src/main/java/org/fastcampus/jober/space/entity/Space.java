@@ -19,7 +19,8 @@ import java.util.List;
 public class Space {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private Long spaceId;
 
     @NotBlank(message = "스페이스 이름은 필수입니다.")
     private String spaceName;
