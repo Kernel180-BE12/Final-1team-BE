@@ -76,15 +76,23 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // 테스트용/간단 API에서는 유용하지만, 여기선 세션 기반을 쓰므로 꺼둠
                 .logout(l -> l
                         .logoutUrl("/user/logout")     // POST
+                        // 1) 세션레지스트리에서 제거
+                        .addLogoutHandler((request, response, authentication) -> {
+                            var session = request.getSession(false);
+                            if (session != null) {
+                                sessionRegistry().removeSessionInformation(session.getId());
+                            }
+                        })
+                        // 2) 표준 처리
                         .deleteCookies("JSESSIONID")
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
-                        .logoutSuccessHandler((_, res, _) -> {
+                        // 3) JSON 응답
+                        .logoutSuccessHandler((req, res, auth) -> {
                             res.setContentType("application/json");
                             res.setStatus(200);
                             res.getWriter().write("{\"success\":true}");
-                        })
-                )
+                        }))
                 .sessionManagement(session -> session
                         // 필요시 세션 정책도 지정:
                         // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
