@@ -6,16 +6,22 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.filter.CsrfCookieFilter;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -26,6 +32,8 @@ import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
+import java.util.Set;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,8 +49,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(encoder);
         return new ProviderManager(provider); // parent 미지정 (null)
     }
@@ -51,6 +58,23 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
+
+        final Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>
+                authorizationManagerRequestMatcherRegistryCustomizer = auth -> auth
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/user/register",
+                        "/user/login"
+                )
+                .permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
+                                 "/h2-console/**",
+                                 "/swagger-ui.html", "/admin/sessions/**"
+                )
+                .permitAll()
+                .anyRequest().authenticated();
+
+        // 열거형 상수 enum - 고정값, 내부에 변수 선언 또는 메서드 구현이 가능한 상수, 타입검사 가능, 추상 메서드 사용 가능
 
         http.csrf(csrf -> csrf
                         .csrfTokenRequestHandler(requestHandler)
@@ -61,21 +85,11 @@ public class SecurityConfig {
                         BasicAuthenticationFilter.class)
                 // 2) H2 콘솔은 frame으로 열리므로 sameOrigin 필요
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,
-                                "/user/register",
-                                "/user/login")
-                        .permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
-                                "/h2-console/**",
-                                "/swagger-ui.html", "/admin/sessions/**")
-                        .permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistryCustomizer
                 )
                 .formLogin(AbstractHttpConfigurer::disable)  // 폼 로그인 사용 안 함(우리는 JSON 엔드포인트 사용)
                 .httpBasic(AbstractHttpConfigurer::disable) // 테스트용/간단 API에서는 유용하지만, 여기선 세션 기반을 쓰므로 꺼둠
-                .logout(l -> l
-                        .logoutUrl("/user/logout")     // POST
+                .logout(l -> l.logoutUrl("/user/logout")     // POST
                         // 1) 세션레지스트리에서 제거
                         .addLogoutHandler((request, response, authentication) -> {
                             var session = request.getSession(false);
@@ -89,8 +103,8 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         // 3) JSON 응답
                         .logoutSuccessHandler((req, res, auth) -> {
-                            res.setContentType("application/json");
-                            res.setStatus(200);
+                            res.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            res.setStatus(HttpStatus.OK.value());
                             res.getWriter().write("{\"success\":true}");
                         }))
                 .sessionManagement(session -> session

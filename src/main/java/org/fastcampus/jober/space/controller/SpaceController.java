@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.fastcampus.jober.user.entity.Users;
 import org.springframework.security.core.Authentication;
@@ -31,7 +32,7 @@ public class SpaceController {
     )
     @ApiResponse(responseCode = "201", description = "스페이스 생성 성공")
     @PostMapping
-    public ResponseEntity<Void> createSpace(@RequestBody SpaceCreateRequestDto dto) {
+    public ResponseEntity<Void> createSpace(@Valid @RequestBody SpaceCreateRequestDto dto) {
         spaceService.createSpace(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
