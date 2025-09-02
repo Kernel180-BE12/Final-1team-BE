@@ -43,5 +43,6 @@ security:
     - /swagger-ui/**
     - /v3/api-docs/**
     - /auth/**
+    - /h2-console/**
   permit-post-user:
     - /users
