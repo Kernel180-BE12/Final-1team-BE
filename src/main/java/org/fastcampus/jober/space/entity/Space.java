@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.user.entity.Users;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -38,6 +35,11 @@ public class Space {
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL)
     private List<SpaceMember> spaceMembers;
+
+    public boolean isAdminUser(final Users user) {
+        return this.admin.getUserId().equals(user.getUserId());
+    }
+
 
     // 이 아래로 꼭 필요할지?
 //    private String faxNum;
