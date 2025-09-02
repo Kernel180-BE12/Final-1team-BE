@@ -40,4 +40,5 @@ security:
     - /auth/**
     - /h2-console/**
   permit-post-user:
-    - /users
+    - /user/register
+    - /user/login
