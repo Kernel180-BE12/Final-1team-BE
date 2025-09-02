@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 템플릿 비즈니스 로직을 처리하는 서비스
@@ -34,13 +33,7 @@ public class TemplateService {
     public List<TemplateTitleResponseDto> getTitlesBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) Long spaceId
     ) {
-        List<String> titles = templateRepository.findTitlesBySpaceId(spaceId);
-        
-        return titles.stream()
-                .map(title -> TemplateTitleResponseDto.builder()
-                        .title(title)
-                        .build())
-                .collect(Collectors.toList());
+        return Template.findTitlesBySpaceId(templateRepository, spaceId);
     }
     
     /**
@@ -55,6 +48,6 @@ public class TemplateService {
     public List<Template> getTemplatesBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) Long spaceId
     ) {
-        return templateRepository.findBySpaceId(spaceId);
+        return Template.findBySpaceId(templateRepository, spaceId);
     }
 }
