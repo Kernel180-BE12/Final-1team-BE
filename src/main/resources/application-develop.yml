@@ -31,3 +31,13 @@ logging:
     org.springframework.security: DEBUG
     com.movement.mvp: DEBUG
     org.springframework.web.multipart: DEBUG
+
+security:
+  permit-all:
+    - /actuator/health
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /auth/**
+    - /h2-console/**
+  permit-post-user:
+    - /users
