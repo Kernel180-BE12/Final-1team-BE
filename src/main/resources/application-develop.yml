@@ -36,3 +36,12 @@ logging:
 ai:
   flask:
     base-url: http://localhost:5000  # AI Flask 서버 URL (추후 실제 URL로 변경)
+
+security:
+  permit-all:
+    - /actuator/health
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /auth/**
+  permit-post-user:
+    - /users
