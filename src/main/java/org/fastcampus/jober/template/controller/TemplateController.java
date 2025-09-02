@@ -1,10 +1,11 @@
 package org.fastcampus.jober.template.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.service.TemplateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class TemplateController {
      * 사용자의 메시지를 받아서 AI Flask 서버로 전달하고, 
      * 생성된 템플릿 내용을 반환합니다.
      * 
-     * @param message 사용자가 입력한 템플릿 생성 요청 메시지
+     * @param request 템플릿 생성 요청 DTO (사용자 메시지 포함)
      * @return AI가 생성한 템플릿 내용 (String 형태)
      */
     @Operation(
@@ -35,15 +36,17 @@ public class TemplateController {
         description = "사용자 메시지를 기반으로 AI가 템플릿을 생성합니다. " +
                      "리액트에서 사용자 입력을 받아 AI Flask 서버로 전달하는 중간다리 역할을 합니다."
     )
-    @GetMapping("/create-template")
+    @PostMapping("/create-template")
     public ResponseEntity<String> createTemplate(
-            @Parameter(description = "템플릿 생성을 위한 사용자 메시지", required = true, example = "마케팅용 카카오 알림톡 템플릿을 만들어주세요")
-            @RequestParam String message) {
+            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                description = "템플릿 생성 요청 정보", 
+                required = true
+            ) TemplateCreateRequestDto request) {
         
-        log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}", message);
+        log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}", request.getMessage());
         
         // TemplateService를 통해 AI Flask 서버로 요청 전달
-        String templateContent = templateService.createTemplate(message);
+        String templateContent = templateService.createTemplate(request.getMessage());
         
         log.info("템플릿 생성 완료 - 응답 길이: {} 문자", templateContent != null ? templateContent.length() : 0);
         
