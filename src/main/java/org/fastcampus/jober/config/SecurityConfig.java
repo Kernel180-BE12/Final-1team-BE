@@ -49,8 +49,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(encoder);
         return new ProviderManager(provider); // parent 미지정 (null)
     }
@@ -119,7 +118,7 @@ public class SecurityConfig {
                 .logout(l -> l
                         .logoutUrl("/user/logout")     // POST
                         // 1) 세션레지스트리에서 제거
-                        .addLogoutHandler((request, response, authentication) -> {
+                        .addLogoutHandler((request, _, _) -> {
                             var session = request.getSession(false);
                             if (session != null) {
                                 sessionRegistry().removeSessionInformation(session.getId());
@@ -130,7 +129,7 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                         // 3) JSON 응답
-                        .logoutSuccessHandler((req, res, auth) -> {
+                        .logoutSuccessHandler((_, res, _) -> {
                             res.setContentType("application/json");
                             res.setStatus(200);
                             res.getWriter().write("{\"success\":true}");
