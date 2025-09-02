@@ -35,3 +35,14 @@ logging:
     org.springframework.security: INFO
     com.movement.mvp: INFO
     org.springframework.web.multipart: INFO
+
+security:
+  permit-all:
+    - "/swagger-ui/**"
+    - "/v3/api-docs/**"
+    - "/h2-console/**"
+    - "/swagger-ui.html"
+    - "/admin/sessions/**"
+  permit-post-user:
+    - "/user/register"
+    - "/user/login"
