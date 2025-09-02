@@ -1,4 +1,4 @@
-package org.fastcampus.jober.common.entity;
+package org.fastcampus.jober.space.common.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

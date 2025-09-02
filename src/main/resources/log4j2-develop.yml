@@ -72,7 +72,7 @@ Configuration:
 
     Logger:
       # 애플리케이션 핵심
-      - name: org.fastcampus.jober
+      - name: com.movement.mvp
         additivity: "false"
         level: DEBUG
         AppenderRef:

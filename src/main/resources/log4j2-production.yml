@@ -21,18 +21,6 @@ Configuration:
         value: ${log-path}/base/json-info.log
       - name: "archive-path"
         value: ${log-path}/archive
-      - name: "jdbc-driver"
-        value: "${spring:spring.datasource.driver-class-name}"
-      - name: "jdbc-url"
-        value: "${spring:spring.datasource.url}"
-      - name: "jdbc-user"
-        value: "${spring:spring.datasource.username}"
-      - name: "jdbc-pass"
-        value: "${spring:spring.datasource.password}"
-      - name: "db-table"
-        value: "log_table"
-      - name: "db-layout-pattern"
-        value: "[%X{id}] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
 
   Appenders:
     Console:
@@ -75,44 +63,22 @@ Configuration:
         PatternLayout:
           pattern: ${file-layout-pattern}
 
-    JDBC:
-      name: db-appender
-      tableName: ${db-table}
-      bufferSize: 0
-      DriverManager:
-        driverClassName: ${jdbc-driver}
-        connectionString: ${jdbc-url}
-        userName: ${jdbc-user}
-        password: ${jdbc-pass}
-      Column:
-        - name: created_at
-          isEventTimestamp: true
-        - name: contents
-          pattern: ${db-layout-pattern}
-
-    Async:
-      name: async-db-appender
-      AppenderRef:
-        - ref: db-appender
-
   Loggers:
     Root:
       level: WARN
       AppenderRef:
         - ref: console-appender
         - ref: rolling-file-appender
-        - ref: async-db-appender
 
     Logger:
       # 애플리케이션 핵심
-      - name: org.fastcampus.jober
+      - name: com.movement.mvp
         additivity: "false"
         level: INFO
         AppenderRef:
           - ref: console-appender
           - ref: file-info-appender
           - ref: file-error-appender
-          - ref: async-db-appender
 
       # Spring Security (감사/인증)
       - name: org.springframework.security
@@ -129,7 +95,6 @@ Configuration:
         AppenderRef:
           - ref: console-appender
           - ref: file-info-appender
-          - ref: async-db-appender
 
       # 트랜잭션
       - name: org.springframework.transaction

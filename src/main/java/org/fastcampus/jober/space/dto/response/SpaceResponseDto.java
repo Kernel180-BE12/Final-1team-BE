@@ -1,23 +1,6 @@
 package org.fastcampus.jober.space.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+// sample
+// 필요한 DTO 따로 만들어서 사용하기
 public class SpaceResponseDto {
-    private Long spaceId;
-    private String spaceName;
-    private String adminName;
-    private String adminNum;
-    private String spaceEmail;
-    private String spaceUrl;
-    private String createAt;
-    private String updateAt;
-
 }
