@@ -6,9 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.fastcampus.jober.user.entity.Users;
-import org.springframework.security.core.Authentication;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
@@ -31,7 +31,7 @@ public class SpaceController {
     )
     @ApiResponse(responseCode = "201", description = "스페이스 생성 성공")
     @PostMapping
-    public ResponseEntity<Void> createSpace(@RequestBody SpaceCreateRequestDto dto) {
+    public ResponseEntity<Void> createSpace(@Valid @RequestBody SpaceCreateRequestDto dto) {
         spaceService.createSpace(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -62,10 +62,9 @@ public class SpaceController {
     @PatchMapping("/{id}")
     public ResponseEntity<SpaceResponseDto> updateSpace(
             @PathVariable Long id,
-            @RequestBody SpaceUpdateRequestDto dto,
-            Users user) {
+            @Valid @RequestBody SpaceUpdateRequestDto dto) {
 
-        SpaceResponseDto result = spaceService.updateSpace(id, dto, user);
+        SpaceResponseDto result = spaceService.updateSpace(id, dto);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
