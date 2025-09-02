@@ -31,12 +31,12 @@ public class TemplateController {
     
     /**
      * GET 방식으로 spaceId를 받아서 해당 spaceId의 템플릿 title들을 조회하는 API
-     * @param spaceId 스페이스 ID (0이 아닌 값)
+     * @param spaceId 스페이스 ID
      * @return 템플릿 제목 리스트
      */
     @Operation(
         summary = "템플릿 제목 조회",
-        description = "특정 spaceId의 템플릿 제목들을 조회합니다. spaceId는 0이 아닌 값이어야 합니다."
+        description = "특정 spaceId의 템플릿 제목들을 조회합니다."
     )
     @ApiResponses({
         @ApiResponse(
@@ -50,10 +50,6 @@ public class TemplateController {
             )
         ),
         @ApiResponse(
-            responseCode = "400",
-            description = "잘못된 요청 (spaceId가 0인 경우)"
-        ),
-        @ApiResponse(
             responseCode = "404",
             description = "해당 spaceId의 템플릿을 찾을 수 없음"
         )
@@ -61,13 +57,13 @@ public class TemplateController {
     @GetMapping("/{spaceId}")
     public ResponseEntity<List<TemplateTitleResponseDto>> getTemplateTitlesBySpaceId(
         @Parameter(
-            description = "스페이스 ID (0이 아닌 값)",
+            description = "스페이스 ID",
             required = true,
             example = "1"
         )
         @PathVariable(name = "spaceId") Long spaceId
     ) {
-        List<TemplateTitleResponseDto> titles = templateService.getTitlesBySpaceIdNotZero(spaceId);
+        List<TemplateTitleResponseDto> titles = templateService.getTitlesBySpaceId(spaceId);
         return ResponseEntity.ok(titles);
     }
 }

@@ -23,23 +23,18 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     
     /**
-     * spaceID가 0이 아닌 템플릿들의 title만 조회
-     * @param spaceId 스페이스 ID (0이 아닌 값)
+     * 특정 spaceId의 템플릿들의 title만 조회
+     * @param spaceId 스페이스 ID
      * @return 템플릿 제목 응답 DTO 리스트
      */
     @Operation(
         summary = "템플릿 제목 조회",
-        description = "spaceID가 0이 아닌 특정 spaceId의 템플릿 제목들을 조회합니다."
+        description = "특정 spaceId의 템플릿 제목들을 조회합니다."
     )
-    public List<TemplateTitleResponseDto> getTitlesBySpaceIdNotZero(
-        @Parameter(description = "스페이스 ID (0이 아닌 값)", required = true) Long spaceId
+    public List<TemplateTitleResponseDto> getTitlesBySpaceId(
+        @Parameter(description = "스페이스 ID", required = true) Long spaceId
     ) {
-        // spaceId가 0인지 검증
-        if (spaceId == null || spaceId == 0L) {
-            throw new IllegalArgumentException("spaceId는 0이 아닌 값이어야 합니다.");
-        }
-        
-        List<String> titles = templateRepository.findTitlesBySpaceIdNotZero(spaceId);
+        List<String> titles = templateRepository.findTitlesBySpaceId(spaceId);
         
         return titles.stream()
                 .map(title -> TemplateTitleResponseDto.builder()
@@ -49,22 +44,17 @@ public class TemplateService {
     }
     
     /**
-     * spaceID가 0이 아닌 템플릿들을 조회
-     * @param spaceId 스페이스 ID (0이 아닌 값)
+     * 특정 spaceId의 템플릿들을 조회
+     * @param spaceId 스페이스 ID
      * @return 템플릿 엔티티 리스트
      */
     @Operation(
         summary = "템플릿 엔티티 조회",
-        description = "spaceID가 0이 아닌 특정 spaceId의 템플릿들을 조회합니다."
+        description = "특정 spaceId의 템플릿들을 조회합니다."
     )
-    public List<Template> getTemplatesBySpaceIdNotZero(
-        @Parameter(description = "스페이스 ID (0이 아닌 값)", required = true) Long spaceId
+    public List<Template> getTemplatesBySpaceId(
+        @Parameter(description = "스페이스 ID", required = true) Long spaceId
     ) {
-        // spaceId가 0인지 검증
-        if (spaceId == null || spaceId == 0L) {
-            throw new IllegalArgumentException("spaceId는 0이 아닌 값이어야 합니다.");
-        }
-        
-        return templateRepository.findBySpaceIdNotZero(spaceId);
+        return templateRepository.findBySpaceId(spaceId);
     }
 }
