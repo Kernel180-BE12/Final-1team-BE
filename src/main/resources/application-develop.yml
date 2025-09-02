@@ -31,3 +31,8 @@ logging:
     org.springframework.security: DEBUG
     com.movement.mvp: DEBUG
     org.springframework.web.multipart: DEBUG
+
+# AI Flask 서버 설정
+ai:
+  flask:
+    base-url: http://localhost:5000  # AI Flask 서버 URL (추후 실제 URL로 변경)
