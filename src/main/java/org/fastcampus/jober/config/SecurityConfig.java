@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.fastcampus.jober.common.SecurityProps;
 import org.fastcampus.jober.filter.CsrfCookieFilter;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -32,13 +33,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-import static org.fastcampus.jober.common.EndpointGroup.PUBLIC;
-import static org.fastcampus.jober.common.EndpointGroup.USER;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
+    private final SecurityProps props;
 
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
@@ -109,8 +109,8 @@ public class SecurityConfig {
                 // 2) H2 콘솔은 frame으로 열리므로 sameOrigin 필요
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC.getPatterns()).permitAll()
-                        .requestMatchers(HttpMethod.POST, USER.getPatterns()).permitAll()
+                        .requestMatchers(props.getPermitAll().toArray(String[]::new)).permitAll()
+                        .requestMatchers(HttpMethod.POST, props.getPermitPostUser().toArray(String[]::new)).permitAll()
                         .anyRequest()
                         .authenticated()
                 )
