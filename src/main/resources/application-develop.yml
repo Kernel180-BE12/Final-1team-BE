@@ -18,6 +18,10 @@ spring:
 springdoc:
   swagger-ui:
     enabled: true
+    csrf:
+      enabled: true
+      cookie-name: XSRF-TOKEN     # CookieCsrfTokenRepository의 기본 쿠키명
+      header-name: X-XSRF-TOKEN
   api-docs:
     enabled: true
 
@@ -27,3 +31,19 @@ logging:
     org.springframework.security: DEBUG
     com.movement.mvp: DEBUG
     org.springframework.web.multipart: DEBUG
+
+# AI Flask 서버 설정
+ai:
+  flask:
+    base-url: http://15.164.102.187:8000  # AI Flask 서버 URL (추후 실제 URL로 변경)
+
+security:
+  permit-all:
+    - /actuator/health
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /auth/**
+    - /h2-console/**
+  permit-post-user:
+    - /user/register
+    - /user/login

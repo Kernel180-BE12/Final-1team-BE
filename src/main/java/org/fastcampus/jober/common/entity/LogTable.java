@@ -1,4 +1,4 @@
-package org.fastcampus.jober.space.common.entity;
+package org.fastcampus.jober.common.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +12,8 @@ public class LogTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDateTime createdAt;
+
     private String contents;
 }

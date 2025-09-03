@@ -4,19 +4,55 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import jakarta.persistence.*;
+import org.fastcampus.jober.common.entity.BaseEntity;
 
-import java.time.LocalDateTime;
 
 @Entity
-public class Users {
+@Getter
+public class Users extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private Long userId;
+
     private String username;
+
     private String password;
+
     private String name;
+
     private String email;
-    private LocalDateTime registeredAt;
-    private LocalDateTime updatedAt;
-    private String updatedBy;
+
+    // ✅ 기본 생성자 (JPA 필수)
+    protected Users() {}
+
+    // ✅ private 생성자
+    private Users(String username, String password, String name, String email) {
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+    }
+
+    // ✅ 상황별 팩토리 메서드
+    public static Users forSignup(String username, String password, String name, String email) {
+        return new Users(username,
+                password,
+                name,
+                email);
+    }
+
+//    public static Users forUpdate(Users existing, String updatedBy) {
+//        return new Users(
+//                existing.username,
+//                existing.password,
+//                existing.name,
+//                existing.email,
+//                existing.registeredAt,
+//                LocalDateTime.now(),
+//                updatedBy
+//        );
+//    }
 }
