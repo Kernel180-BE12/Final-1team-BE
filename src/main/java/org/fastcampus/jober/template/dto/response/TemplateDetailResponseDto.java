@@ -18,7 +18,6 @@ public class TemplateDetailResponseDto {
     private Long spaceId;
     private String title;
     private String status;
-    private Long kakaoTemplateId;
     private String extractedVariables;
     // 상세 조회에서 생성일시(completedAt) 조회 제외 - 사용자 요구사항에 따라 제외
     // private LocalDateTime completedAt; 
@@ -45,7 +44,6 @@ public class TemplateDetailResponseDto {
                 .spaceId(template.getSpaceId())
                 .title(template.getTitle())
                 .status(template.getStatus() != null ? template.getStatus().name() : null)
-                .kakaoTemplateId(template.getKakaoTemplateId())
                 .extractedVariables(template.getExtractedVariables())
                 .sessionId(template.getSessionId())
                 .finalTemplate(template.getFinalTemplate())

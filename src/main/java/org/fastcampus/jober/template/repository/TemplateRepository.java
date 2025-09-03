@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 import java.util.List;
 
 /**
@@ -43,6 +45,9 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
     List<Template> findBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId
     );
+
+    Optional<Template> findByIdAndSpaceId(Long id, Long spaceId);
+
 
     /**
      * 특정 spaceId와 templateId의 템플릿을 조회

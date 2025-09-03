@@ -3,7 +3,6 @@ package org.fastcampus.jober.template.controller;
 /**
  * 템플릿 관련 HTTP 요청을 처리하는 컨트롤러
  */
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +19,13 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.service.TemplateService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
 
 /**
  * 템플릿 관련 REST API를 제공하는 컨트롤러 클래스
@@ -149,5 +148,26 @@ public class TemplateController {
         
         return ResponseEntity.ok(aiResponse);
 
+    }
+
+    @PatchMapping("/{templateId}/space/{spaceId}")
+    @Operation(
+            summary = "템플릿 저장 상태 변경",
+            description = "특정 스페이스의 템플릿 저장 여부(`isSaved`)를 업데이트합니다. " +
+                    "예를 들어 `isSaved=true`로 호출하면 해당 템플릿은 저장된 상태로 변경됩니다."
+    )
+    @ApiResponse(responseCode = "200", description = "성공적으로 저장 상태가 변경됨")
+    @ApiResponse(responseCode = "404", description = "템플릿을 찾을 수 없음")
+    public ResponseEntity<Boolean> saveTemplate(
+            @Parameter(description = "템플릿 ID", required = true, example = "1")
+            @PathVariable Long templateId,
+
+            @Parameter(description = "스페이스 ID", required = true, example = "10")
+            @PathVariable Long spaceId,
+
+            @Parameter(description = "저장 여부 (true=저장, false=삭제)", required = true, example = "true")
+            @RequestParam Boolean isSaved) {
+        Boolean result = templateService.saveTemplate(templateId, spaceId, isSaved);
+        return ResponseEntity.ok(result);
     }
 }

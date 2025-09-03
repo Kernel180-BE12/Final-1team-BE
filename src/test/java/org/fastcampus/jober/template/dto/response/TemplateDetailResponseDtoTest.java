@@ -19,7 +19,6 @@ class TemplateDetailResponseDtoTest {
                 .spaceId(100L)
                 .title("테스트 템플릿")
                 .status(Status.APPROVED_MOCK)
-                .kakaoTemplateId(12345L)
                 .extractedVariables("{\"name\": \"value\"}")
                 .sessionId("session123")
                 .finalTemplate("최종 템플릿 내용")
@@ -39,7 +38,6 @@ class TemplateDetailResponseDtoTest {
         assertThat(dto.getSpaceId()).isEqualTo(100L);
         assertThat(dto.getTitle()).isEqualTo("테스트 템플릿");
         assertThat(dto.getStatus()).isEqualTo("APPROVED_MOCK");
-        assertThat(dto.getKakaoTemplateId()).isEqualTo(12345L);
         assertThat(dto.getExtractedVariables()).isEqualTo("{\"name\": \"value\"}");
         assertThat(dto.getSessionId()).isEqualTo("session123");
         assertThat(dto.getFinalTemplate()).isEqualTo("최종 템플릿 내용");

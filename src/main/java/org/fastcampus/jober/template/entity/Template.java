@@ -34,9 +34,6 @@ public class Template extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status; //상태
 
-    @Column(length=80)
-    private Long kakaoTemplateId; //카카오 실제 템플릿 id
-
     @Column(columnDefinition ="JSON" )
     private String extractedVariables; //태그json
 
@@ -52,10 +49,10 @@ public class Template extends BaseEntity {
 
     private Integer totalAttempts;
 
-    private Boolean isSaved;
+    private Boolean isSaved; // 0:저장안됨 / 1:저장됨
 
     private Boolean isAccepted;
-    
+
     /**
      * 이 템플릿의 제목만 추출합니다.
      * @return 템플릿 제목
@@ -63,7 +60,7 @@ public class Template extends BaseEntity {
     public String extractTitle() {
         return this.title;
     }
-    
+
     /**
      * 템플릿 리스트에서 제목들만 추출합니다.
      * @param templates 템플릿 리스트
@@ -78,7 +75,7 @@ public class Template extends BaseEntity {
                 .map(Template::extractTitle)
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * 특정 spaceId에 속하는 템플릿들을 필터링합니다.
      * @param templates 템플릿 리스트
@@ -94,7 +91,7 @@ public class Template extends BaseEntity {
                 .filter(template -> spaceId.equals(template.getSpaceId()))
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * 이 템플릿이 특정 spaceId에 속하는지 확인합니다.
      * @param spaceId 스페이스 ID
@@ -106,7 +103,7 @@ public class Template extends BaseEntity {
         }
         return this.spaceId.equals(spaceId);
     }
-    
+
     /**
      * 특정 spaceId의 템플릿들을 조회하고 DTO로 변환합니다.
      * @param repository TemplateRepository
@@ -114,7 +111,7 @@ public class Template extends BaseEntity {
      * @return TemplateTitleResponseDto 리스트
      */
     public static List<TemplateTitleResponseDto> findTitlesBySpaceId(
-            org.fastcampus.jober.template.repository.TemplateRepository repository, 
+            org.fastcampus.jober.template.repository.TemplateRepository repository,
             Long spaceId) {
         return TemplateTitleResponseDto.fromTitleList(repository.findTitlesBySpaceId(spaceId));
     }
@@ -131,6 +128,11 @@ public class Template extends BaseEntity {
         return repository.findBySpaceId(spaceId);
     }
 
+    public Boolean updateIsSaved(Boolean isSaved) {
+        this.isSaved = isSaved;
+        return this.isSaved;
+    }
+
     /**
      * 특정 spaceId와 templateId의 템플릿을 조회합니다.
      * @param repository TemplateRepository
@@ -139,8 +141,8 @@ public class Template extends BaseEntity {
      * @return Template 엔티티
      */
     public static Template findBySpaceIdAndTemplateId(
-            org.fastcampus.jober.template.repository.TemplateRepository repository, 
-            Long spaceId, 
+            org.fastcampus.jober.template.repository.TemplateRepository repository,
+            Long spaceId,
             Long templateId) {
         return repository.findBySpaceIdAndTemplateId(spaceId, templateId);
     }
@@ -153,8 +155,8 @@ public class Template extends BaseEntity {
      * @return TemplateDetailResponseDto
      */
     public static org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto findDetailBySpaceIdAndTemplateId(
-            org.fastcampus.jober.template.repository.TemplateRepository repository, 
-            Long spaceId, 
+            org.fastcampus.jober.template.repository.TemplateRepository repository,
+            Long spaceId,
             Long templateId) {
         Template template = repository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId);
         if (template == null) {
