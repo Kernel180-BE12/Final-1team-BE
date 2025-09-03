@@ -1,12 +1,22 @@
 package org.fastcampus.jober.template.service;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
+import org.fastcampus.jober.template.entity.Template;
+import org.fastcampus.jober.template.repository.TemplateRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -16,19 +26,51 @@ import java.util.Map;
  * 템플릿 관련 비즈니스 로직을 처리하는 서비스 클래스
  * AI Flask 서버와의 통신을 통해 템플릿 생성 등의 기능을 제공합니다.
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Slf4j
 public class TemplateService {
 
-    private final RestTemplate restTemplate;
-
-    /**
+  private final TemplateRepository templateRepository;
+  private final RestTemplate restTemplate;
+  
+  /**
      * AI Flask 서버의 기본 URL
      * application.yml의 ai.flask.base-url 값을 주입받습니다.
      */
     @Value("${ai.flask.base-url}")
     private String aiFlaskBaseUrl;
+
+  /**
+   * 특정 spaceId의 템플릿들의 title만 조회
+   * @param spaceId 스페이스 ID
+   * @return 템플릿 제목 응답 DTO 리스트
+   */
+  @Operation(
+    summary = "템플릿 제목 조회",
+    description = "특정 spaceId의 템플릿 제목들을 조회합니다."
+  )
+  public List<TemplateTitleResponseDto> getTitlesBySpaceId(
+    @Parameter(description = "스페이스 ID", required = true) Long spaceId
+  ) {
+    return Template.findTitlesBySpaceId(templateRepository, spaceId);
+  }
+
+  /**
+   * 특정 spaceId의 템플릿들을 조회
+   * @param spaceId 스페이스 ID
+   * @return 템플릿 엔티티 리스트
+   */
+  @Operation(
+    summary = "템플릿 엔티티 조회",
+    description = "특정 spaceId의 템플릿들을 조회합니다."
+  )
+  public List<Template> getTemplatesBySpaceId(
+    @Parameter(description = "스페이스 ID", required = true) Long spaceId
+  ) {
+    return Template.findBySpaceId(templateRepository, spaceId);
+  }
 
     /**
      * 사용자 메시지를 기반으로 AI가 템플릿을 생성하도록 요청합니다.
