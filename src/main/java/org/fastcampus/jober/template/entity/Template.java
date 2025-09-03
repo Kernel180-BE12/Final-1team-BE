@@ -10,7 +10,9 @@ import org.fastcampus.jober.template.entity.enums.Status;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -67,7 +69,11 @@ public class Template {
      * @return 제목 리스트
      */
     public static List<String> extractTitles(List<Template> templates) {
+        if (templates == null) {
+            return new ArrayList<>();
+        }
         return templates.stream()
+                .filter(Objects::nonNull)
                 .map(Template::extractTitle)
                 .collect(Collectors.toList());
     }
@@ -79,8 +85,12 @@ public class Template {
      * @return 필터링된 템플릿 리스트
      */
     public static List<Template> filterBySpaceId(List<Template> templates, Long spaceId) {
+        if (templates == null || spaceId == null) {
+            return new ArrayList<>();
+        }
         return templates.stream()
-                .filter(template -> template.getSpaceId().equals(spaceId))
+                .filter(Objects::nonNull)
+                .filter(template -> spaceId.equals(template.getSpaceId()))
                 .collect(Collectors.toList());
     }
     
@@ -90,6 +100,9 @@ public class Template {
      * @return 속하는 경우 true
      */
     public boolean belongsToSpace(Long spaceId) {
+        if (this.spaceId == null || spaceId == null) {
+            return false;
+        }
         return this.spaceId.equals(spaceId);
     }
     
