@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
-import org.fastcampus.jober.user.entity.Users;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;

@@ -1,19 +1,14 @@
 package org.fastcampus.jober.space.mapper;
 
-import org.fastcampus.jober.error.BusinessException;
-import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
-import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
-import org.fastcampus.jober.user.entity.Users;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SpaceMapper {
 
-    SpaceMapper INSTANCE = Mappers.getMapper(SpaceMapper.class);
+//    SpaceMapper INSTANCE = Mappers.getMapper(SpaceMapper.class);
 
     // 생성용: DTO → Entity
     @Mapping(target = "spaceId", ignore = true)
