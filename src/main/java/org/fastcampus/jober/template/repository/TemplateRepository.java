@@ -43,4 +43,28 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
     List<Template> findBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId
     );
+
+    /**
+     * 특정 spaceId와 templateId의 템플릿을 조회
+     * @param spaceId 스페이스 ID
+     * @param templateId 템플릿 ID
+     * @return 템플릿 엔티티
+     */
+    @Query("SELECT t FROM Template t WHERE t.spaceId = :spaceId AND t.id = :templateId")
+    Template findBySpaceIdAndTemplateId(
+        @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
+        @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId
+    );
+
+    /**
+     * 특정 spaceId와 templateId의 템플릿을 조회 (completedAt(생성일시) 제외 모든 필드 조회)
+     * @param spaceId 스페이스 ID
+     * @param templateId 템플릿 ID
+     * @return 템플릿 엔티티
+     */
+    @Query("SELECT t FROM Template t WHERE t.spaceId = :spaceId AND t.id = :templateId")
+    Template findBySpaceIdAndTemplateIdWithAllFields(
+        @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
+        @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId
+    );
 }
