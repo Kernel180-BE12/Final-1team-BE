@@ -8,8 +8,9 @@ import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.mapper.SpaceMapper;
 import org.fastcampus.jober.space.repository.SpaceRepository;
-import org.fastcampus.jober.user.entity.Users;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.springframework.stereotype.Service;
+
 
 @Service
 @RequiredArgsConstructor
@@ -18,9 +19,8 @@ public class SpaceService {
     private final SpaceMapper spaceMapper; // Mapper 주입
 
     @Transactional
-    public void createSpace(SpaceCreateRequestDto dto) {
-        // MapStruct로 DTO → Entity 변환
-        Space space = spaceMapper.toEntity(dto);
+    public void createSpace(SpaceCreateRequestDto dto, CustomUserDetails principal) {
+        Space space = spaceMapper.toEntity(dto, principal.getUserId());
         spaceRepository.save(space);
     }
 
@@ -30,18 +30,27 @@ public class SpaceService {
     }
 
     @Transactional
-    public SpaceResponseDto updateSpace(Long id, SpaceUpdateRequestDto dto) {
+    public SpaceResponseDto updateSpace(Long spaceId, SpaceUpdateRequestDto dto, CustomUserDetails principal) {
 
-        // 데이터 조회
-        Space existingSpace = spaceRepository.findByIdOrThrow(id);
-        spaceMapper.updateSpaceFromDto(dto, existingSpace);
+        // 1. 데이터 조회
+        Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+
+        Long userId = principal.getUserId();
+        // 2. 관리자인지 체크
+        existingSpace.isAdminUser(userId);
+        // 3. 엔티티 업데이트
+        existingSpace.updateSpaceFromDto(dto);
+        // 4. Entity to DTO
         return spaceMapper.toResponseDto(existingSpace);
     }
 
-    public void deleteSpace(Long id, Users user) {
-        Space existingSpace = spaceRepository.findByIdOrThrow(id);
-        existingSpace.isAdminUser(user);
-        spaceRepository.deleteById(id);
+    @Transactional
+    public void deleteSpace(Long spaceId, CustomUserDetails principal) {
+        Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+
+        existingSpace.isAdminUser(principal.getUserId());
+
+        spaceRepository.deleteById(existingSpace.getSpaceId());
     }
 }
 

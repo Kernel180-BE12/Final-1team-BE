@@ -5,12 +5,14 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.fastcampus.jober.common.entity.BaseEntity;
+
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class SpaceContacts {
+public class SpaceContacts extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -68,9 +70,7 @@ public class SpaceContacts {
             return new SpaceContacts(id, name, phoneNum, email, spaceId);
         }
     }
-    
 
-    
     /**
      * 연락처 정보 유효성 검증
      */
