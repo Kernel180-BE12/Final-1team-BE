@@ -73,7 +73,7 @@ public class TemplateController {
     ) {
         List<TemplateTitleResponseDto> titles = templateService.getTitlesBySpaceId(spaceId);
         return ResponseEntity.ok(titles);
-
+    }
 
     /**
      * AI를 통한 템플릿 생성 요청 API
