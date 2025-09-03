@@ -37,29 +37,31 @@ public class TemplateService {
      * @return AI가 생성한 템플릿 내용 (String 형태)
      * @throws RuntimeException AI 서버 통신 실패 시 발생
      */
-    public String createTemplate(String userMessage) {
+    public Object createTemplate(String userMessage, Map<String, Object> sessionState) {
         try {
             // AI Flask 서버로 보낼 URL 구성
-            String url = aiFlaskBaseUrl + "/create-template";
+            String url = aiFlaskBaseUrl + "/api/chat";
             
-            // POST 요청을 위한 JSON body 구성
-            Map<String, String> requestBody = new HashMap<>();
+            // POST 요청을 위한 JSON body 구성 (message + state)
+            Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("message", userMessage);
+            requestBody.put("state", sessionState != null ? sessionState : new HashMap<>());
             
             // HTTP 헤더 설정 (JSON 전송)
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             
-            HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
             log.info("AI Flask 서버로 템플릿 생성 요청 전송: {}", url);
+            log.info("전송할 JSON: {}", requestBody);
 
-            // AI Flask 서버로 POST 요청을 보내고 응답을 String으로 받음
-            String templateContent = restTemplate.postForObject(url, request, String.class);
+            // AI Flask 서버로 POST 요청을 보내고 응답을 Object로 받음 (JSON 전체)
+            Object aiResponse = restTemplate.postForObject(url, request, Object.class);
 
-            log.info("AI Flask 서버로부터 템플릿 내용 수신 완료");
+            log.info("AI Flask 서버로부터 응답 수신 완료");
             
-            return templateContent;
+            return aiResponse;
             
         } catch (Exception e) {
             log.error("AI Flask 서버와의 통신 중 오류 발생: {}", e.getMessage(), e);

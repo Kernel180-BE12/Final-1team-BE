@@ -37,19 +37,16 @@ public class TemplateController {
                      "리액트에서 사용자 입력을 받아 AI Flask 서버로 전달하는 중간다리 역할을 합니다."
     )
     @PostMapping("/create-template")
-    public ResponseEntity<String> createTemplate(
-            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                description = "템플릿 생성 요청 정보", 
-                required = true
-            ) TemplateCreateRequestDto request) {
+    public ResponseEntity<Object> createTemplate(
+            @org.springframework.web.bind.annotation.RequestBody TemplateCreateRequestDto request) {
         
-        log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}", request.getMessage());
+        log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}, state: {}", request.getMessage(), request.getState());
         
-        // TemplateService를 통해 AI Flask 서버로 요청 전달
-        String templateContent = templateService.createTemplate(request.getMessage());
+        // TemplateService를 통해 AI Flask 서버로 요청 전달 (message + state)
+        Object aiResponse = templateService.createTemplate(request.getMessage(), request.getState());
         
-        log.info("템플릿 생성 완료 - 응답 길이: {} 문자", templateContent != null ? templateContent.length() : 0);
+        log.info("AI Flask 서버로부터 응답 수신 완료");
         
-        return ResponseEntity.ok(templateContent);
+        return ResponseEntity.ok(aiResponse);
     }
 }
