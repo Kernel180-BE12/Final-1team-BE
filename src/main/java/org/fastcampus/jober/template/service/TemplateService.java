@@ -2,6 +2,7 @@ package org.fastcampus.jober.template.service;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
@@ -21,7 +22,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 
@@ -32,25 +32,25 @@ import org.fastcampus.jober.error.ErrorCode;
 @Service
 @Transactional(readOnly = true)
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TemplateService {
     private final TemplateRepository templateRepository;
     private final RestTemplate restTemplate;
 
-    @Transactional
-    public Boolean saveTemplate(Long id, Long spaceId, Boolean isSaved) {
-        Template template = templateRepository.findByIdAndSpaceIdAndIsSaved(id, spaceId, isSaved)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
-
-        return template.updateIsSaved(isSaved);
-    }
-
-  /**
+    /**
      * AI Flask 서버의 기본 URL
      * application.yml의 ai.flask.base-url 값을 주입받습니다.
      */
     @Value("${ai.flask.base-url}")
     private String aiFlaskBaseUrl;
+
+    @Transactional
+    public Boolean saveTemplate(Long id, Long spaceId, Boolean isSaved) {
+        Template template = templateRepository.findByIdAndSpaceId(id, spaceId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
+
+        return template.updateIsSaved(isSaved);
+    }
 
   /**
    * 특정 spaceId의 템플릿들의 title만 조회

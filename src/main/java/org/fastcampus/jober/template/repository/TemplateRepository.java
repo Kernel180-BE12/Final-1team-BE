@@ -46,6 +46,6 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId
     );
 
-    Optional<Template> findByIdAndSpaceIdAndIsSaved(Long id, Long spaceId, Boolean isSaved);
+    Optional<Template> findByIdAndSpaceId(Long id, Long spaceId);
 
 }

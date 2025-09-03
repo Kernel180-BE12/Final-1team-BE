@@ -34,9 +34,6 @@ public class Template extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status; //상태
 
-    @Column(length=80)
-    private Long kakaoTemplateId; //카카오 실제 템플릿 id
-
     @Column(columnDefinition ="JSON" )
     private String extractedVariables; //태그json
 
