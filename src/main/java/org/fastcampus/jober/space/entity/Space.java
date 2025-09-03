@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.fastcampus.jober.user.entity.Users;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -35,6 +37,10 @@ public class Space {
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL)
     private List<SpaceMember> spaceMembers;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
     public boolean isAdminUser(final Users user) {
         return this.admin.getUserId().equals(user.getUserId());
