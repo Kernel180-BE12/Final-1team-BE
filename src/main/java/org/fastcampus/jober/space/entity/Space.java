@@ -38,9 +38,9 @@ public class Space {
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL)
     private List<SpaceMember> spaceMembers;
 
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
 
     public boolean isAdminUser(final Users user) {
         return this.admin.getUserId().equals(user.getUserId());
