@@ -1,6 +1,7 @@
 package org.fastcampus.jober.template.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,8 +17,8 @@ import java.util.stream.Collectors;
 @Schema(description = "템플릿 제목 응답")
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
+@AllArgsConstructor (access = AccessLevel.PROTECTED)
 public class TemplateTitleResponseDto {
     
     @Schema(

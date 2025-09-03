@@ -18,36 +18,36 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TemplateService {
-    
-    private final TemplateRepository templateRepository;
-    
-    /**
-     * 특정 spaceId의 템플릿들의 title만 조회
-     * @param spaceId 스페이스 ID
-     * @return 템플릿 제목 응답 DTO 리스트
-     */
-    @Operation(
-        summary = "템플릿 제목 조회",
-        description = "특정 spaceId의 템플릿 제목들을 조회합니다."
-    )
-    public List<TemplateTitleResponseDto> getTitlesBySpaceId(
-        @Parameter(description = "스페이스 ID", required = true) Long spaceId
-    ) {
-        return Template.findTitlesBySpaceId(templateRepository, spaceId);
-    }
-    
-    /**
-     * 특정 spaceId의 템플릿들을 조회
-     * @param spaceId 스페이스 ID
-     * @return 템플릿 엔티티 리스트
-     */
-    @Operation(
-        summary = "템플릿 엔티티 조회",
-        description = "특정 spaceId의 템플릿들을 조회합니다."
-    )
-    public List<Template> getTemplatesBySpaceId(
-        @Parameter(description = "스페이스 ID", required = true) Long spaceId
-    ) {
-        return Template.findBySpaceId(templateRepository, spaceId);
-    }
+
+  private final TemplateRepository templateRepository;
+
+  /**
+   * 특정 spaceId의 템플릿들의 title만 조회
+   * @param spaceId 스페이스 ID
+   * @return 템플릿 제목 응답 DTO 리스트
+   */
+  @Operation(
+    summary = "템플릿 제목 조회",
+    description = "특정 spaceId의 템플릿 제목들을 조회합니다."
+  )
+  public List<TemplateTitleResponseDto> getTitlesBySpaceId(
+    @Parameter(description = "스페이스 ID", required = true) Long spaceId
+  ) {
+    return Template.findTitlesBySpaceId(templateRepository, spaceId);
+  }
+
+  /**
+   * 특정 spaceId의 템플릿들을 조회
+   * @param spaceId 스페이스 ID
+   * @return 템플릿 엔티티 리스트
+   */
+  @Operation(
+    summary = "템플릿 엔티티 조회",
+    description = "특정 spaceId의 템플릿들을 조회합니다."
+  )
+  public List<Template> getTemplatesBySpaceId(
+    @Parameter(description = "스페이스 ID", required = true) Long spaceId
+  ) {
+    return Template.findBySpaceId(templateRepository, spaceId);
+  }
 }

@@ -1,6 +1,7 @@
 package org.fastcampus.jober.template.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
+@AllArgsConstructor (access = AccessLevel.PROTECTED)
 @Entity
 public class Template {
     @Id
