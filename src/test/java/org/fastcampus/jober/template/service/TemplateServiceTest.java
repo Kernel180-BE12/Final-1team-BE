@@ -42,7 +42,6 @@ class TemplateServiceTest {
                 .spaceId(100L)
                 .title("테스트 템플릿")
                 .status(Status.APPROVED_MOCK)
-                .kakaoTemplateId(12345L)
                 .extractedVariables("{\"name\": \"value\"}")
                 .sessionId("session123")
                 .finalTemplate("최종 템플릿 내용")
@@ -127,7 +126,6 @@ class TemplateServiceTest {
         assertThat(result.getSpaceId()).isEqualTo(100L);
         assertThat(result.getTitle()).isEqualTo("테스트 템플릿");
         assertThat(result.getStatus()).isEqualTo("APPROVED_MOCK");
-        assertThat(result.getKakaoTemplateId()).isEqualTo(12345L);
         assertThat(result.getExtractedVariables()).isEqualTo("{\"name\": \"value\"}");
         assertThat(result.getSessionId()).isEqualTo("session123");
         assertThat(result.getFinalTemplate()).isEqualTo("최종 템플릿 내용");

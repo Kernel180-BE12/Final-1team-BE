@@ -18,6 +18,8 @@ public interface SpaceMapper {
     Space toEntity(SpaceCreateRequestDto dto, Long adminUserId);
 
     // 조회용: Entity → DTO
+    @Mapping(target = "adminName", source = "ownerName")
+    @Mapping(target = "adminNum", source = "ownerNum")
     SpaceResponseDto toResponseDto(Space space);
 
 }

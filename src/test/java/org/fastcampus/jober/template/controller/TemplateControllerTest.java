@@ -49,7 +49,6 @@ class TemplateControllerTest {
                 .spaceId(100L)
                 .title("테스트 템플릿")
                 .status("APPROVED_MOCK")
-                .kakaoTemplateId(12345L)
                 .extractedVariables("{\"name\": \"value\"}")
                 .sessionId("session123")
                 .finalTemplate("최종 템플릿 내용")
@@ -98,7 +97,6 @@ class TemplateControllerTest {
         assertThat(response.getBody().getSpaceId()).isEqualTo(100L);
         assertThat(response.getBody().getTitle()).isEqualTo("테스트 템플릿");
         assertThat(response.getBody().getStatus()).isEqualTo("APPROVED_MOCK");
-        assertThat(response.getBody().getKakaoTemplateId()).isEqualTo(12345L);
         assertThat(response.getBody().getExtractedVariables()).isEqualTo("{\"name\": \"value\"}");
         assertThat(response.getBody().getSessionId()).isEqualTo("session123");
         assertThat(response.getBody().getFinalTemplate()).isEqualTo("최종 템플릿 내용");
