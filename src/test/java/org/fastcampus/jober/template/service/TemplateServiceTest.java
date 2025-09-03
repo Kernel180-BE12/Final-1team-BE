@@ -19,7 +19,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-
+/**
+ * TemplateService 테스트 클래스
+ */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TemplateService 테스트")
 class TemplateServiceTest {
