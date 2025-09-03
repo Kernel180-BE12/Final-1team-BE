@@ -21,8 +21,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDateTime;
-
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -169,8 +167,8 @@ class SpaceControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.spaceId").value(testSpace.getSpaceId()))
                 .andExpect(jsonPath("$.spaceName").value(testSpace.getSpaceName()))
-                .andExpect(jsonPath("$.adminName").value(testSpace.getAdminName()))
-                .andExpect(jsonPath("$.adminNum").value(testSpace.getAdminNum()));
+                .andExpect(jsonPath("$.adminName").value(testSpace.getOwnerName()))
+                .andExpect(jsonPath("$.adminNum").value(testSpace.getOwnerNum()));
     }
 
     @Test
@@ -207,7 +205,7 @@ class SpaceControllerIntegrationTest {
         // given
         SpaceUpdateRequestDto requestDto = new SpaceUpdateRequestDto();
         requestDto.setSpaceName("Updated Space");
-        requestDto.setAdminName("수정된 관리자");
+        requestDto.setOwnerName("수정된 관리자");
         requestDto.setUser(adminUser);
 
         // when & then
@@ -246,7 +244,7 @@ class SpaceControllerIntegrationTest {
         Long nonExistentId = 99999L;
         SpaceUpdateRequestDto requestDto = new SpaceUpdateRequestDto();
         requestDto.setSpaceName("Updated Space");
-        requestDto.setAdminName("수정된 관리자");
+        requestDto.setOwnerName("수정된 관리자");
 
         // when & then
         mockMvc.perform(patch("/spaces/{id}", nonExistentId)

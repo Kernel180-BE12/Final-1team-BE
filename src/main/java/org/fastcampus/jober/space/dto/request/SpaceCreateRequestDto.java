@@ -13,8 +13,8 @@ public class SpaceCreateRequestDto {
     private String spaceName;
 
     @Schema(description = "스페이스 관리자 이름", example = "홍길동")
-    private String adminName;
+    private String ownerName;
 
     @Schema(description = "스페이스 관리자 연락처", example = "010-1234-5678")
-    private String adminNum;
+    private String ownerNum;
 }

@@ -30,4 +30,5 @@ public class SpaceMember extends BaseEntity {
     @JoinColumn(name = "userId")
     private Users user;
 
+
 }
