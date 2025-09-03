@@ -2,7 +2,7 @@ package org.fastcampus.jober.space.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.fastcampus.jober.space.entity.Space;
+
 
 @Getter
 @Setter

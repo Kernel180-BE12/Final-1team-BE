@@ -2,16 +2,21 @@ package org.fastcampus.jober.space.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.entity.Users;
+
 
 @Entity
 @Getter
-public class SpaceMember {
+public class SpaceMember extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Authority authority;
+
     private InviteStatus inviteStatus;
+
     private String tag;
 
     // 관리자, 참여문서 관리자, 권한해제 3개인데 이걸 구현해야 할까........

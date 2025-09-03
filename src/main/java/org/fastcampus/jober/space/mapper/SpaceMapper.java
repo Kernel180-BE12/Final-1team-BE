@@ -19,8 +19,6 @@ public interface SpaceMapper {
     @Mapping(target = "admin", ignore = true)
     @Mapping(target = "spaceUrl", ignore = true)
     @Mapping(target = "spaceMembers", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     Space toEntity(SpaceCreateRequestDto dto);
 
     // 조회용: Entity → DTO
