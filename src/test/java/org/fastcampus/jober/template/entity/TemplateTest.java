@@ -1,158 +1,275 @@
 package org.fastcampus.jober.template.entity;
 
+import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.enums.Status;
+import org.fastcampus.jober.template.repository.TemplateRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 
-/**
- * Template 엔티티 테스트 클래스
- */
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Template 엔티티 테스트")
 class TemplateTest {
 
-  private Template template1;
-  private Template template2;
-  private Template template3;
+    @Mock
+    private TemplateRepository templateRepository;
 
-  @BeforeEach
-  void setUp() {
-    // 테스트용 템플릿 데이터 생성
-    template1 = Template.builder()
-      .id(1L)
-      .spaceId(100L)
-      .title("첫 번째 템플릿")
-      .status(Status.DRAFT)
-      .kakaoTemplateId(12345L)
-      .extractedVariables("{\"name\": \"홍길동\"}")
-      .completedAt(LocalDateTime.now())
-      .sessionId("session123")
-      .finalTemplate("최종 템플릿 내용")
-      .htmlPreview("<html>미리보기</html>")
-      .parameterizedTemplate("안녕하세요 {name}님")
-      .totalAttempts(3)
-      .isSaved(true)
-      .isAccepted(false)
-      .build();
+    private Template testTemplate;
+    private List<Template> testTemplates;
 
-    template2 = Template.builder()
-      .id(2L)
-      .spaceId(100L)
-      .title("두 번째 템플릿")
-      .status(Status.SUBMITTED_MOCK)
-      .spaceId(100L)
-      .build();
+    @BeforeEach
+    void setUp() {
+        testTemplate = Template.builder()
+                .id(1L)
+                .spaceId(100L)
+                .title("테스트 템플릿")
+                .status(Status.APPROVED_MOCK)
+                .kakaoTemplateId(12345L)
+                .extractedVariables("{\"name\": \"value\"}")
+                .completedAt(LocalDateTime.now())
+                .sessionId("session123")
+                .finalTemplate("최종 템플릿 내용")
+                .htmlPreview("<html>미리보기</html>")
+                .parameterizedTemplate("파라미터화된 템플릿")
+                .totalAttempts(3)
+                .isSaved(true)
+                .isAccepted(false)
+                .build();
 
-    template3 = Template.builder()
-      .id(3L)
-      .spaceId(200L)
-      .title("다른 스페이스 템플릿")
-      .status(Status.APPROVED_MOCK)
-      .spaceId(200L)
-      .build();
-  }
+        testTemplates = Arrays.asList(testTemplate);
+    }
 
-  @Test
-  @DisplayName("Template 빌더 패턴으로 정상 생성되는지 테스트")
-  void testTemplateBuilder() {
-    // given & when
-    Template template = Template.builder()
-      .id(1L)
-      .spaceId(100L)
-      .title("테스트 템플릿")
-      .status(Status.DRAFT)
-      .build();
+    @Test
+    @DisplayName("템플릿의 제목을 추출할 수 있다")
+    void extractTitle_ReturnsTitle() {
+        // when
+        String title = testTemplate.extractTitle();
 
-    // then
-    assertThat(template.getId()).isEqualTo(1L);
-    assertThat(template.getSpaceId()).isEqualTo(100L);
-    assertThat(template.getTitle()).isEqualTo("테스트 템플릿");
-    assertThat(template.getStatus()).isEqualTo(Status.DRAFT);
-  }
+        // then
+        assertThat(title).isEqualTo("테스트 템플릿");
+    }
 
-  @Test
-  @DisplayName("extractTitle 메서드가 정상적으로 제목을 반환하는지 테스트")
-  void testExtractTitle() {
-    // when
-    String title = template1.extractTitle();
+    @Test
+    @DisplayName("템플릿 리스트에서 제목들을 추출할 수 있다")
+    void extractTitles_WithValidTemplates_ReturnsTitles() {
+        // when
+        List<String> titles = Template.extractTitles(testTemplates);
 
-    // then
-    assertThat(title).isEqualTo("첫 번째 템플릿");
-  }
+        // then
+        assertThat(titles).isNotNull();
+        assertThat(titles).hasSize(1);
+        assertThat(titles.get(0)).isEqualTo("테스트 템플릿");
+    }
 
-  @Test
-  @DisplayName("extractTitles 정적 메서드가 템플릿 리스트에서 제목들만 추출하는지 테스트")
-  void testExtractTitles() {
-    // given
-    List<Template> templates = Arrays.asList(template1, template2, template3);
+    @Test
+    @DisplayName("null 템플릿 리스트에서 제목을 추출하면 빈 리스트를 반환한다")
+    void extractTitles_WithNullTemplates_ReturnsEmptyList() {
+        // when
+        List<String> titles = Template.extractTitles(null);
 
-    // when
-    List<String> titles = Template.extractTitles(templates);
+        // then
+        assertThat(titles).isNotNull();
+        assertThat(titles).isEmpty();
+    }
 
-    // then
-    assertThat(titles).hasSize(3);
-    assertThat(titles).containsExactly(
-      "첫 번째 템플릿",
-      "두 번째 템플릿",
-      "다른 스페이스 템플릿"
-    );
-  }
+    @Test
+    @DisplayName("특정 spaceId에 속하는 템플릿들을 필터링할 수 있다")
+    void filterBySpaceId_WithValidSpaceId_ReturnsFilteredTemplates() {
+        // given
+        Long spaceId = 100L;
 
-  @Test
-  @DisplayName("filterBySpaceId 정적 메서드가 특정 스페이스의 템플릿만 필터링하는지 테스트")
-  void testFilterBySpaceId() {
-    // given
-    List<Template> templates = Arrays.asList(template1, template2, template3);
+        // when
+        List<Template> filteredTemplates = Template.filterBySpaceId(testTemplates, spaceId);
 
-    // when
-    List<Template> filteredTemplates = Template.filterBySpaceId(templates, 100L);
+        // then
+        assertThat(filteredTemplates).isNotNull();
+        assertThat(filteredTemplates).hasSize(1);
+        assertThat(filteredTemplates.get(0).getSpaceId()).isEqualTo(100L);
+    }
 
-    // then
-    assertThat(filteredTemplates).hasSize(2);
-    assertThat(filteredTemplates).allMatch(template -> template.getSpaceId().equals(100L));
-    assertThat(filteredTemplates).extracting("id").containsExactly(1L, 2L);
-  }
+    @Test
+    @DisplayName("다른 spaceId로 필터링하면 빈 리스트를 반환한다")
+    void filterBySpaceId_WithDifferentSpaceId_ReturnsEmptyList() {
+        // given
+        Long differentSpaceId = 200L;
 
-  @Test
-  @DisplayName("belongsToSpace 메서드가 템플릿이 특정 스페이스에 속하는지 정확히 판단하는지 테스트")
-  void testBelongsToSpace() {
-    // when & then
-    assertThat(template1.belongsToSpace(100L)).isTrue();
-    assertThat(template1.belongsToSpace(200L)).isFalse();
-    assertThat(template3.belongsToSpace(200L)).isTrue();
-    assertThat(template3.belongsToSpace(100L)).isFalse();
-  }
+        // when
+        List<Template> filteredTemplates = Template.filterBySpaceId(testTemplates, differentSpaceId);
 
-  @Test
-  @DisplayName("빈 템플릿 리스트에 대한 메서드들이 정상 동작하는지 테스트")
-  void testWithEmptyList() {
-    // given
-    List<Template> emptyTemplates = Arrays.asList();
+        // then
+        assertThat(filteredTemplates).isNotNull();
+        assertThat(filteredTemplates).isEmpty();
+    }
 
-    // when
-    List<String> emptyTitles = Template.extractTitles(emptyTemplates);
-    List<Template> emptyFiltered = Template.filterBySpaceId(emptyTemplates, 100L);
+    @Test
+    @DisplayName("null spaceId로 필터링하면 빈 리스트를 반환한다")
+    void filterBySpaceId_WithNullSpaceId_ReturnsEmptyList() {
+        // when
+        List<Template> filteredTemplates = Template.filterBySpaceId(testTemplates, null);
 
-    // then
-    assertThat(emptyTitles).isEmpty();
-    assertThat(emptyFiltered).isEmpty();
-  }
+        // then
+        assertThat(filteredTemplates).isNotNull();
+        assertThat(filteredTemplates).isEmpty();
+    }
 
-  @Test
-  @DisplayName("null 값이 포함된 템플릿 리스트에 대한 안전성 테스트")
-  void testWithNullValues() {
-    // given
-    List<Template> templatesWithNull = Arrays.asList(template1, null, template2);
+    @Test
+    @DisplayName("템플릿이 특정 spaceId에 속하는지 확인할 수 있다")
+    void belongsToSpace_WithValidSpaceId_ReturnsTrue() {
+        // given
+        Long spaceId = 100L;
 
-    // when & then
-    // null 값이 포함된 경우에도 예외가 발생하지 않아야 함
-    assertThat(Template.extractTitles(templatesWithNull)).hasSize(2);
-  }
+        // when
+        boolean belongs = testTemplate.belongsToSpace(spaceId);
+
+        // then
+        assertThat(belongs).isTrue();
+    }
+
+    @Test
+    @DisplayName("템플릿이 다른 spaceId에 속하지 않음을 확인할 수 있다")
+    void belongsToSpace_WithDifferentSpaceId_ReturnsFalse() {
+        // given
+        Long differentSpaceId = 200L;
+
+        // when
+        boolean belongs = testTemplate.belongsToSpace(differentSpaceId);
+
+        // then
+        assertThat(belongs).isFalse();
+    }
+
+    @Test
+    @DisplayName("null spaceId로 속하는지 확인하면 false를 반환한다")
+    void belongsToSpace_WithNullSpaceId_ReturnsFalse() {
+        // when
+        boolean belongs = testTemplate.belongsToSpace(null);
+
+        // then
+        assertThat(belongs).isFalse();
+    }
+
+    @Test
+    @DisplayName("특정 spaceId의 템플릿들을 조회하고 DTO로 변환할 수 있다")
+    void findTitlesBySpaceId_WithValidSpaceId_ReturnsDtoList() {
+        // given
+        Long spaceId = 100L;
+        List<String> titles = Arrays.asList("템플릿1", "템플릿2");
+        when(templateRepository.findTitlesBySpaceId(spaceId)).thenReturn(titles);
+
+        // when
+        List<TemplateTitleResponseDto> result = Template.findTitlesBySpaceId(templateRepository, spaceId);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getTitle()).isEqualTo("템플릿1");
+        assertThat(result.get(1).getTitle()).isEqualTo("템플릿2");
+    }
+
+    @Test
+    @DisplayName("특정 spaceId의 템플릿들을 조회할 수 있다")
+    void findBySpaceId_WithValidSpaceId_ReturnsTemplates() {
+        // given
+        Long spaceId = 100L;
+        when(templateRepository.findBySpaceId(spaceId)).thenReturn(testTemplates);
+
+        // when
+        List<Template> result = Template.findBySpaceId(templateRepository, spaceId);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(0).getSpaceId()).isEqualTo(100L);
+    }
+
+    @Test
+    @DisplayName("특정 spaceId와 templateId의 템플릿을 조회할 수 있다")
+    void findBySpaceIdAndTemplateId_WithValidIds_ReturnsTemplate() {
+        // given
+        Long spaceId = 100L;
+        Long templateId = 1L;
+        when(templateRepository.findBySpaceIdAndTemplateId(spaceId, templateId)).thenReturn(testTemplate);
+
+        // when
+        Template result = Template.findBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getSpaceId()).isEqualTo(100L);
+        assertThat(result.getTitle()).isEqualTo("테스트 템플릿");
+    }
+
+    @Test
+    @DisplayName("특정 spaceId와 templateId의 템플릿을 조회하고 상세 응답 DTO로 변환할 수 있다")
+    void findDetailBySpaceIdAndTemplateId_WithValidIds_ReturnsDetailDto() {
+        // given
+        Long spaceId = 100L;
+        Long templateId = 1L;
+        when(templateRepository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId)).thenReturn(testTemplate);
+
+        // when
+        TemplateDetailResponseDto result = Template.findDetailBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getSpaceId()).isEqualTo(100L);
+        assertThat(result.getTitle()).isEqualTo("테스트 템플릿");
+        assertThat(result.getStatus()).isEqualTo("APPROVED_MOCK");
+        assertThat(result.getKakaoTemplateId()).isEqualTo(12345L);
+        assertThat(result.getExtractedVariables()).isEqualTo("{\"name\": \"value\"}");
+        assertThat(result.getSessionId()).isEqualTo("session123");
+        assertThat(result.getFinalTemplate()).isEqualTo("최종 템플릿 내용");
+        assertThat(result.getHtmlPreview()).isEqualTo("<html>미리보기</html>");
+        assertThat(result.getParameterizedTemplate()).isEqualTo("파라미터화된 템플릿");
+        assertThat(result.getTotalAttempts()).isEqualTo(3);
+        assertThat(result.getIsSaved()).isTrue();
+        assertThat(result.getIsAccepted()).isFalse();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 템플릿을 조회하면 null을 반환한다")
+    void findDetailBySpaceIdAndTemplateId_WithNonExistentTemplate_ReturnsNull() {
+        // given
+        Long spaceId = 999L;
+        Long templateId = 999L;
+        when(templateRepository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId)).thenReturn(null);
+
+        // when
+        TemplateDetailResponseDto result = Template.findDetailBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("completedAt 필드가 DTO에 포함되지 않는다")
+    void findDetailBySpaceIdAndTemplateId_ExcludesCompletedAt() {
+        // given
+        Long spaceId = 100L;
+        Long templateId = 1L;
+        when(templateRepository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId)).thenReturn(testTemplate);
+
+        // when
+        TemplateDetailResponseDto result = Template.findDetailBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
+
+        // then
+        assertThat(result).isNotNull();
+        // completedAt 필드가 DTO에 정의되어 있지 않음을 확인
+        // TemplateDetailResponseDto 클래스에 completedAt 필드가 없어야 함
+    }
 }

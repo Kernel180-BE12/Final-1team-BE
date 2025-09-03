@@ -3,6 +3,7 @@ package org.fastcampus.jober.template.controller;
 /**
  * 템플릿 관련 HTTP 요청을 처리하는 컨트롤러
  */
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
+import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.service.TemplateService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -32,11 +40,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/template")
 @RequiredArgsConstructor
-@Tag(name = "Template", description = "템플릿 관련 API")
 public class TemplateController {
-
+    
     private final TemplateService templateService;
-
+    
     /**
      * GET 방식으로 spaceId를 받아서 해당 spaceId의 템플릿 title들을 조회하는 API
      * @param spaceId 스페이스 ID
@@ -76,30 +83,75 @@ public class TemplateController {
     }
 
     /**
+     * GET 방식으로 spaceId와 templateId를 받아서 해당 템플릿의 상세 정보를 조회하는 API (completedAt 제외)
+     * @param spaceId 스페이스 ID
+     * @param templateId 템플릿 ID
+     * @return 템플릿 상세 정보
+     */
+    @Operation(
+        summary = "템플릿 상세 조회",
+        description = "특정 spaceId와 templateId의 템플릿 상세 정보를 조회합니다. (생성일시 제외)"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "조회 성공",
+            content = @Content(
+                schema = @Schema(implementation = TemplateDetailResponseDto.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "해당 템플릿을 찾을 수 없음"
+        )
+    })
+    @GetMapping("/{spaceId}/{templateId}")
+    public ResponseEntity<TemplateDetailResponseDto> getTemplateDetailBySpaceIdAndTemplateId(
+        @Parameter(
+            description = "스페이스 ID",
+            required = true,
+            example = "1"
+        )
+        @PathVariable(name = "spaceId") Long spaceId,
+        @Parameter(
+            description = "템플릿 ID",
+            required = true,
+            example = "1"
+        )
+        @PathVariable(name = "templateId") Long templateId
+    ) {
+        TemplateDetailResponseDto template = templateService.getTemplateDetailBySpaceIdAndTemplateId(spaceId, templateId);
+        if (template == null || !template.isValid()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(template);
+    }
+     /**
      * AI를 통한 템플릿 생성 요청 API
-     * 사용자의 메시지를 받아서 AI Flask 서버로 전달하고,
+     * 사용자의 메시지를 받아서 AI Flask 서버로 전달하고, 
      * 생성된 템플릿 내용을 반환합니다.
-     *
+     * 
      * @param request 템플릿 생성 요청 DTO (사용자 메시지 포함)
      * @return AI가 생성한 템플릿 내용 (String 형태)
      */
     @Operation(
-        summary = "AI 템플릿 생성 요청",
+        summary = "AI 템플릿 생성 요청", 
         description = "사용자 메시지를 기반으로 AI가 템플릿을 생성합니다. " +
                      "리액트에서 사용자 입력을 받아 AI Flask 서버로 전달하는 중간다리 역할을 합니다."
     )
     @PostMapping("/create-template")
     public ResponseEntity<Object> createTemplate(
             @org.springframework.web.bind.annotation.RequestBody TemplateCreateRequestDto request) {
-
+        
         log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}, state: {}", request.getMessage(), request.getState());
-
+        
         // TemplateService를 통해 AI Flask 서버로 요청 전달 (message + state)
         Object aiResponse = templateService.createTemplate(request.getMessage(), request.getState());
-
+        
         log.info("AI Flask 서버로부터 응답 수신 완료");
-
+        
         return ResponseEntity.ok(aiResponse);
+
     }
 
     @PatchMapping("/{templateId}/space/{spaceId}")
