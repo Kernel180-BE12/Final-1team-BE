@@ -4,19 +4,20 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
+import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.error.BusinessException;
+import org.fastcampus.jober.error.ErrorCode;
+import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.user.entity.Users;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Space {
+public class Space extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -25,30 +26,38 @@ public class Space {
     @NotBlank(message = "스페이스 이름은 필수입니다.")
     private String spaceName;
 
+    private Long adminUserId;
+
     @OneToOne
     @JoinColumn(name = "id")
     private Users admin;
 
-    private String adminName;
+    private String ownerName;
 
     @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "전화번호는 010-0000-0000 형식이어야 합니다.")
-    private String adminNum;
+    private String ownerNum;
 
     private String spaceUrl;
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL)
     private List<SpaceMember> spaceMembers;
 
-    // 이 아래로 꼭 필요할지?
-//    private String faxNum;
-//    private String email;
-//    private String businessType;
-//    private String corporateRegistrationNo;
-//    private String businessRegistrationNo;
-//    private String signatureImgUrl;
-//    private LocalDate businessOpenDate;
-//    private String businessCategory;
-//    private String businessItem;
-//    private String taxEmail;
+    public void isAdminUser(long userId) {
+        if (!(this.adminUserId.equals(userId))) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "스페이스 관리자만 가능합니다.");
+        }
+    }
 
+    // 부분 업데이트 (null 값 무시)
+    public void updateSpaceFromDto(SpaceUpdateRequestDto dto) {
+        if (dto.getSpaceName() != null && !dto.getSpaceName().isBlank()) {
+            this.spaceName = dto.getSpaceName();
+        }
+        if (dto.getOwnerName() != null && !dto.getOwnerName().isBlank()) {
+            this.ownerName = dto.getOwnerName();
+        }
+        if (dto.getOwnerNum() != null) {
+            this.ownerNum = dto.getOwnerNum();
+        }
+    }
 }

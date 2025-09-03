@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.template.entity.enums.Status;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
 @AllArgsConstructor (access = AccessLevel.PROTECTED)
 @Entity
-public class Template {
+public class Template extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //템플릿 아이디

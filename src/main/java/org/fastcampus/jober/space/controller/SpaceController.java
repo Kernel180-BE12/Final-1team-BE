@@ -6,15 +6,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.fastcampus.jober.user.entity.Users;
-import org.springframework.security.core.Authentication;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.service.SpaceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +32,8 @@ public class SpaceController {
     )
     @ApiResponse(responseCode = "201", description = "스페이스 생성 성공")
     @PostMapping
-    public ResponseEntity<Void> createSpace(@RequestBody SpaceCreateRequestDto dto) {
-        spaceService.createSpace(dto);
+    public ResponseEntity<Void> createSpace(@Valid @RequestBody SpaceCreateRequestDto dto, @AuthenticationPrincipal CustomUserDetails principal) {
+        spaceService.createSpace(dto, principal);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -59,13 +60,13 @@ public class SpaceController {
     @ApiResponse(responseCode = "200", description = "스페이스 수정 성공")
     @ApiResponse(responseCode = "403", description = "권한 없음")
     @ApiResponse(responseCode = "404", description = "스페이스 없음")
-    @PatchMapping("/{id}")
+    @PatchMapping("/{spaceId}")
     public ResponseEntity<SpaceResponseDto> updateSpace(
-            @PathVariable Long id,
-            @RequestBody SpaceUpdateRequestDto dto,
-            Users user) {
+            @PathVariable Long spaceId,
+            @Valid @RequestBody SpaceUpdateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        SpaceResponseDto result = spaceService.updateSpace(id, dto, user);
+        SpaceResponseDto result = spaceService.updateSpace(spaceId, dto, principal);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
@@ -77,8 +78,8 @@ public class SpaceController {
             @ApiResponse(responseCode = "404", description = "해당 ID의 스페이스를 찾을 수 없음")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSpace(@PathVariable Long id, Users user) {
-        spaceService.deleteSpace(id, user);
+    public ResponseEntity<Void> deleteSpace(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        spaceService.deleteSpace(id, principal);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
