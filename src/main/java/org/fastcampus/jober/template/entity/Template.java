@@ -45,7 +45,12 @@ public class Template {
 
     private Integer totalAttempts;
 
-    private Boolean isSaved;
+    private Boolean isSaved; // 0:저장안됨 / 1:저장됨
 
     private Boolean isAccepted;
+
+    public Boolean updateIsSaved(Boolean isSaved) {
+        this.isSaved = isSaved;
+        return this.isSaved;
+    }
 }
