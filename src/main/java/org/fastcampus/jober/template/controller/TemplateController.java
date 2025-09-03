@@ -3,7 +3,6 @@ package org.fastcampus.jober.template.controller;
 /**
  * 템플릿 관련 HTTP 요청을 처리하는 컨트롤러
  */
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +19,12 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.service.TemplateService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
 
 
 /**
