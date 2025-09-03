@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
+import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.service.TemplateService;
 import org.springframework.http.ResponseEntity;
@@ -65,5 +67,50 @@ public class TemplateController {
     ) {
         List<TemplateTitleResponseDto> titles = templateService.getTitlesBySpaceId(spaceId);
         return ResponseEntity.ok(titles);
+    }
+
+    /**
+     * GET 방식으로 spaceId와 templateId를 받아서 해당 템플릿의 상세 정보를 조회하는 API (completedAt 제외)
+     * @param spaceId 스페이스 ID
+     * @param templateId 템플릿 ID
+     * @return 템플릿 상세 정보
+     */
+    @Operation(
+        summary = "템플릿 상세 조회",
+        description = "특정 spaceId와 templateId의 템플릿 상세 정보를 조회합니다. (생성일시 제외)"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "조회 성공",
+            content = @Content(
+                schema = @Schema(implementation = TemplateDetailResponseDto.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "해당 템플릿을 찾을 수 없음"
+        )
+    })
+    @GetMapping("/{spaceId}/{templateId}")
+    public ResponseEntity<TemplateDetailResponseDto> getTemplateDetailBySpaceIdAndTemplateId(
+        @Parameter(
+            description = "스페이스 ID",
+            required = true,
+            example = "1"
+        )
+        @PathVariable(name = "spaceId") Long spaceId,
+        @Parameter(
+            description = "템플릿 ID",
+            required = true,
+            example = "1"
+        )
+        @PathVariable(name = "templateId") Long templateId
+    ) {
+        TemplateDetailResponseDto template = templateService.getTemplateDetailBySpaceIdAndTemplateId(spaceId, templateId);
+        if (template == null || !template.isValid()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(template);
     }
 }

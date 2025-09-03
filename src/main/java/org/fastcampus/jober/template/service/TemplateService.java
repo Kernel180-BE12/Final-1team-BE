@@ -3,6 +3,8 @@ package org.fastcampus.jober.template.service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+
+import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
@@ -49,5 +51,31 @@ public class TemplateService {
     @Parameter(description = "스페이스 ID", required = true) Long spaceId
   ) {
     return Template.findBySpaceId(templateRepository, spaceId);
+  }
+
+  /**
+   * 특정 spaceId와 templateId의 템플릿을 조회
+   * @param spaceId 스페이스 ID
+   * @param templateId 템플릿 ID
+   * @return 템플릿 엔티티
+   */
+  public Template getTemplateBySpaceIdAndTemplateId(
+    @Parameter(description = "스페이스 ID", required = true) Long spaceId,
+    @Parameter(description = "템플릿 ID", required = true) Long templateId
+  ) {
+    return Template.findBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
+  }
+
+  /**
+   * 특정 spaceId와 templateId의 템플릿 상세 정보를 조회합니다 (completedAt 제외).
+   * @param spaceId 스페이스 ID
+   * @param templateId 템플릿 ID
+   * @return 템플릿 상세 응답 DTO
+   */
+  public TemplateDetailResponseDto getTemplateDetailBySpaceIdAndTemplateId(
+    @Parameter(description = "스페이스 ID", required = true) Long spaceId,
+    @Parameter(description = "템플릿 ID", required = true) Long templateId
+  ) {
+    return Template.findDetailBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
   }
 }
