@@ -86,5 +86,25 @@ public class SpaceContacts extends BaseEntity {
         }
     }
     
-
+    /**
+     * 연락처 정보 수정
+     */
+    public void updateContactInfo(String name, String phoneNumber, String email) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        }
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+            this.phoneNum = phoneNumber;
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            this.email = email;
+        }
+    }
+    
+    /**
+     * 전화번호 조회 (DTO와의 일관성을 위한 메서드)
+     */
+    public String getPhoneNumber() {
+        return this.phoneNum;
+    }
 }

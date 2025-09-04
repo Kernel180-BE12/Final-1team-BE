@@ -23,4 +23,6 @@ public interface SpaceContactsRepository extends JpaRepository<SpaceContacts, Lo
      * @param spaceId 삭제할 스페이스 ID
      */
     void deleteBySpaceId(Long spaceId);
+
+    
 }

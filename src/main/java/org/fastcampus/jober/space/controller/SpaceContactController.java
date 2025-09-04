@@ -8,6 +8,8 @@ import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.service.SpaceContactService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
+import org.fastcampus.jober.space.dto.response.SpaceContactsUpdateResponseDto;
 
 @Tag(name = "Space Contact", description = "스페이스 연락처 관리 API")
 @RestController
@@ -28,6 +30,20 @@ public class SpaceContactController {
   public ResponseEntity<ContactResponseDto> addContacts(
       @RequestBody ContactRequestDto requestDto) {
     ContactResponseDto response = spaceContactService.addContacts(requestDto);
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * 연락처 정보 수정 API
+   * 
+   * @param requestDto 수정할 연락처 정보 (스페이스 ID, 연락처 ID, 수정할 정보)
+   * @return 수정된 연락처 정보
+   */
+  @Operation(summary = "연락처 정보 수정", description = "스페이스 ID와 연락처 ID를 받아 해당 연락처의 이름, 전화번호, 이메일을 수정합니다.")
+  @PutMapping("/contact")
+  public ResponseEntity<SpaceContactsUpdateResponseDto> updateContactInfo(
+      @RequestBody SpaceContactsUpdateRequestDto requestDto) {
+    SpaceContactsUpdateResponseDto response = spaceContactService.updateContactInfo(requestDto);
     return ResponseEntity.ok(response);
   }
 }
