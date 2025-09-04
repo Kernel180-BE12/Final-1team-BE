@@ -34,9 +34,7 @@ public class SpaceContactService {
   @Transactional
   public ContactResponseDto addContacts(ContactRequestDto requestDto) {
     // DTO를 엔티티로 변환하고 유효성 검증
-    List<SpaceContacts> contacts = requestDto.toEntities().stream()
-        .peek(SpaceContacts::validateContactInfo)
-        .collect(Collectors.toList());
+    List<SpaceContacts> contacts = requestDto.toValidateEntities();
 
     // 연락처 저장
     List<SpaceContacts> savedContacts = spaceContactsRepository.saveAll(contacts);
@@ -57,18 +55,13 @@ public class SpaceContactService {
     SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
     
-    // 스페이스 ID 검증
-    if (!contact.getSpaceId().equals(requestDto.getSpaceId())) {
-      throw new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스의 연락처가 아닙니다.");
-    }
-    
-    // 연락처 정보 수정
-    contact.updateContactInfo(requestDto.getName(), requestDto.getPhoneNumber(), requestDto.getEmail());
+    // DTO를 사용하여 엔티티 업데이트 및 검증
+    SpaceContacts updatedContact = requestDto.updateExistingContact(contact);
     
     // 수정된 연락처 저장
-    SpaceContacts updatedContact = spaceContactsRepository.save(contact);
+    SpaceContacts savedContact = spaceContactsRepository.save(updatedContact);
     
     // 응답 DTO 생성
-    return SpaceContactsUpdateResponseDto.fromEntities(updatedContact);
+    return SpaceContactsUpdateResponseDto.fromEntities(savedContact);
   }
 }
