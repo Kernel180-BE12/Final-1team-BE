@@ -35,6 +35,10 @@ public class SpaceContactsUpdateResponseDto {
     @Schema(description = "수정된 시간")
     private LocalDateTime updatedAt;
 
+    
+    /**
+     * SpaceContacts 엔티티로부터 SpaceContactsUpdateResponseDto 생성
+     */
     public static SpaceContactsUpdateResponseDto fromEntities(SpaceContacts spaceContacts) {
         return SpaceContactsUpdateResponseDto.builder()
             .id(spaceContacts.getId())
