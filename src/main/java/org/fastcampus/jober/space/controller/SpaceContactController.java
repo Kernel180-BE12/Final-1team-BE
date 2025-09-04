@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceContactsUpdateResponseDto;
+import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
 
 @Tag(name = "Space Contact", description = "스페이스 연락처 관리 API")
 @RestController
@@ -45,5 +46,19 @@ public class SpaceContactController {
       @RequestBody SpaceContactsUpdateRequestDto requestDto) {
     SpaceContactsUpdateResponseDto response = spaceContactService.updateContactInfo(requestDto);
     return ResponseEntity.ok(response);
+  }
+
+  /**
+   * 연락처 삭제 API
+   * 
+   * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
+   * @return 삭제 성공 응답
+   */
+  @Operation(summary = "연락처 삭제", description = "스페이스 ID와 연락처 ID를 받아 해당 연락처를 삭제합니다.")
+  @DeleteMapping("/contact")
+  public ResponseEntity<Void> deleteContact(
+      @RequestBody ContactDeleteRequestDto requestDto) {
+    spaceContactService.deleteContact(requestDto);
+    return ResponseEntity.ok().build();
   }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceContactsUpdateResponseDto;
@@ -63,5 +64,23 @@ public class SpaceContactService {
     
     // 응답 DTO 생성
     return SpaceContactsUpdateResponseDto.fromEntities(savedContact);
+  }
+
+  /**
+   * 연락처를 삭제하는 비즈니스 로직
+   * 
+   * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
+   */
+  @Transactional
+  public void deleteContact(ContactDeleteRequestDto requestDto) {
+    // 연락처 ID로 연락처 조회
+    SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
+    
+    // DTO를 통해 권한 검증 및 삭제 준비
+    requestDto.validateAndPrepareForDeletion(contact);
+    
+    // 연락처 삭제
+    spaceContactsRepository.delete(contact);
   }
 }

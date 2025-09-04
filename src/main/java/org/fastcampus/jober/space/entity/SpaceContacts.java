@@ -107,4 +107,16 @@ public class SpaceContacts extends BaseEntity {
     public String getPhoneNumber() {
         return this.phoneNum;
     }
+
+    /**
+     * 스페이스 삭제 권한 검증
+     * 
+     * @param spaceId 검증할 스페이스 ID
+     * @throws IllegalArgumentException 권한이 없는 경우
+     */
+    public void validateDeletePermission(Long spaceId) {
+        if (!this.spaceId.equals(spaceId)) {
+            throw new IllegalArgumentException("해당 스페이스에서 연락처를 삭제할 권한이 없습니다.");
+        }
+    }
 }
