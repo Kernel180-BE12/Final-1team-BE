@@ -14,7 +14,7 @@ public class UserService {
     public Long getUserId(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow()
-                .getId();
+                .getUserId();
     }
 
     public void register(RegisterRequestDto req) {
