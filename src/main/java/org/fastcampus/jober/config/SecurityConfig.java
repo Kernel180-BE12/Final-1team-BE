@@ -98,11 +98,12 @@ public class SecurityConfig {
 
         http
                 .cors(_ -> {})
-                .csrf(csrf -> csrf
-                        .csrfTokenRequestHandler(requestHandler)
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**", "/user/login", "/user/register")
-                ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
+                .csrf().disable()
+                // .csrf(csrf -> csrf
+                //         .csrfTokenRequestHandler(requestHandler)
+                //         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                //         .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**", "/user/login", "/user/register")
+                // ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
                 .addFilterAfter(new CsrfCookieFilter(),
                         BasicAuthenticationFilter.class)
                 // 2) H2 콘솔은 frame으로 열리므로 sameOrigin 필요
