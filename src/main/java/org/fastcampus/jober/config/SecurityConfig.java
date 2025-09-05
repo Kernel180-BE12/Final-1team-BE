@@ -98,7 +98,7 @@ public class SecurityConfig {
 
         http
                 .cors(_ -> {})
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // .csrf(csrf -> csrf
                 //         .csrfTokenRequestHandler(requestHandler)
                 //         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
