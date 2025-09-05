@@ -62,14 +62,5 @@ public class TemplateDetailResponseDto {
     public boolean isValid() {
         return id != null && spaceId != null && title != null && title.trim().length() > 0;
     }
-    
-    /**
-     * 템플릿 제목을 안전하게 반환합니다.
-     * @return 템플릿 제목 (null인 경우 빈 문자열)
-     */
-    public String getSafeTitle() {
-        return title != null ? title : "";
-    }
 
-    
 }

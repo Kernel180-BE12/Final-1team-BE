@@ -65,36 +65,9 @@ public class TemplateService {
   public List<TemplateTitleResponseDto> getTitlesBySpaceId(
     @Parameter(description = "스페이스 ID", required = true) Long spaceId
   ) {
-    return Template.findTitlesBySpaceId(templateRepository, spaceId);
+    return TemplateTitleResponseDto.fromList(templateRepository.findBySpaceId(spaceId));
   }
 
-  /**
-   * 특정 spaceId의 템플릿들을 조회
-   * @param spaceId 스페이스 ID
-   * @return 템플릿 엔티티 리스트
-   */
-  @Operation(
-    summary = "템플릿 엔티티 조회",
-    description = "특정 spaceId의 템플릿들을 조회합니다."
-  )
-  public List<Template> getTemplatesBySpaceId(
-    @Parameter(description = "스페이스 ID", required = true) Long spaceId
-  ) {
-    return Template.findBySpaceId(templateRepository, spaceId);
-  }
-
-  /**
-   * 특정 spaceId와 templateId의 템플릿을 조회
-   * @param spaceId 스페이스 ID
-   * @param templateId 템플릿 ID
-   * @return 템플릿 엔티티
-   */
-  public Template getTemplateBySpaceIdAndTemplateId(
-    @Parameter(description = "스페이스 ID", required = true) Long spaceId,
-    @Parameter(description = "템플릿 ID", required = true) Long templateId
-  ) {
-    return Template.findBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
-  }
 
   /**
    * 특정 spaceId와 templateId의 템플릿 상세 정보를 조회합니다 (completedAt 제외).
@@ -106,7 +79,11 @@ public class TemplateService {
     @Parameter(description = "스페이스 ID", required = true) Long spaceId,
     @Parameter(description = "템플릿 ID", required = true) Long templateId
   ) {
-    return Template.findDetailBySpaceIdAndTemplateId(templateRepository, spaceId, templateId);
+    Template template = templateRepository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId);
+    if (template == null) {
+      return null;
+    }
+    return TemplateDetailResponseDto.from(template);
   }
 
     /**
