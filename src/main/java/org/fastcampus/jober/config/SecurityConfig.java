@@ -58,7 +58,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         var conf = new CorsConfiguration();
         // ★ 배포 환경에선 와일드카드(*) 대신 '정확한 오리진'만 허용
-        conf.setAllowedOrigins(List.of("http://localhost:3000", "https://your-frontend.com"));
+        conf.setAllowedOrigins(List.of("http://localhost:5173", "https://your-frontend.com"));
         conf.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         conf.setAllowedHeaders(List.of("Content-Type","Authorization","X-XSRF-TOKEN"));
         conf.setAllowCredentials(true); // 쿠키/인증 포함 요청이면 필수
