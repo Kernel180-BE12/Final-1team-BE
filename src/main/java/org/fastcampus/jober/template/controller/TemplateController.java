@@ -127,8 +127,8 @@ public class TemplateController {
      * 사용자의 메시지를 받아서 AI Flask 서버로 전달하고, 
      * 생성된 템플릿 내용을 반환합니다.
      * 
-     * @param request 템플릿 생성 요청 DTO (사용자 메시지 포함)
-     * @return AI가 생성한 템플릿 내용 (String 형태)
+     * @param request 템플릿 생성 요청 DTO (사용자 메시지와 AI 세션 상태 포함)
+     * @return AI가 생성한 템플릿 내용 (Object 형태)
      */
     @Operation(
         summary = "AI 템플릿 생성 요청", 
@@ -141,8 +141,8 @@ public class TemplateController {
         
         log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}, state: {}", request.getMessage(), request.getState());
         
-        // TemplateService를 통해 AI Flask 서버로 요청 전달 (message + state)
-        Object aiResponse = templateService.createTemplate(request.getMessage(), request.getState());
+        // TemplateService를 통해 AI Flask 서버로 요청 전달
+        Object aiResponse = templateService.createTemplate(request);
         
         log.info("AI Flask 서버로부터 응답 수신 완료");
         
