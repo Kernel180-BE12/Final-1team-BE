@@ -101,7 +101,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRequestHandler(requestHandler)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**")
+                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**", "/user/login", "/user/register")
                 ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
                 .addFilterAfter(new CsrfCookieFilter(),
                         BasicAuthenticationFilter.class)
