@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +66,7 @@ public class SpaceContactService {
   }
 
   /**
-   * 연락처를 삭제하는 비즈니스 로직
+   * 연락처를 논리삭제하는 비즈니스 로직
    * 
    * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
    */
@@ -80,7 +79,8 @@ public class SpaceContactService {
     // DTO를 통해 권한 검증 및 삭제 준비
     requestDto.validateAndPrepareForDeletion(contact);
     
-    // 연락처 삭제
-    spaceContactsRepository.delete(contact);
+    // 연락처 논리삭제 (isDeleted를 true로 설정)
+    contact.softDelete();
+    spaceContactsRepository.save(contact);
   }
 }

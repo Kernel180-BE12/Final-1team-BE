@@ -46,7 +46,7 @@ public class SpaceContactsUpdateResponseDto {
         return SpaceContactsUpdateResponseDto.builder()
             .id(spaceContacts.getId())
             .name(spaceContacts.getName())
-            .phoneNumber(spaceContacts.getPhoneNumber())
+            .phoneNumber(spaceContacts.getPhoneNum())
             .email(spaceContacts.getEmail())
             .tag(spaceContacts.getTag())
             .updatedAt(spaceContacts.getUpdatedAt())

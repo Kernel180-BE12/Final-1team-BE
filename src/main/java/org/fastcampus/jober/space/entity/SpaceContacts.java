@@ -32,7 +32,7 @@ public class SpaceContacts extends BaseEntity {
 
     @Column(nullable = false)
     @ColumnDefault("false")
-    private String isDeleted;
+    private Boolean isDeleted;
     
     @Column(name = "space_id", nullable = false)
     private Long spaceId;
@@ -48,7 +48,7 @@ public class SpaceContacts extends BaseEntity {
         private String phoneNum;
         private String email;
         private String tag;
-        private String isDeleted;
+        private Boolean isDeleted;
         private Long spaceId;
         
         public SpaceContactsBuilder id(Long id) {
@@ -76,7 +76,7 @@ public class SpaceContacts extends BaseEntity {
             return this;
         }
 
-        public SpaceContactsBuilder isDeleted(String isDeleted) {
+        public SpaceContactsBuilder isDeleted(Boolean isDeleted) {
             this.isDeleted = isDeleted;
             return this;
         }
@@ -87,7 +87,7 @@ public class SpaceContacts extends BaseEntity {
         }
         
         public SpaceContacts build() {
-            return new SpaceContacts(id, name, phoneNum, email, tag, isDeleted, spaceId);
+            return new SpaceContacts(id, name, phoneNum, email, tag, isDeleted != null ? isDeleted : false, spaceId);
         }
     }
 
@@ -124,12 +124,6 @@ public class SpaceContacts extends BaseEntity {
         }
     }
     
-    /**
-     * 전화번호 조회 (DTO와의 일관성을 위한 메서드)
-     */
-    public String getPhoneNumber() {
-        return this.phoneNum;
-    }
 
     /**
      * 스페이스 삭제 권한 검증
@@ -142,4 +136,12 @@ public class SpaceContacts extends BaseEntity {
             throw new IllegalArgumentException("해당 스페이스에서 연락처를 삭제할 권한이 없습니다.");
         }
     }
+    
+    /**
+     * 연락처를 논리삭제합니다 (isDeleted를 true로 설정)
+     */
+    public void softDelete() {
+        this.isDeleted = true;
+    }
+    
 }
