@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.template.entity.enums.Status;
-import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -104,64 +103,10 @@ public class Template extends BaseEntity {
         return this.spaceId.equals(spaceId);
     }
 
-    /**
-     * 특정 spaceId의 템플릿들을 조회하고 DTO로 변환합니다.
-     * @param repository TemplateRepository
-     * @param spaceId 스페이스 ID
-     * @return TemplateTitleResponseDto 리스트
-     */
-    public static List<TemplateTitleResponseDto> findTitlesBySpaceId(
-            org.fastcampus.jober.template.repository.TemplateRepository repository,
-            Long spaceId) {
-        return TemplateTitleResponseDto.fromTitleList(repository.findTitlesBySpaceId(spaceId));
-    }
-    
-    /**
-     * 특정 spaceId의 템플릿들을 조회합니다.
-     * @param repository TemplateRepository
-     * @param spaceId 스페이스 ID
-     * @return Template 리스트
-     */
-    public static List<Template> findBySpaceId(
-            org.fastcampus.jober.template.repository.TemplateRepository repository, 
-            Long spaceId) {
-        return repository.findBySpaceId(spaceId);
-    }
 
     public Boolean updateIsSaved(Boolean isSaved) {
         this.isSaved = isSaved;
         return this.isSaved;
     }
 
-    /**
-     * 특정 spaceId와 templateId의 템플릿을 조회합니다.
-     * @param repository TemplateRepository
-     * @param spaceId 스페이스 ID
-     * @param templateId 템플릿 ID
-     * @return Template 엔티티
-     */
-    public static Template findBySpaceIdAndTemplateId(
-            org.fastcampus.jober.template.repository.TemplateRepository repository,
-            Long spaceId,
-            Long templateId) {
-        return repository.findBySpaceIdAndTemplateId(spaceId, templateId);
-    }
-
-    /**
-     * 특정 spaceId와 templateId의 템플릿을 조회하고 상세 응답 DTO로 변환합니다.
-     * @param repository TemplateRepository
-     * @param spaceId 스페이스 ID
-     * @param templateId 템플릿 ID
-     * @return TemplateDetailResponseDto
-     */
-    public static org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto findDetailBySpaceIdAndTemplateId(
-            org.fastcampus.jober.template.repository.TemplateRepository repository,
-            Long spaceId,
-            Long templateId) {
-        Template template = repository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId);
-        if (template == null) {
-            return null;
-        }
-        return org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto.from(template);
-    }
 }
