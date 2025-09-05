@@ -1,6 +1,7 @@
 package org.fastcampus.jober.template.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,11 +10,15 @@ import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.template.entity.enums.Status;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
+@AllArgsConstructor (access = AccessLevel.PROTECTED)
 @Entity
 public class Template extends BaseEntity {
     @Id
@@ -27,9 +32,6 @@ public class Template extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private Status status; //상태
-
-    @Column(length=80)
-    private Long kakaoTemplateId; //카카오 실제 템플릿 id
 
     @Column(columnDefinition ="JSON" )
     private String extractedVariables; //태그json
@@ -46,7 +48,14 @@ public class Template extends BaseEntity {
 
     private Integer totalAttempts;
 
-    private Boolean isSaved;
+    private Boolean isSaved; // 0:저장안됨 / 1:저장됨
 
     private Boolean isAccepted;
+
+
+    public Boolean updateIsSaved(Boolean isSaved) {
+        this.isSaved = isSaved;
+        return this.isSaved;
+    }
+
 }
