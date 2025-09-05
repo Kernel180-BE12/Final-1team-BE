@@ -42,4 +42,6 @@ public interface SpaceContactsRepository extends JpaRepository<SpaceContacts, Lo
     void deleteBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId
     );
+
+    @Query("UPDATE SpaceContacts sc SET sc.")
 }

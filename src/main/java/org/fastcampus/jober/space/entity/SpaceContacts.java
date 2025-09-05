@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.hibernate.annotations.ColumnDefault;
 
 
 @Entity
@@ -25,6 +26,13 @@ public class SpaceContacts extends BaseEntity {
     
     @Column(nullable = false)
     private String email;
+
+    @Column
+    private String tag;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private String isDeleted;
     
     @Column(name = "space_id", nullable = false)
     private Long spaceId;
@@ -39,6 +47,8 @@ public class SpaceContacts extends BaseEntity {
         private String name;
         private String phoneNum;
         private String email;
+        private String tag;
+        private String isDeleted;
         private Long spaceId;
         
         public SpaceContactsBuilder id(Long id) {
@@ -60,6 +70,16 @@ public class SpaceContacts extends BaseEntity {
             this.email = email;
             return this;
         }
+
+        public SpaceContactsBuilder tag(String tag) {
+            this.tag = tag;
+            return this;
+        }
+
+        public SpaceContactsBuilder isDeleted(String isDeleted) {
+            this.isDeleted = isDeleted;
+            return this;
+        }
         
         public SpaceContactsBuilder spaceId(Long spaceId) {
             this.spaceId = spaceId;
@@ -67,7 +87,7 @@ public class SpaceContacts extends BaseEntity {
         }
         
         public SpaceContacts build() {
-            return new SpaceContacts(id, name, phoneNum, email, spaceId);
+            return new SpaceContacts(id, name, phoneNum, email, tag, isDeleted, spaceId);
         }
     }
 
@@ -89,7 +109,7 @@ public class SpaceContacts extends BaseEntity {
     /**
      * 연락처 정보 수정
      */
-    public void updateContactInfo(String name, String phoneNumber, String email) {
+    public void updateContactInfo(String name, String phoneNumber, String email, String tag) {
         if (name != null && !name.trim().isEmpty()) {
             this.name = name;
         }
@@ -98,6 +118,9 @@ public class SpaceContacts extends BaseEntity {
         }
         if (email != null && !email.trim().isEmpty()) {
             this.email = email;
+        }
+        if (tag != null && !tag.trim().isEmpty()) {
+            this.tag = tag;
         }
     }
     

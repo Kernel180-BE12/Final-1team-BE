@@ -21,6 +21,8 @@ public class ContactDeleteRequestDto {
   @Schema(description = "삭제할 연락처 ID", example = "1")
   private Long contactId;
 
+  @Schema(description = "삭제할 연락처 ", example = "홍길동")
+
   /**
    * 연락처 삭제 권한 검증 및 처리
    * 

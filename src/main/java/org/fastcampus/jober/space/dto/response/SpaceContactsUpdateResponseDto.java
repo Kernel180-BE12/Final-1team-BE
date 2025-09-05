@@ -32,6 +32,9 @@ public class SpaceContactsUpdateResponseDto {
     @Schema(description = "연락처 이메일", example = "hong@example.com")
     private String email;
     
+    @Schema(description = "연락처 태그", example = "프리랜서")
+    private String tag;
+
     @Schema(description = "수정된 시간")
     private LocalDateTime updatedAt;
 
@@ -45,6 +48,7 @@ public class SpaceContactsUpdateResponseDto {
             .name(spaceContacts.getName())
             .phoneNumber(spaceContacts.getPhoneNumber())
             .email(spaceContacts.getEmail())
+            .tag(spaceContacts.getTag())
             .updatedAt(spaceContacts.getUpdatedAt())
             .build();
     }

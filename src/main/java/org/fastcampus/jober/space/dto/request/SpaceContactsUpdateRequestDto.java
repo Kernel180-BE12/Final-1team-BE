@@ -32,6 +32,9 @@ public class SpaceContactsUpdateRequestDto {
     @Schema(description = "연락처 이메일", example = "hong@example.com")
     private String email;
     
+    @Schema(description = "연락처 태그", example = "프리랜서")
+    private String tag;
+
     /**
      * 기존 연락처 엔티티의 정보를 업데이트
      * @param existingContact 기존 연락처 엔티티
@@ -44,7 +47,7 @@ public class SpaceContactsUpdateRequestDto {
         }
         
         // 연락처 정보 업데이트
-        existingContact.updateContactInfo(this.name, this.phoneNumber, this.email);
+        existingContact.updateContactInfo(this.name, this.phoneNumber, this.email, this.tag);
         
         return existingContact;
     }
