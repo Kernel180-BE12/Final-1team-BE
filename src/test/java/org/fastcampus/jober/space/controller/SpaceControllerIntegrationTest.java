@@ -27,22 +27,10 @@
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 //import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 //
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@AutoConfigureWebMvc
-//@TestPropertySource(properties = {
-//        "spring.datasource.url=jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
-//        "spring.datasource.username=sa",
-//        "spring.datasource.password=",
-//        "spring.datasource.driver-class-name=org.h2.Driver",
-//        "spring.jpa.hibernate.ddl-auto=create-drop",
-//        "spring.jpa.show-sql=true",
-//        "spring.jpa.properties.hibernate.format_sql=true",
-//        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
-//        "spring.h2.console.enabled=true",
-//        "logging.level.org.springframework.security=DEBUG",
-//        "logging.level.org.springframework.web=DEBUG"
-//})
-//@Transactional
+
+import org.fastcampus.jober.IntegrationTest;
+
+@IntegrationTest
 //class SpaceControllerIntegrationTest {
 //
 //    @Autowired

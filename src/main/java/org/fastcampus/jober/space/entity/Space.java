@@ -3,7 +3,10 @@ package org.fastcampus.jober.space.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
@@ -11,6 +14,7 @@ import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.user.entity.Users;
 
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -18,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Space extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -26,9 +31,7 @@ public class Space extends BaseEntity {
     @NotBlank(message = "스페이스 이름은 필수입니다.")
     private String spaceName;
 
-    private Long adminUserId;
-
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id")
     private Users admin;
 
@@ -42,22 +45,17 @@ public class Space extends BaseEntity {
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL)
     private List<SpaceMember> spaceMembers;
 
-    public void isAdminUser(long userId) {
-        if (!(this.adminUserId.equals(userId))) {
+    public void validateAdminUser(long userId) {
+        if (!(admin.isSameUser(userId))) {
             throw new BusinessException(ErrorCode.FORBIDDEN, "스페이스 관리자만 가능합니다.");
         }
     }
 
     // 부분 업데이트 (null 값 무시)
-    public void updateSpaceFromDto(SpaceUpdateRequestDto dto) {
-        if (dto.getSpaceName() != null && !dto.getSpaceName().isBlank()) {
-            this.spaceName = dto.getSpaceName();
-        }
-        if (dto.getOwnerName() != null && !dto.getOwnerName().isBlank()) {
-            this.ownerName = dto.getOwnerName();
-        }
-        if (dto.getOwnerNum() != null) {
-            this.ownerNum = dto.getOwnerNum();
-        }
+    public void updateSpaceFromDto(SpaceUpdateRequestDto dto, final Long userId) {
+        validateAdminUser(userId);
+        this.spaceName = Optional.ofNullable(dto.getSpaceName()).filter(name -> !name.isBlank()).orElse(this.spaceName);
+        this.ownerName = Optional.ofNullable(dto.getOwnerName()).filter(name -> !name.isBlank()).orElse(this.ownerName);
+        this.ownerNum = Optional.ofNullable(dto.getOwnerNum()).orElse(this.ownerNum);
     }
 }

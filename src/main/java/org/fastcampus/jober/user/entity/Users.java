@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import jakarta.persistence.*;
 import org.fastcampus.jober.common.entity.BaseEntity;
-
+import org.fastcampus.jober.space.validator.NotNullOrEmpty;
 
 @Entity
 @Getter
@@ -17,12 +17,16 @@ public class Users extends BaseEntity {
     @Column(name = "id")
     private Long userId;
 
+    @NotNullOrEmpty
     private String username;
 
+    @NotNullOrEmpty
     private String password;
 
+    @NotNullOrEmpty
     private String name;
 
+    @NotNullOrEmpty
     private String email;
 
     // ✅ 기본 생성자 (JPA 필수)
@@ -44,7 +48,11 @@ public class Users extends BaseEntity {
                 email);
     }
 
-//    public static Users forUpdate(Users existing, String updatedBy) {
+    public boolean isSameUser(final long userId) {
+        return this.userId == userId;
+    }
+
+    //    public static Users forUpdate(Users existing, String updatedBy) {
 //        return new Users(
 //                existing.username,
 //                existing.password,

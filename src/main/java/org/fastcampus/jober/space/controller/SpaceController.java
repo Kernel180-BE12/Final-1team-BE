@@ -8,13 +8,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.fastcampus.jober.user.dto.CurrentUserId;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.service.SpaceService;
+import org.fastcampus.jober.user.dto.UserIdDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -64,9 +67,9 @@ public class SpaceController {
     public ResponseEntity<SpaceResponseDto> updateSpace(
             @PathVariable Long spaceId,
             @Valid @RequestBody SpaceUpdateRequestDto dto,
-            @AuthenticationPrincipal CustomUserDetails principal) {
+            @CurrentUserId UserIdDto userIdDto) {
 
-        SpaceResponseDto result = spaceService.updateSpace(spaceId, dto, principal);
+        SpaceResponseDto result = spaceService.updateSpace(spaceId, dto, userIdDto);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

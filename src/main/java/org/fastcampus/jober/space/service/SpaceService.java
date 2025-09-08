@@ -9,6 +9,7 @@ import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.mapper.SpaceMapper;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
+import org.fastcampus.jober.user.dto.UserIdDto;
 import org.springframework.stereotype.Service;
 
 
@@ -30,17 +31,12 @@ public class SpaceService {
     }
 
     @Transactional
-    public SpaceResponseDto updateSpace(Long spaceId, SpaceUpdateRequestDto dto, CustomUserDetails principal) {
-
+    public SpaceResponseDto updateSpace(Long spaceId, SpaceUpdateRequestDto dto, UserIdDto userIdDto) {
         // 1. 데이터 조회
         Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 
-        Long userId = principal.getUserId();
-        // 2. 관리자인지 체크
-        existingSpace.isAdminUser(userId);
-        // 3. 엔티티 업데이트
-        existingSpace.updateSpaceFromDto(dto);
-        // 4. Entity to DTO
+        existingSpace.updateSpaceFromDto(dto, userIdDto.getUserId());
+        // 3. Entity to DTO
         return spaceMapper.toResponseDto(existingSpace);
     }
 
@@ -48,7 +44,7 @@ public class SpaceService {
     public void deleteSpace(Long spaceId, CustomUserDetails principal) {
         Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 
-        existingSpace.isAdminUser(principal.getUserId());
+        existingSpace.validateAdminUser(principal.getUserId());
 
         spaceRepository.deleteById(existingSpace.getSpaceId());
     }
