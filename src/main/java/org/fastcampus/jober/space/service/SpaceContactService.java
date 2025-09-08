@@ -10,6 +10,7 @@ import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceContactsUpdateResponseDto;
 import org.fastcampus.jober.space.entity.SpaceContacts;
 import org.fastcampus.jober.space.repository.SpaceContactsRepository;
+import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class SpaceContactService {
 
   private final SpaceContactsRepository spaceContactsRepository;
+  private final SpaceRepository spaceRepository;
 
   /**
    * 스페이스에 연락처를 추가하는 비즈니스 로직
@@ -33,6 +35,9 @@ public class SpaceContactService {
    */
   @Transactional
   public ContactResponseDto addContacts(ContactRequestDto requestDto) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
+    
     // DTO를 엔티티로 변환하고 유효성 검증
     List<SpaceContacts> contacts = requestDto.toValidateEntities();
 
@@ -51,6 +56,9 @@ public class SpaceContactService {
    */
   @Transactional
   public SpaceContactsUpdateResponseDto updateContactInfo(SpaceContactsUpdateRequestDto requestDto) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
+    
     // 연락처 ID로 연락처 조회
     SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
@@ -72,6 +80,9 @@ public class SpaceContactService {
    */
   @Transactional
   public void deleteContact(ContactDeleteRequestDto requestDto) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
+    
     // 연락처 ID로 연락처 조회
     SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
