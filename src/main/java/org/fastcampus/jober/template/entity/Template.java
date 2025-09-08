@@ -10,10 +10,6 @@ import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.template.entity.enums.Status;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder

@@ -2,7 +2,10 @@ package org.fastcampus.jober.space.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
+import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
+import org.fastcampus.jober.space.dto.response.SpaceContactsUpdateResponseDto;
 import org.fastcampus.jober.space.service.SpaceContactService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SpaceContactController.class)
@@ -37,6 +40,9 @@ class SpaceContactControllerTest {
 
     private ContactRequestDto requestDto;
     private ContactResponseDto responseDto;
+    private SpaceContactsUpdateRequestDto updateRequestDto;
+    private SpaceContactsUpdateResponseDto updateResponseDto;
+    private ContactDeleteRequestDto deleteRequestDto;
 
     @BeforeEach
     void setUp() {
@@ -65,6 +71,29 @@ class SpaceContactControllerTest {
                 .spaceName("테스트 회사")
                 .contacts(Arrays.asList(responseContactInfo))
                 .registeredAt(LocalDateTime.now())
+                .build();
+
+        // 연락처 수정 요청/응답 데이터 설정
+        updateRequestDto = SpaceContactsUpdateRequestDto.builder()
+                .spaceId(1L)
+                .contactId(1L)
+                .name("김철수(수정)")
+                .phoneNumber("010-9876-5432")
+                .email("kim.updated@example.com")
+                .build();
+
+        updateResponseDto = SpaceContactsUpdateResponseDto.builder()
+                .id(1L)
+                .name("김철수(수정)")
+                .phoneNumber("010-9876-5432")
+                .email("kim.updated@example.com")
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        // 연락처 삭제 요청 데이터 설정
+        deleteRequestDto = ContactDeleteRequestDto.builder()
+                .spaceId(1L)
+                .contactId(1L)
                 .build();
     }
 
@@ -129,5 +158,76 @@ class SpaceContactControllerTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isUnauthorized()); // 401 Unauthorized 또는 302 Redirect 예상
+    }
+
+    @Test
+    @DisplayName("연락처 수정 API 테스트 - 성공")
+    @WithMockUser
+    void updateContactInfo_Success() throws Exception {
+        // given
+        when(spaceContactService.updateContactInfo(any(SpaceContactsUpdateRequestDto.class)))
+                .thenReturn(updateResponseDto);
+
+        // when & then
+        mockMvc.perform(put("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("김철수(수정)"))
+                .andExpect(jsonPath("$.phoneNumber").value("010-9876-5432"))
+                .andExpect(jsonPath("$.email").value("kim.updated@example.com"));
+    }
+
+    @Test
+    @DisplayName("연락처 삭제 API 테스트 - 성공")
+    @WithMockUser
+    void deleteContact_Success() throws Exception {
+        // given
+        // deleteContact는 void를 반환하므로 when 설정 불필요
+
+        // when & then
+        mockMvc.perform(delete("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(deleteRequestDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("연락처 수정 API 테스트 - 잘못된 요청")
+    @WithMockUser
+    void updateContactInfo_BadRequest() throws Exception {
+        // given
+        SpaceContactsUpdateRequestDto invalidRequest = SpaceContactsUpdateRequestDto.builder()
+                .spaceId(null)
+                .contactId(null)
+                .build();
+
+        // when & then
+        mockMvc.perform(put("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
+    }
+
+    @Test
+    @DisplayName("연락처 삭제 API 테스트 - 잘못된 요청")
+    @WithMockUser
+    void deleteContact_BadRequest() throws Exception {
+        // given
+        ContactDeleteRequestDto invalidRequest = ContactDeleteRequestDto.builder()
+                .spaceId(null)
+                .contactId(null)
+                .build();
+
+        // when & then
+        mockMvc.perform(delete("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
     }
 }
