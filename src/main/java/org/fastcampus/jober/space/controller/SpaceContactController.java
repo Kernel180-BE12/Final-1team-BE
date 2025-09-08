@@ -1,6 +1,7 @@
 package org.fastcampus.jober.space.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
@@ -19,6 +20,24 @@ import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
 public class SpaceContactController {
 
   private final SpaceContactService spaceContactService;
+
+  /**
+   * 연락처 조회하는 API
+   * @param spaceId 연락처 조회 요청 데이터 (스페이스 ID)
+   * @return 조회된 연락처 정보
+   */
+  @Operation(summary = "연락처 조회", description = "스페이스 ID를 받아 해당 스페이스의 연락처를 조회합니다.")
+  @GetMapping("/contact/{spaceId}")
+  public ResponseEntity<ContactResponseDto> getContacts(
+      @Parameter(
+        description = "스페이스 ID",
+        required = true,
+        example = "1")
+      @PathVariable(name = "spaceId") Long spaceId
+  ) {
+    ContactResponseDto response = spaceContactService.getContacts(spaceId);
+    return ResponseEntity.ok(response);
+  }
 
   /**
    * 스페이스에 여러 연락처를 추가하는 API

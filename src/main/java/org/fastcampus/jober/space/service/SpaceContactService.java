@@ -25,6 +25,21 @@ public class SpaceContactService {
   private final SpaceRepository spaceRepository;
 
   /**
+   * 스페이스에 연락처를 조회하는 비즈니스 로직
+   * 
+   * @param spaceId 조회할 스페이스 ID
+   * @return 조회된 연락처 정보
+   */
+  public ContactResponseDto getContacts(Long spaceId) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(spaceId);
+    
+    // 연락처 조회
+    List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceId(spaceId);
+    return ContactResponseDto.fromEntities(contacts, spaceId);
+  }
+
+  /**
    * 스페이스에 연락처를 추가하는 비즈니스 로직
    * 
    * 기존 연락처를 유지하면서 새로운 연락처들을 추가합니다.
