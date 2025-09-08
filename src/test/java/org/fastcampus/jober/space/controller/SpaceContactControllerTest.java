@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -68,7 +69,6 @@ class SpaceContactControllerTest {
 
         responseDto = ContactResponseDto.builder()
                 .spaceId(1L)
-                .spaceName("테스트 회사")
                 .contacts(Arrays.asList(responseContactInfo))
                 .registeredAt(LocalDateTime.now())
                 .build();
@@ -98,6 +98,47 @@ class SpaceContactControllerTest {
     }
 
     @Test
+    @DisplayName("연락처 조회 API 테스트 - 성공")
+    @WithMockUser
+    void getContacts_Success() throws Exception {
+        // given
+        when(spaceContactService.getContacts(1L))
+                .thenReturn(responseDto);
+
+        // when & then
+        mockMvc.perform(get("/space/contact/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.spaceId").value(1))
+                .andExpect(jsonPath("$.contacts[0].id").value(1))
+                .andExpect(jsonPath("$.contacts[0].name").value("김철수"))
+                .andExpect(jsonPath("$.contacts[0].phoneNum").value("010-1234-5678"))
+                .andExpect(jsonPath("$.contacts[0].email").value("kim@example.com"));
+    }
+
+    @Test
+    @DisplayName("연락처 조회 API 테스트 - 존재하지 않는 스페이스")
+    @WithMockUser
+    void getContacts_SpaceNotFound() throws Exception {
+        // given
+        when(spaceContactService.getContacts(999L))
+                .thenThrow(new org.fastcampus.jober.error.BusinessException(
+                        org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
+
+        // when & then
+        mockMvc.perform(get("/space/contact/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("연락처 조회 API 테스트 - 잘못된 경로 변수")
+    @WithMockUser
+    void getContacts_InvalidPathVariable() throws Exception {
+        // when & then
+        mockMvc.perform(get("/space/contact/invalid"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("연락처 등록 API 테스트 - 성공")
     @WithMockUser // 인증된 사용자로 테스트 실행
     void addContacts_Success() throws Exception {
@@ -119,7 +160,7 @@ class SpaceContactControllerTest {
 
     @Test
     @DisplayName("연락처 등록 API 테스트 - 잘못된 요청")
-    @WithMockUser // 인증된 사용자로 테스트 실행
+    @WithMockUser
     void addContacts_BadRequest() throws Exception {
         // given
         ContactRequestDto invalidRequest = ContactRequestDto.builder()
@@ -129,10 +170,27 @@ class SpaceContactControllerTest {
 
         // when & then
         mockMvc.perform(post("/space/contact")
-                        .with(csrf()) // CSRF 토큰 추가
+                        .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
+    }
+
+    @Test
+    @DisplayName("연락처 등록 API 테스트 - 존재하지 않는 스페이스")
+    @WithMockUser
+    void addContacts_SpaceNotFound() throws Exception {
+        // given
+        when(spaceContactService.addContacts(any(ContactRequestDto.class)))
+                .thenThrow(new org.fastcampus.jober.error.BusinessException(
+                        org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
+
+        // when & then
+        mockMvc.perform(post("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -214,6 +272,40 @@ class SpaceContactControllerTest {
     }
 
     @Test
+    @DisplayName("연락처 수정 API 테스트 - 존재하지 않는 스페이스")
+    @WithMockUser
+    void updateContactInfo_SpaceNotFound() throws Exception {
+        // given
+        when(spaceContactService.updateContactInfo(any(SpaceContactsUpdateRequestDto.class)))
+                .thenThrow(new org.fastcampus.jober.error.BusinessException(
+                        org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
+
+        // when & then
+        mockMvc.perform(put("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequestDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("연락처 수정 API 테스트 - 존재하지 않는 연락처")
+    @WithMockUser
+    void updateContactInfo_ContactNotFound() throws Exception {
+        // given
+        when(spaceContactService.updateContactInfo(any(SpaceContactsUpdateRequestDto.class)))
+                .thenThrow(new org.fastcampus.jober.error.BusinessException(
+                        org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
+
+        // when & then
+        mockMvc.perform(put("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequestDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("연락처 삭제 API 테스트 - 잘못된 요청")
     @WithMockUser
     void deleteContact_BadRequest() throws Exception {
@@ -229,5 +321,39 @@ class SpaceContactControllerTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
+    }
+
+    @Test
+    @DisplayName("연락처 삭제 API 테스트 - 존재하지 않는 스페이스")
+    @WithMockUser
+    void deleteContact_SpaceNotFound() throws Exception {
+        // given
+        doThrow(new org.fastcampus.jober.error.BusinessException(
+                        org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."))
+                .when(spaceContactService).deleteContact(any(ContactDeleteRequestDto.class));
+
+        // when & then
+        mockMvc.perform(delete("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(deleteRequestDto)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("연락처 삭제 API 테스트 - 존재하지 않는 연락처")
+    @WithMockUser
+    void deleteContact_ContactNotFound() throws Exception {
+        // given
+        doThrow(new org.fastcampus.jober.error.BusinessException(
+                        org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."))
+                .when(spaceContactService).deleteContact(any(ContactDeleteRequestDto.class));
+
+        // when & then
+        mockMvc.perform(delete("/space/contact")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(deleteRequestDto)))
+                .andExpect(status().isNotFound());
     }
 }
