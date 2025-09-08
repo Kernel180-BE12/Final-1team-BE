@@ -95,7 +95,6 @@ class SpaceContactControllerTest {
                 .spaceId(1L)
                 .contactId(1L)
                 .build();
-<<<<<<< HEAD
     }
 
     @Test
@@ -137,8 +136,6 @@ class SpaceContactControllerTest {
         // when & then
         mockMvc.perform(get("/space/contact/invalid"))
                 .andExpect(status().isBadRequest());
-=======
->>>>>>> 4987c0a981833eeca30cf9042698bbf27efdd1a7
     }
 
     @Test
@@ -275,7 +272,6 @@ class SpaceContactControllerTest {
     }
 
     @Test
-<<<<<<< HEAD
     @DisplayName("연락처 수정 API 테스트 - 존재하지 않는 스페이스")
     @WithMockUser
     void updateContactInfo_SpaceNotFound() throws Exception {
@@ -310,8 +306,6 @@ class SpaceContactControllerTest {
     }
 
     @Test
-=======
->>>>>>> 4987c0a981833eeca30cf9042698bbf27efdd1a7
     @DisplayName("연락처 삭제 API 테스트 - 잘못된 요청")
     @WithMockUser
     void deleteContact_BadRequest() throws Exception {
@@ -328,7 +322,6 @@ class SpaceContactControllerTest {
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
     }
-<<<<<<< HEAD
 
     @Test
     @DisplayName("연락처 삭제 API 테스트 - 존재하지 않는 스페이스")
@@ -363,6 +356,4 @@ class SpaceContactControllerTest {
                         .content(objectMapper.writeValueAsString(deleteRequestDto)))
                 .andExpect(status().isNotFound());
     }
-=======
->>>>>>> 4987c0a981833eeca30cf9042698bbf27efdd1a7
 }
