@@ -52,18 +52,8 @@ public class UserService {
         Users user = userRepository.findById(principal.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         
-        // 변경사항이 있는지 먼저 확인
-        if (!req.hasChanges(user)) {
-            return false; // 변경사항이 없으면 저장하지 않음
-        }
-        
-        // DTO를 통해 엔티티 업데이트 (변경된 필드만)
-        boolean hasChanges = req.updateEntity(user);
-        
-        // 변경사항이 있을 때만 저장
-        if (hasChanges) {
-            userRepository.save(user);
-        }
+        // DTO를 통해 엔티티 업데이트 (@Transactional로 자동 저장)
+        boolean hasChanges = user.updateUserInfo(req);
         
         return hasChanges;
     }

@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import jakarta.persistence.*;
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
 
 
 @Entity
@@ -44,40 +45,26 @@ public class Users extends BaseEntity {
                 email);
     }
 
-//    public static Users forUpdate(Users existing, String updatedBy) {
-//        return new Users(
-//                existing.username,
-//                existing.password,
-//                existing.name,
-//                existing.email,
-//                existing.registeredAt,
-//                LocalDateTime.now(),
-//                updatedBy
-//        );
-//    }
-
     /**
-     * 사용자 정보 업데이트 (기존 값과 다를 때만 업데이트)
-     * @param newUsername 새로운 사용자명 (null이면 변경하지 않음)
-     * @param newName 새로운 이름 (null이면 변경하지 않음)
-     * @param newEmail 새로운 이메일 (null이면 변경하지 않음)
+     * 사용자 정보 업데이트 (null이 아닌 필드만 업데이트)
+     * @param req 업데이트 요청 DTO
      * @return 변경된 필드가 있는지 여부
      */
-    public boolean updateUserInfo(String newUsername, String newName, String newEmail) {
+    public boolean updateUserInfo(UpdateRequestDto req) {
         boolean hasChanges = false;
         
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
+        if (req.getUsername() != null) {
+            this.username = req.getUsername();
             hasChanges = true;
         }
         
-        if (newName != null && !newName.equals(this.name)) {
-            this.name = newName;
+        if (req.getName() != null) {
+            this.name = req.getName();
             hasChanges = true;
         }
         
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
+        if (req.getEmail() != null) {
+            this.email = req.getEmail();
             hasChanges = true;
         }
         
