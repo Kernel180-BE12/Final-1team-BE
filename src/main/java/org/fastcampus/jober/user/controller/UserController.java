@@ -5,21 +5,27 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.dto.request.LoginRequestDto;
 import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
+import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
 import org.fastcampus.jober.user.dto.response.LoginResponseDto;
+import org.fastcampus.jober.user.dto.response.UserInfoResponseDto;
 import org.fastcampus.jober.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -90,5 +96,63 @@ public class UserController {
         } catch (BadCredentialsException e) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "Bad credentials");
         }
+    }
+
+    /**
+     * 회원 정보 조회
+     * @param userId 회원 정보 조회 요청 데이터 (사용자 ID)
+     * @return 조회된 회원 정보
+     */
+    @GetMapping("/info")
+    @Operation(summary = "회원 정보 조회", description = "현재 로그인된 사용자의 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공")
+    public ResponseEntity<UserInfoResponseDto> getUser(@AuthenticationPrincipal CustomUserDetails principal) {
+        UserInfoResponseDto response = userService.getUserInfo(principal);
+        return ResponseEntity.ok(response);
+    }
+
+
+    /**
+     * 회원 정보 수정
+     * @param req 수정할 회원 정보
+     * @param principal 현재 로그인된 사용자 정보
+     * @return 수정된 회원 정보
+     */
+    @PutMapping("/update")
+    @Operation(
+            summary = "회원 정보 수정",
+            description = "현재 로그인된 사용자의 정보를 수정합니다. 기존 값과 동일한 필드는 변경되지 않습니다."
+    )
+    @ApiResponse(responseCode = "200", description = "사용자 정보 수정 성공")
+    @ApiResponse(responseCode = "400", description = "요청 데이터가 잘못되었거나 이미 존재하는 아이디 또는 이메일")
+    @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+    @ApiResponse(responseCode = "204", description = "변경사항이 없음")
+    public ResponseEntity<Void> update(
+            @RequestBody UpdateRequestDto req,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        
+        // username 중복 검사 (현재 username과 다를 경우에만)
+        if (req.getUsername() != null && !req.getUsername().equals(principal.getUsername())) {
+            if (userService.isUsernameExists(req.getUsername())) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
+            }
+        }
+
+        // email 중복 검사
+        if (req.getEmail() != null) {
+            if (userService.isEmailExists(req.getEmail())) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
+            }
+        }
+        
+        // 사용자 정보 업데이트 (변경사항이 있을 때만)
+        boolean hasChanges = userService.update(req, principal);
+        
+        if (!hasChanges) {
+            // 변경사항이 없으면 204 No Content 응답
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.ok().build();
     }
 }
