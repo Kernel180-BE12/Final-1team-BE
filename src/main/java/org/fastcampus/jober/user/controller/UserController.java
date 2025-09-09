@@ -1,14 +1,18 @@
 package org.fastcampus.jober.user.controller;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.user.dto.request.LoginRequestDto;
+import org.fastcampus.jober.user.dto.request.PasswordResetEmailRequestDto;
+import org.fastcampus.jober.user.dto.request.PasswordResetRequestDto;
 import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
 import org.fastcampus.jober.user.dto.response.LoginResponseDto;
 import org.fastcampus.jober.user.service.UserService;
+import org.fastcampus.jober.util.ClientIpResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,14 +23,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/user")
@@ -36,6 +39,7 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final SessionRegistry sessionRegistry;
+    private final ClientIpResolver ipResolver;
 
     @PostMapping("/register")
     @Operation(
@@ -90,5 +94,20 @@ public class UserController {
         } catch (BadCredentialsException e) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "Bad credentials");
         }
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<Boolean> sendPasswordResetEmail(@RequestBody PasswordResetEmailRequestDto passwordResetEmailRequestDto, HttpServletRequest request) throws MessagingException, NoSuchAlgorithmException {
+            String ip = ipResolver.resolve(request);
+            String ua = request.getHeader("User-Agent");
+            if (ua != null && ua.length() > 255) ua = ua.substring(0, 255);
+
+            userService.issueTokenAndSendMail(passwordResetEmailRequestDto, ip, ua);
+            return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Boolean> changePassword(PasswordResetRequestDto passwordResetRequestDto) {
+        return  ResponseEntity.ok().build();
     }
 }
