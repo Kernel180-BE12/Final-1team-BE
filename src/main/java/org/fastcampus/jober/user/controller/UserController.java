@@ -139,7 +139,7 @@ public class UserController {
         }
 
         // email 중복 검사
-        if (req.getEmail() != null) {
+        if (req.getEmail() != null && !userService.getUserInfo(principal).getEmail().equals(req.getEmail())) {
             if (userService.isEmailExists(req.getEmail())) {
                 throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
             }
