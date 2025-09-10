@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactTagRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
+import org.fastcampus.jober.space.dto.response.ContactTagResponseDto;
 import org.fastcampus.jober.space.service.SpaceContactService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -79,5 +81,32 @@ public class SpaceContactController {
       @RequestBody ContactDeleteRequestDto requestDto) {
     spaceContactService.deleteContact(requestDto);
     return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 연락처 태그 추가 API
+   * 
+   * @param requestDto 연락처 태그 추가 요청 데이터 (스페이스 ID, 태그)
+   * @return 추가된 연락처 태그 정보
+   */
+  @Operation(summary = "연락처 태그 추가", description = "스페이스 ID와 태그를 받아 해당 스페이스의 연락처 태그를 추가합니다.")
+  @PostMapping("/contact/tag")
+  public ResponseEntity<ContactTagResponseDto> addContactTag(
+      @RequestBody ContactTagRequestDto requestDto) {
+    ContactTagResponseDto response = spaceContactService.addContactTag(requestDto);
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * 연락처 태그 조회 API
+   * 
+   * @param spaceId 연락처 태그 조회 요청 데이터 (스페이스 ID)
+   * @return 조회된 연락처 태그 정보
+   */
+  @Operation(summary = "연락처 태그 조회", description = "스페이스 ID를 받아 해당 스페이스의 연락처 태그를 조회합니다.")
+  @GetMapping("/contact/tag/{spaceId}")
+  public ResponseEntity<ContactTagResponseDto> getContactTag(@PathVariable Long spaceId) {
+    ContactTagResponseDto response = spaceContactService.getContactTag(spaceId);
+    return ResponseEntity.ok(response);
   }
 }
