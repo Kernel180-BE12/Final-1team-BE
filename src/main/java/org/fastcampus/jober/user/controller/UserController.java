@@ -35,6 +35,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.Duration;
 import java.util.List;
 
 @RestController
@@ -85,6 +86,8 @@ public class UserController {
 
             // 세션을 먼저 생성 (세션이 없으면 생성)
             HttpSession session = request.getSession(true);
+            // 세션 유효시간 설정 (24시간)
+            session.setMaxInactiveInterval((int) Duration.ofHours(24).getSeconds());
 
             // 세션에 SecurityContext 저장 (Spring Security가 자동으로 하지만 명시적으로)
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
