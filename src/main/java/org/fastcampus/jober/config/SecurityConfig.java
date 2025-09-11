@@ -61,7 +61,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         var conf = new CorsConfiguration();
         // ★ 배포 환경에선 와일드카드(*) 대신 '정확한 오리진'만 허용
-        conf.setAllowedOrigins(List.of("http://localhost:3000", "https://your-frontend.com"));
+        conf.setAllowedOrigins(List.of("http://localhost:5173", "https://www.jober-1team.com", "https://api.jober-1team.com"));
         conf.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         conf.setAllowedHeaders(List.of("Content-Type","Authorization","X-XSRF-TOKEN"));
         conf.setAllowCredentials(true); // 쿠키/인증 포함 요청이면 필수
@@ -103,11 +103,12 @@ public class SecurityConfig {
 
         http
                 .cors(_ -> {})
-                .csrf(csrf -> csrf
-                        .csrfTokenRequestHandler(requestHandler)
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**")
-                ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
+                .csrf(AbstractHttpConfigurer::disable)
+                // .csrf(csrf -> csrf
+                //         .csrfTokenRequestHandler(requestHandler)
+                //         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                //         .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**", "/user/login", "/user/register")
+                // ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
                 .addFilterAfter(new CsrfCookieFilter(),
                         BasicAuthenticationFilter.class)
                 // 2) H2 콘솔은 frame으로 열리므로 sameOrigin 필요

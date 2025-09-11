@@ -55,7 +55,7 @@ public class SpaceContactController {
 
   /**
    * 연락처 정보 수정 API
-   * 
+   *
    * @param requestDto 수정할 연락처 정보 (스페이스 ID, 연락처 ID, 수정할 정보)
    * @return 수정된 연락처 정보
    */
@@ -69,7 +69,7 @@ public class SpaceContactController {
 
   /**
    * 연락처 삭제 API
-   * 
+   *
    * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
    * @return 삭제 성공 응답
    */
