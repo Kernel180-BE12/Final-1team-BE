@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.common.SecurityProps;
+import org.fastcampus.jober.error.RestInvalidSessionStrategy;
+import org.fastcampus.jober.error.RestSessionExpiredStrategy;
 import org.fastcampus.jober.filter.CsrfCookieFilter;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -92,7 +94,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   RestInvalidSessionStrategy invalidSessionStrategy,
+                                                   RestSessionExpiredStrategy expiredStrategy) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
@@ -137,8 +141,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         // 필요시 세션 정책도 지정:
                         // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .invalidSessionStrategy(invalidSessionStrategy)
+                        .sessionFixation(sf -> sf.migrateSession())
                         .sessionConcurrency(concurrency -> concurrency
-                                .maximumSessions(-1)               // 제한 없음
+                                .maximumSessions(1)
+                                .maxSessionsPreventsLogin(false)          // 새 로그인 허용, 기존 세션 만료
+                                .expiredSessionStrategy(expiredStrategy)  // 만료 시 JSON 커스텀
                                 .sessionRegistry(sessionRegistry()) // SessionRegistry 빈 사용
                         )
                 );
