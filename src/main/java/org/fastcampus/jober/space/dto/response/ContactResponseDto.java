@@ -21,9 +21,6 @@ public class ContactResponseDto {
   @Schema(description = "스페이스 ID", example = "1")
   private Long spaceId;
 
-  @Schema(description = "스페이스 이름", example = "테스트 회사")
-  private String spaceName;
-
   @Schema(description = "등록된 연락처 목록")
   private List<ContactInfo> contacts;
 

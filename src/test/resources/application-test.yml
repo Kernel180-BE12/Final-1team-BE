@@ -1,0 +1,47 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 1234
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+logging:
+  level:
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate: WARN
+
+# AI Flask 서버 설정 (테스트용)
+ai:
+  flask:
+    base-url: http://localhost:8000
+    chat-endpoint: /api/chat
+
+security:
+  permit-all:
+    - /actuator/health
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /auth/**
+    - /h2-console/**
+  permit-post-user:
+    - /user/register
+    - /user/login
+    - /user/id/check
+    - /user/email/check

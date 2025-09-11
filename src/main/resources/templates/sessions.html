@@ -13,9 +13,11 @@
         th,td{padding:10px 12px; border-bottom:1px solid #e5e7eb; font-size:14px; text-align:left; vertical-align:middle;}
         th{background:#f9fafb; font-weight:600;}
         .badge{display:inline-block; background:#eef2ff; color:#3730a3; padding:2px 8px; border-radius:9999px; font-size:12px;}
+        .chip{display:inline-block; padding:2px 8px; border-radius:9999px; font-size:12px; font-weight:600;}
         .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
         .muted{color:#6b7280;}
         .empty{padding:24px; text-align:center; color:#6b7280;}
+        .row-expired td{color:#6b7280;} /* 만료 행 살짝 흐리게 */
     </style>
 </head>
 <body>
@@ -34,15 +36,31 @@
         <th>세션 ID</th>
         <th>마지막 요청(로컬)</th>
         <th>상대시간</th>
+        <th>상태</th>             <!-- 추가 -->
+        <th>남은 유효시간</th>     <!-- 추가 -->
+        <th>만료 예정(로컬)</th>   <!-- 추가 -->
     </tr>
     </thead>
     <tbody>
-    <tr th:each="r : ${rows}">
+    <tr th:each="r : ${rows}" th:classappend="${r.expired()} ? 'row-expired'">
         <td th:text="${r.username()}">username</td>
         <td class="mono" th:text="${r.authorities()}">[ROLE_USER]</td>
         <td class="mono" th:text="${r.sessionId()}">ABC123...</td>
         <td class="mono" th:text="${#temporals.format(r.lastRequestLocal(), 'yyyy-MM-dd HH:mm:ss')}">2025-09-01 12:34:56</td>
         <td class="muted" th:text="${r.ago()}">방금 전</td>
+
+        <!-- 상태 배지: expired=true ⇒ 만료 / false ⇒ 활성 -->
+        <td>
+            <span class="chip" th:classappend="${r.expired()} ? ' red' : ' green'"
+                  th:text="${r.expired()} ? '만료' : '활성'">활성</span>
+        </td>
+
+        <!-- 남은 유효시간: 만료면 0초로 표시 -->
+        <td class="mono" th:text="${r.expired()} ? '0초' : ${r.remaining()}">0초</td>
+
+        <!-- 만료 예정 시각 -->
+        <td class="mono"
+            th:text="${#temporals.format(r.expiresAtLocal(), 'yyyy-MM-dd HH:mm:ss')}">2025-09-02 12:34:56</td>
     </tr>
     </tbody>
 </table>
