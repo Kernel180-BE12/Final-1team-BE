@@ -105,7 +105,12 @@ public class SpaceContactController {
    */
   @Operation(summary = "연락처 태그 조회", description = "스페이스 ID를 받아 해당 스페이스의 연락처 태그를 조회합니다.")
   @GetMapping("/contact/tag/{spaceId}")
-  public ResponseEntity<ContactTagResponseDto> getContactTag(@PathVariable Long spaceId) {
+  public ResponseEntity<ContactTagResponseDto> getContactTag(
+      @Parameter(
+        description = "스페이스 ID",
+        required = true,
+        example = "1")
+      @PathVariable(name = "spaceId") Long spaceId) {
     ContactTagResponseDto response = spaceContactService.getContactTag(spaceId);
     return ResponseEntity.ok(response);
   }
