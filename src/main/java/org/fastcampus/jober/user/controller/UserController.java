@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -68,6 +71,13 @@ public class UserController {
                     new UsernamePasswordAuthenticationToken(loginRequestDto.username(), loginRequestDto.password())
             );
 
+            UserDetails principal = (UserDetails) auth.getPrincipal();
+            List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
+            for (SessionInformation si : sessions) {
+                // security 관점에서 '만료' 표시 (다음 요청부터 인증 끊김)
+                si.expireNow();
+            }
+
             // 인증 성공 시 SecurityContext를 세션에 저장하여 로그인 상태 유지
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(auth);
@@ -88,7 +98,6 @@ public class UserController {
             // 세션 레지스트리에 등록
             sessionRegistry.registerNewSession(session.getId(), auth.getPrincipal());
 
-            UserDetails principal = (UserDetails) auth.getPrincipal();
             String username = principal.getUsername();
             Long id = userService.getUserId(username);
 
