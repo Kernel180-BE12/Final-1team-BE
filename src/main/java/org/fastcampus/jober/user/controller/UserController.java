@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -36,6 +37,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.time.Duration;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -71,6 +75,13 @@ public class UserController {
                     new UsernamePasswordAuthenticationToken(loginRequestDto.username(), loginRequestDto.password())
             );
 
+            UserDetails principal = (UserDetails) auth.getPrincipal();
+            List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
+            for (SessionInformation si : sessions) {
+                // security 관점에서 '만료' 표시 (다음 요청부터 인증 끊김)
+                si.expireNow();
+            }
+
             // 인증 성공 시 SecurityContext를 세션에 저장하여 로그인 상태 유지
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(auth);
@@ -78,20 +89,21 @@ public class UserController {
 
             // 세션을 먼저 생성 (세션이 없으면 생성)
             HttpSession session = request.getSession(true);
+            // 세션 유효시간 설정 (24시간)
+            session.setMaxInactiveInterval((int) Duration.ofHours(24).getSeconds());
 
             // 세션에 SecurityContext 저장 (Spring Security가 자동으로 하지만 명시적으로)
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
             // 세션 고정 공격 방지 - 세션이 생성된 후에 호출
             // 기존 세션이 있는 경우에만 세션 ID 변경
-            if (session != null && !session.isNew()) {
+            if (!session.isNew()) {
                 request.changeSessionId();
             }
 
             // 세션 레지스트리에 등록
             sessionRegistry.registerNewSession(session.getId(), auth.getPrincipal());
 
-            UserDetails principal = (UserDetails) auth.getPrincipal();
             String username = principal.getUsername();
             Long id = userService.getUserId(username);
 
@@ -103,7 +115,6 @@ public class UserController {
 
     /**
      * 회원 정보 조회
-     * @param userId 회원 정보 조회 요청 데이터 (사용자 ID)
      * @return 조회된 회원 정보
      */
     @GetMapping("/info")
