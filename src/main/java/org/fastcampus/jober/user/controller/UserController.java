@@ -112,7 +112,6 @@ public class UserController {
 
     /**
      * 회원 정보 조회
-     * @param userId 회원 정보 조회 요청 데이터 (사용자 ID)
      * @return 조회된 회원 정보
      */
     @GetMapping("/info")

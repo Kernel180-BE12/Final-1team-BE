@@ -20,6 +20,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -142,7 +143,7 @@ public class SecurityConfig {
                         // 필요시 세션 정책도 지정:
                         // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .invalidSessionStrategy(invalidSessionStrategy)
-                        .sessionFixation(sf -> sf.migrateSession())
+                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession)
                         .sessionConcurrency(concurrency -> concurrency
                                 .maximumSessions(1)
                                 .maxSessionsPreventsLogin(false)          // 새 로그인 허용, 기존 세션 만료

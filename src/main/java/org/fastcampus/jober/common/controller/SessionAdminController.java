@@ -28,7 +28,6 @@ public class SessionAdminController {
     public String sessionsPage(Model model) {
         ZoneId zone = ZoneId.systemDefault();
 
-        @SuppressWarnings("unchecked")
         var principals = sessionRegistry.getAllPrincipals();
 
         var rows = principals.stream()

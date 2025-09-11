@@ -39,8 +39,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CustomUserDetails)) return false;
-        CustomUserDetails that = (CustomUserDetails) o;
+        if (!(o instanceof CustomUserDetails that)) return false;
         return Objects.equals(this.username, that.username);
     }
     @Override
