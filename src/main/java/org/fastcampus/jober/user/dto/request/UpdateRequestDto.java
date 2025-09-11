@@ -10,7 +10,7 @@ import org.fastcampus.jober.user.entity.Users;
 @NoArgsConstructor
 public class UpdateRequestDto {
 
-    private String username;
+    // private String username;
     private String name;
     private String email;
 
