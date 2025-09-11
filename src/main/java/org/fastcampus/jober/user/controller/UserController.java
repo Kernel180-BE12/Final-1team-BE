@@ -94,7 +94,7 @@ public class UserController {
 
             // 세션 고정 공격 방지 - 세션이 생성된 후에 호출
             // 기존 세션이 있는 경우에만 세션 ID 변경
-            if (session != null && !session.isNew()) {
+            if (!session.isNew()) {
                 request.changeSessionId();
             }
 
