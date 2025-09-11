@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
+import org.fastcampus.jober.user.dto.request.CheckEmailRequestDto;
+import org.fastcampus.jober.user.dto.request.CheckIdRequestDto;
 import org.fastcampus.jober.user.dto.request.LoginRequestDto;
 import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
 import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -138,8 +141,8 @@ public class UserController {
             }
         }
 
-        // email 중복 검사
-        if (req.getEmail() != null && !userService.getUserInfo(principal).getEmail().equals(req.getEmail())) {
+        // email 중복 검사 (현재 email과 다를 경우에만)
+        if (req.getEmail() != null && !req.getEmail().equals(userService.getUserInfo(principal).getEmail())) {
             if (userService.isEmailExists(req.getEmail())) {
                 throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
             }
@@ -153,6 +156,42 @@ public class UserController {
             return ResponseEntity.noContent().build();
         }
         
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 아이디 중복 체크
+     * @param req 아이디 중복 체크 요청 데이터
+     * @return 아이디 중복 체크 결과
+     */
+    @PostMapping("/id/check")
+    @Operation(summary = "아이디 중복 체크", description = "아이디 중복 체크를 합니다.")
+    @ApiResponse(responseCode = "200", description = "아이디 중복 체크 성공")
+    @ApiResponse(responseCode = "400", description = "아이디 중복 체크 실패")
+    public ResponseEntity<Void> checkId(
+            @Parameter(description = "아이디 중복 체크 요청 데이터", required = true)
+            @RequestBody CheckIdRequestDto checkIdRequestDto) {
+        if (userService.isUsernameExists(checkIdRequestDto.getUsername())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 이메일 중복 체크
+     * @param req 이메일 중복 체크 요청 데이터
+     * @return 이메일 중복 체크 결과
+     */
+    @PostMapping("/email/check")
+    @Operation(summary = "이메일 중복 체크", description = "이메일 중복 체크를 합니다.")
+    @ApiResponse(responseCode = "200", description = "이메일 중복 체크 성공")
+    @ApiResponse(responseCode = "400", description = "이메일 중복 체크 실패")
+    public ResponseEntity<Void> checkEmail(
+            @Parameter(description = "이메일 중복 체크 요청 데이터", required = true)
+            @RequestBody CheckEmailRequestDto checkEmailRequestDto) {
+        if (userService.isEmailExists(checkEmailRequestDto.getEmail())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
+        }
         return ResponseEntity.ok().build();
     }
 }
