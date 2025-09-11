@@ -134,12 +134,12 @@ public class UserController {
             @RequestBody UpdateRequestDto req,
             @AuthenticationPrincipal CustomUserDetails principal) {
         
-        // username 중복 검사 (현재 username과 다를 경우에만)
-        if (req.getUsername() != null && !req.getUsername().equals(principal.getUsername())) {
-            if (userService.isUsernameExists(req.getUsername())) {
-                throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
-            }
-        }
+        // // username 중복 검사 (현재 username과 다를 경우에만)
+        // if (req.getUsername() != null && !req.getUsername().equals(principal.getUsername())) {
+        //     if (userService.isUsernameExists(req.getUsername())) {
+        //         throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
+        //     }
+        // }
 
         // email 중복 검사 (현재 email과 다를 경우에만)
         if (req.getEmail() != null && !req.getEmail().equals(userService.getUserInfo(principal).getEmail())) {

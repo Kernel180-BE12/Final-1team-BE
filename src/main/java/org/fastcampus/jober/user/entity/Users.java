@@ -53,10 +53,10 @@ public class Users extends BaseEntity {
     public boolean updateUserInfo(UpdateRequestDto req) {
         boolean hasChanges = false;
         
-        if (req.getUsername() != null && !req.getUsername().equals(this.username)) {
-            this.username = req.getUsername();
-            hasChanges = true;
-        }
+        // if (req.getUsername() != null && !req.getUsername().equals(this.username)) {
+        //     this.username = req.getUsername();
+        //     hasChanges = true;
+        // }
         
         if (req.getName() != null && !req.getName().equals(this.name)) {
             this.name = req.getName();
