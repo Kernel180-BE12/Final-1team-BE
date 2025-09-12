@@ -28,6 +28,10 @@ public class Users extends BaseEntity {
     // ✅ 기본 생성자 (JPA 필수)
     protected Users() {}
 
+    protected Users(Long userId) {
+        this.userId = userId;
+    }
+
     // ✅ private 생성자
     private Users(String username, String password, String name, String email) {
         this.username = username;
@@ -42,6 +46,14 @@ public class Users extends BaseEntity {
                 password,
                 name,
                 email);
+    }
+
+    public static Users forCreateSpace(Long userId) {
+        return new Users(userId);
+    }
+
+    public boolean isSameUser(final Long userId) {
+        return this.userId.equals(userId);
     }
 
 //    public static Users forUpdate(Users existing, String updatedBy) {
