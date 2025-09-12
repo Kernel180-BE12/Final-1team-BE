@@ -8,6 +8,7 @@ import lombok.Getter;
 import jakarta.persistence.*;
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
+import org.fastcampus.jober.util.PasswordHashing;
 
 
 @Entity
@@ -69,6 +70,10 @@ public class Users extends BaseEntity {
         }
         
         return hasChanges;
+    }
+
+    public void updatePassword(String password) {
+        this.password = PasswordHashing.hash(password);
     }
 
 }
