@@ -1,5 +1,6 @@
 package org.fastcampus.jober.space.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SpaceContacts extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +29,9 @@ public class SpaceContacts extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column
-    private String tag;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contact_tag_id")
+    private ContactTag contactTag;
 
     @Column(nullable = false)
     @ColumnDefault("false")
@@ -47,7 +50,7 @@ public class SpaceContacts extends BaseEntity {
         private String name;
         private String phoneNum;
         private String email;
-        private String tag;
+        private ContactTag contactTag;
         private Boolean isDeleted;
         private Long spaceId;
         
@@ -71,8 +74,8 @@ public class SpaceContacts extends BaseEntity {
             return this;
         }
 
-        public SpaceContactsBuilder tag(String tag) {
-            this.tag = tag;
+        public SpaceContactsBuilder contactTag(ContactTag contactTag) {
+            this.contactTag = contactTag;
             return this;
         }
 
@@ -87,7 +90,7 @@ public class SpaceContacts extends BaseEntity {
         }
         
         public SpaceContacts build() {
-            return new SpaceContacts(id, name, phoneNum, email, tag, isDeleted != null ? isDeleted : false, spaceId);
+            return new SpaceContacts(id, name, phoneNum, email, contactTag, isDeleted != null ? isDeleted : false, spaceId);
         }
     }
 
@@ -109,7 +112,7 @@ public class SpaceContacts extends BaseEntity {
     /**
      * 연락처 정보 수정
      */
-    public void updateContactInfo(String name, String phoneNumber, String email, String tag) {
+    public void updateContactInfo(String name, String phoneNumber, String email, ContactTag contactTag) {
         if (name != null && !name.trim().isEmpty()) {
             this.name = name;
         }
@@ -119,8 +122,8 @@ public class SpaceContacts extends BaseEntity {
         if (email != null && !email.trim().isEmpty()) {
             this.email = email;
         }
-        if (tag != null && !tag.trim().isEmpty()) {
-            this.tag = tag;
+        if (contactTag != null) {
+            this.contactTag = contactTag;
         }
     }
     

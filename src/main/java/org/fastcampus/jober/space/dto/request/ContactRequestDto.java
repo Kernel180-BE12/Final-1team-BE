@@ -40,8 +40,12 @@ public class ContactRequestDto {
     @Schema(description = "이메일", example = "kim@example.com")
     private String email;
     
+    // @Schema(description = "태그명", example = "프리랜서")
+    // private String tag;
+    
     /**
      * ContactInfo를 SpaceContacts 엔티티로 변환
+     * 태그는 서비스 레이어에서 검증 후 설정됩니다.
      */
     public SpaceContacts toEntity(Long spaceId) {
       return SpaceContacts.builder()

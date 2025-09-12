@@ -25,7 +25,7 @@ public interface SpaceContactsRepository extends JpaRepository<SpaceContacts, Lo
         summary = "스페이스 연락처 조회",
         description = "특정 spaceId의 연락처들을 조회합니다. (삭제되지 않은 연락처만)"
     )
-    @Query("SELECT sc FROM SpaceContacts sc WHERE sc.spaceId = :spaceId AND (sc.isDeleted = false OR sc.isDeleted IS NULL)")
+    @Query("SELECT sc FROM SpaceContacts sc LEFT JOIN FETCH sc.contactTag WHERE sc.spaceId = :spaceId AND (sc.isDeleted = false OR sc.isDeleted IS NULL)")
     List<SpaceContacts> findBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId
     );
