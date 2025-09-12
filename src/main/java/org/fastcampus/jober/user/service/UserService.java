@@ -1,6 +1,8 @@
 package org.fastcampus.jober.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.fastcampus.jober.error.BusinessException;
+import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
 import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
@@ -23,6 +25,18 @@ public class UserService {
     }
 
     public void register(RegisterRequestDto req) {
+        // 입력값 형식 검증
+        if (!req.username().matches("^[a-z0-9]{5,15}$")) {
+            throw new BusinessException(ErrorCode.INVALID_USERNAME);
+        }
+        if (!req.password().matches("^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$")) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+        if (!req.email().matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new BusinessException(ErrorCode.INVALID_EMAIL);
+        }
+        
+        // 중복 검증
         if (userRepository.existsByUsername(req.username())) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
@@ -49,6 +63,14 @@ public class UserService {
      */
     @Transactional
     public boolean update(UpdateRequestDto req, CustomUserDetails principal) {
+        // 입력값 형식 검증 (null이 아닌 경우에만)
+        if (req.getName() != null && !req.getName().matches("^[a-z0-9]{5,15}$")) {
+            throw new BusinessException(ErrorCode.INVALID_USERNAME);
+        }
+        if (req.getEmail() != null && !req.getEmail().matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new BusinessException(ErrorCode.INVALID_EMAIL);
+        }
+        
         Users user = userRepository.findById(principal.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         
