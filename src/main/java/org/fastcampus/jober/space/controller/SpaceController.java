@@ -1,13 +1,15 @@
 package org.fastcampus.jober.space.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.fastcampus.jober.space.dto.response.SpaceListResponseDto;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
@@ -19,12 +21,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "Spaces", description = "스페이스 관련 API")
 @Controller
 @RequestMapping("/spaces")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SpaceController {
-    private SpaceService spaceService;
+    private final SpaceService spaceService;
 
     @Operation(
             summary = "스페이스 생성",
@@ -83,32 +87,28 @@ public class SpaceController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-//    @PostMapping("/{spaceId}/members")
-//    public ResponseEntity<Void> addSpaceMember(
-//            @PathVariable Long spaceId, @RequestBody SpaceMemberRequestDto dto) {
-//       spaceService.addSpaceMember(spaceId, dto.getUserId());
-//       return ResponseEntity.status(HttpStatus.CREATED).build();
-//    }
-//
-//    @DeleteMapping("/{spaceId}/members/{userId}")
-//    public ResponseEntity<Void> deleteSpaceMember(
-//            @PathVariable Long spaceId,
-//            @PathVariable Long userId) {
-//        spaceService.deleteSpaceMember(spaceId, userId);
-//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//    }
-//
-//    @GetMapping("/user/{userId}")
-//    public ResponseEntity<List<SpaceResponseDto>> getUserSpace(@PathVariable Long userId) {
-//        List<SpaceResponseDto> result = SpaceService.getUserSpace(userId);
-//        return ResponseEntity.status(HttpStatus.OK).body(result);
-//    }
-//
-//    // 스페이스의 멤버 조회
-//    @GetMapping("/{spaceId}/members")
-//    public ResponseEntity<List<SpaceMemberResponseDto>> getSpaceMembers(@PathVariable Long spaceId) {
-//        List<SpaceMemberResponseDto> result = spaceService.getSpaceMembers(spaceId);
-//        return ResponseEntity.ok(result);
-//    }
-
+    @Operation(
+            summary = "스페이스 목록 조회",
+            description = "로그인한 사용자가 속한 모든 스페이스 목록을 조회합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "스페이스 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = SpaceListResponseDto.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "인증되지 않은 사용자"
+            )
+    })
+    @GetMapping("/list")
+    public ResponseEntity<List<SpaceListResponseDto>> getSpaceList(
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        List<SpaceListResponseDto> result = spaceService.getSpaceList(principal);
+        return ResponseEntity.ok(result);
+    }
 }
