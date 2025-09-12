@@ -100,7 +100,7 @@ public class SpaceContactController {
       @PathVariable(name = "spaceId") Long spaceId,
         @Parameter(description = "태그", 
         required = true, 
-        example = "1")
+        example = "프리랜서")
       @PathVariable(name = "tag") String tag) {
     ContactResponseDto response = spaceContactService.getContactsByTag(spaceId, tag);
     return ResponseEntity.ok(response);
