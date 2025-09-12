@@ -72,6 +72,14 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "로그인 성공 및 사용자 ID/이름 반환")
     @ApiResponse(responseCode = "401", description = "인증 실패 (잘못된 아이디/비밀번호)")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletRequest request) {
+        // 입력값 형식 검증
+        if (!loginRequestDto.username().matches("^[a-z0-9]{5,15}$")) {
+            throw new BusinessException(ErrorCode.INVALID_USERNAME);
+        }
+        if (!loginRequestDto.password().matches("^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$")) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+        
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequestDto.username(), loginRequestDto.password())
