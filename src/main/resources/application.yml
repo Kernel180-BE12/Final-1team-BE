@@ -20,7 +20,7 @@ app:
   mail:
     from: "no-reply@your-domain.com"
   reset:
-    url: "https://final-1team-fe.vercel.app/reset-password"
+    url: "https://www.jober-1team.com/reset-password/"
 
 server:
   port: 8080

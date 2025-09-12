@@ -54,3 +54,4 @@ security:
     - /user/login
     - /user/id/check
     - /user/email/check
+    - /user/password
