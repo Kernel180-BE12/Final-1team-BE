@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.common.SecurityProps;
+import org.fastcampus.jober.error.RestInvalidSessionStrategy;
+import org.fastcampus.jober.error.RestSessionExpiredStrategy;
 import org.fastcampus.jober.filter.CsrfCookieFilter;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -58,7 +61,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         var conf = new CorsConfiguration();
         // ★ 배포 환경에선 와일드카드(*) 대신 '정확한 오리진'만 허용
-        conf.setAllowedOrigins(List.of("http://localhost:3000", "https://your-frontend.com"));
+        conf.setAllowedOrigins(List.of("http://localhost:5173", "https://www.jober-1team.com", "https://api.jober-1team.com"));
         conf.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         conf.setAllowedHeaders(List.of("Content-Type","Authorization","X-XSRF-TOKEN"));
         conf.setAllowCredentials(true); // 쿠키/인증 포함 요청이면 필수
@@ -92,17 +95,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   RestInvalidSessionStrategy invalidSessionStrategy,
+                                                   RestSessionExpiredStrategy expiredStrategy) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
         http
                 .cors(_ -> {})
-                .csrf(csrf -> csrf
-                        .csrfTokenRequestHandler(requestHandler)
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**")
-                ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
+                .csrf(AbstractHttpConfigurer::disable)
+                // .csrf(csrf -> csrf
+                //         .csrfTokenRequestHandler(requestHandler)
+                //         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                //         .ignoringRequestMatchers("/h2-console/**", "/admin/sessions/**", "/user/login", "/user/register")
+                // ) // 세션 기반이므로 CSRF 활성화 (SPA에서는 쿠키 CSRF 토큰 사용)
                 .addFilterAfter(new CsrfCookieFilter(),
                         BasicAuthenticationFilter.class)
                 // 2) H2 콘솔은 frame으로 열리므로 sameOrigin 필요
@@ -137,8 +143,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         // 필요시 세션 정책도 지정:
                         // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .invalidSessionStrategy(invalidSessionStrategy)
+                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession)
                         .sessionConcurrency(concurrency -> concurrency
-                                .maximumSessions(-1)               // 제한 없음
+                                .maximumSessions(1)
+                                .maxSessionsPreventsLogin(false)          // 새 로그인 허용, 기존 세션 만료
+                                .expiredSessionStrategy(expiredStrategy)  // 만료 시 JSON 커스텀
                                 .sessionRegistry(sessionRegistry()) // SessionRegistry 빈 사용
                         )
                 );

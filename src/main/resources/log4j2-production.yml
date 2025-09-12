@@ -1,8 +1,8 @@
 Configuration:
   name: production
 
-  properties:
-    property:
+  Properties:
+    Property:
       - name: "log-path"
         value: "./logs"
       - name: "charset-UTF-8"
@@ -53,7 +53,7 @@ Configuration:
           size: "10MB"
         TimeBasedTriggeringPolicy:
           interval: "1"
-      DefaultRollOverStrategy:
+      DefaultRolloverStrategy:
         max: "30"
         fileIndex: "max"
 
@@ -107,7 +107,7 @@ Configuration:
       # 애플리케이션 핵심
       - name: org.fastcampus.jober
         additivity: "false"
-        level: INFO
+        level: DEBUG
         AppenderRef:
           - ref: console-appender
           - ref: file-info-appender
@@ -117,15 +117,16 @@ Configuration:
       # Spring Security (감사/인증)
       - name: org.springframework.security
         additivity: "false"
-        level: INFO
+        level: DEBUG
         AppenderRef:
           - ref: console-appender
           - ref: file-auth-appender
+          - ref: async-db-appender
 
       # 웹 요청
       - name: org.springframework.web
         additivity: "false"
-        level: INFO
+        level: DEBUG
         AppenderRef:
           - ref: console-appender
           - ref: file-info-appender
