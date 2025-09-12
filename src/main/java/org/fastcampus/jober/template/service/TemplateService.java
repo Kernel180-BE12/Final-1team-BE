@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
+import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
+import org.fastcampus.jober.template.dto.response.TemplateSaveResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
@@ -188,5 +190,15 @@ public class TemplateService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
 
         return template.updateIsSaved(isSaved);
+    }
+
+    /**
+     * 템플릿을 저장합니다.
+     * @param request 템플릿 저장 요청 DTO
+     * @return 템플릿 저장 응답 DTO
+     */
+    public TemplateSaveResponseDto saveTemplate(TemplateSaveRequestDto request) {
+        Template template = templateRepository.save(request.toEntity());
+        return TemplateSaveResponseDto.from(template);
     }
 }
