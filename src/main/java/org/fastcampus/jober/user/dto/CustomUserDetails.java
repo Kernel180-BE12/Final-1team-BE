@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Getter
 public class CustomUserDetails implements UserDetails {
@@ -35,5 +36,15 @@ public class CustomUserDetails implements UserDetails {
         return authorities;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CustomUserDetails that)) return false;
+        return Objects.equals(this.username, that.username);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
+    }
 }
 

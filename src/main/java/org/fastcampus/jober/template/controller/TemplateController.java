@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.service.TemplateService;
@@ -125,24 +126,29 @@ public class TemplateController {
      /**
      * AI를 통한 템플릿 생성 요청 API
      * 사용자의 메시지를 받아서 AI Flask 서버로 전달하고, 
-     * 생성된 템플릿 내용을 반환합니다.
+     * 구조화된 템플릿 응답을 반환합니다.
      * 
-     * @param request 템플릿 생성 요청 DTO (사용자 메시지 포함)
-     * @return AI가 생성한 템플릿 내용 (String 형태)
+     * @param request 템플릿 생성 요청 DTO (사용자 메시지와 AI 세션 상태 포함)
+     * @return AI가 생성한 구조화된 템플릿 응답 DTO
      */
     @Operation(
         summary = "AI 템플릿 생성 요청", 
         description = "사용자 메시지를 기반으로 AI가 템플릿을 생성합니다. " +
-                     "리액트에서 사용자 입력을 받아 AI Flask 서버로 전달하는 중간다리 역할을 합니다."
+                     "리액트에서 사용자 입력을 받아 AI Flask 서버로 전달하고 구조화된 응답을 반환합니다."
+    )
+    @ApiResponse(
+        responseCode = "200", 
+        description = "AI 템플릿 생성 성공",
+        content = @Content(schema = @Schema(implementation = TemplateCreateResponseDto.class))
     )
     @PostMapping("/create-template")
-    public ResponseEntity<Object> createTemplate(
+    public ResponseEntity<TemplateCreateResponseDto> createTemplate(
             @org.springframework.web.bind.annotation.RequestBody TemplateCreateRequestDto request) {
         
         log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}, state: {}", request.getMessage(), request.getState());
         
-        // TemplateService를 통해 AI Flask 서버로 요청 전달 (message + state)
-        Object aiResponse = templateService.createTemplate(request.getMessage(), request.getState());
+        // TemplateService를 통해 AI Flask 서버로 요청 전달
+        TemplateCreateResponseDto aiResponse = templateService.createTemplate(request);
         
         log.info("AI Flask 서버로부터 응답 수신 완료");
         

@@ -29,8 +29,8 @@ public class TemplateTitleResponseDto {
     private String title; // 템플릿 제목
     
     /**
-     * Template 엔티티로부터 DTO를 생성합니다.
-     * @param template Template 엔티티
+     * 제목 문자열로부터 DTO를 생성합니다.
+     * @param title 템플릿 제목
      * @return TemplateTitleResponseDto
      */
     public static TemplateTitleResponseDto from(Template template) {
@@ -40,35 +40,13 @@ public class TemplateTitleResponseDto {
     }
     
     /**
-     * Template 엔티티 리스트로부터 DTO 리스트를 생성합니다.
-     * @param templates Template 엔티티 리스트
-     * @return TemplateTitleResponseDto 리스트
-     */
-    public static List<TemplateTitleResponseDto> fromList(List<Template> templates) {
-        return templates.stream()
-                .map(TemplateTitleResponseDto::from)
-                .collect(Collectors.toList());
-    }
-    
-    /**
-     * 제목 문자열로부터 DTO를 생성합니다.
-     * @param title 템플릿 제목
-     * @return TemplateTitleResponseDto
-     */
-    public static TemplateTitleResponseDto fromTitle(String title) {
-        return TemplateTitleResponseDto.builder()
-                .title(title)
-                .build();
-    }
-    
-    /**
      * 제목 문자열 리스트로부터 DTO 리스트를 생성합니다.
      * @param titles 템플릿 제목 리스트
      * @return TemplateTitleResponseDto 리스트
      */
-    public static List<TemplateTitleResponseDto> fromTitleList(List<String> titles) {
+    public static List<TemplateTitleResponseDto> fromList(List<Template> titles) {
         return titles.stream()
-                .map(TemplateTitleResponseDto::fromTitle)
+                .map(TemplateTitleResponseDto::from)
                 .collect(Collectors.toList());
     }
 }

@@ -13,14 +13,12 @@ public class SpaceMember extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private Authority authority;
 
     private InviteStatus inviteStatus;
 
     private String tag;
-
-    // 관리자, 참여문서 관리자, 권한해제 3개인데 이걸 구현해야 할까........
-//    private String documentPermission;
 
     @ManyToOne
     @JoinColumn(name = "spaceId")

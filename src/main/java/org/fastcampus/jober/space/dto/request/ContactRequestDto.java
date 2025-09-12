@@ -56,9 +56,10 @@ public class ContactRequestDto {
   /**
    * DTO를 SpaceContacts 엔티티 리스트로 변환
    */
-  public List<SpaceContacts> toEntities() {
+  public List<SpaceContacts> toValidateEntities() {
     return contacts.stream()
         .map(contactInfo -> contactInfo.toEntity(this.spaceId))
+        .peek(SpaceContacts::validateContactInfo)
         .collect(Collectors.toList());
   }
 }
