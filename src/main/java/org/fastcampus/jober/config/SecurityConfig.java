@@ -115,7 +115,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(props.getPermitAll().toArray(String[]::new)).permitAll()
-                        .requestMatchers(HttpMethod.POST, props.getPermitPostUser().toArray(String[]::new)).permitAll()
+                        .requestMatchers(props.getPermitUser().toArray(String[]::new)).permitAll()
                         .anyRequest()
                         .authenticated()
                 )
