@@ -2,12 +2,10 @@ package org.fastcampus.jober.user.service;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.fastcampus.jober.error.BusinessException;
+import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
-import org.fastcampus.jober.user.dto.request.LoginRequestDto;
-import org.fastcampus.jober.user.dto.request.PasswordResetEmailRequestDto;
-import org.fastcampus.jober.user.dto.request.PasswordResetRequestDto;
-import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
-import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
+import org.fastcampus.jober.user.dto.request.*;
 import org.fastcampus.jober.user.dto.response.UserInfoResponseDto;
 import org.fastcampus.jober.user.entity.Users;
 import org.fastcampus.jober.user.entity.PasswordResetToken;
@@ -18,9 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -95,7 +93,7 @@ public class UserService {
 
     @Transactional
     public void issueTokenAndSendMail(PasswordResetEmailRequestDto passwordResetEmailRequestDto, String ip, String ua) throws MessagingException, NoSuchAlgorithmException {
-        PasswordResetToken token = PasswordResetToken.forGenerateToken(ip, ua);
+        PasswordResetToken token = PasswordResetToken.forGenerateToken(ip, ua, passwordResetEmailRequestDto.email());
         passwordResetTokenRepository.save(token);
 
         // 프론트엔드 비밀번호 변경 페이지 URL 생성
@@ -109,8 +107,19 @@ public class UserService {
                 plain);
     }
 
+    public void checkToken(PasswordResetTokenRequestDto token) {
+        if(!passwordResetTokenRepository.existsBySecretHashAndUsedAtIsNullAndExpiresAtAfter(token.token(), Instant.now())) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "토큰이 만료되었습니다");
+        }
+    }
+
     @Transactional
     public void changePassword(PasswordResetRequestDto passwordResetRequestDto) {
+        PasswordResetToken token = passwordResetTokenRepository.findBySecretHashAndUsedAtIsNullAndExpiresAtAfter(passwordResetRequestDto.token(),  Instant.now()).orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED, "토큰이 만료되었습니다"));
 
+        Users u = userRepository.findByEmail(token.getEmail()).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다"));
+
+        token.updateIsUsedAt(Instant.now());
+        u.updatePassword(passwordResetRequestDto.newPassword());
     }
 }

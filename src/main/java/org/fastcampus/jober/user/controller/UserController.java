@@ -7,13 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
-import org.fastcampus.jober.user.dto.request.CheckEmailRequestDto;
-import org.fastcampus.jober.user.dto.request.CheckIdRequestDto;
-import org.fastcampus.jober.user.dto.request.LoginRequestDto;
-import org.fastcampus.jober.user.dto.request.PasswordResetEmailRequestDto;
-import org.fastcampus.jober.user.dto.request.PasswordResetRequestDto;
-import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
-import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
+import org.fastcampus.jober.user.dto.request.*;
 import org.fastcampus.jober.user.dto.response.LoginResponseDto;
 import org.fastcampus.jober.user.dto.response.UserInfoResponseDto;
 import org.fastcampus.jober.user.service.UserService;
@@ -227,8 +221,22 @@ public class UserController {
             return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/token/check")
+    @Operation(summary = "비밀번호 변경 토큰 검증", description = "비밀번호 변경 시 토큰 검증")
+    @ApiResponse(responseCode = "200", description = "토큰 존재")
+    @ApiResponse(responseCode = "401", description = "토큰 만료")
+    public ResponseEntity<Boolean> checkToken(@RequestBody PasswordResetTokenRequestDto passwordResetTokenRequestDto) {
+        userService.checkToken(passwordResetTokenRequestDto);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/password")
+    @Operation(summary = "비밀번호 변경", description = "새 비밀번호로 변경")
+    @ApiResponse(responseCode = "200", description = "비밀번호 변경 완료")
+    @ApiResponse(responseCode = "401", description = "토큰 만료")
+    @ApiResponse(responseCode = "404", description = "없는 회원")
     public ResponseEntity<Boolean> changePassword(PasswordResetRequestDto passwordResetRequestDto) {
+        userService.changePassword(passwordResetRequestDto);
         return  ResponseEntity.ok().build();
     }
 }

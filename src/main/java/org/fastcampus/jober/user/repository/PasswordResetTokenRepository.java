@@ -7,21 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, UUID> {
+    Optional<PasswordResetToken> findBySecretHashAndUsedAtIsNullAndExpiresAtAfter(String secretHash, Instant now);
 
-    @Modifying
-    @Query("""
-      update PasswordResetToken t
-         set t.usedAt = :now
-       where t.id = :id
-         and t.secretHash = :secretHash
-         and t.usedAt is null
-         and t.expiresAt > :now
-    """)
-    int markUsedIfValid(@Param("id") UUID id,
-                        @Param("secretHash") String secretHash,
-                        @Param("now") Instant now);
+    boolean existsBySecretHashAndUsedAtIsNullAndExpiresAtAfter(String secretHash, Instant now);
 }
 
