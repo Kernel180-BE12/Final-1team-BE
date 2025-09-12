@@ -54,12 +54,9 @@ dependencies {
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
 
-	// mapstruct
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
-	// Spring Security core
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+    // mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
 	// apache commons util -> sha-256 생성용
 	implementation 'commons-codec:commons-codec:1.16.1'

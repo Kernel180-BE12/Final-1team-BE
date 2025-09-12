@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import jakarta.persistence.*;
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
 
 
 @Entity
@@ -44,15 +45,30 @@ public class Users extends BaseEntity {
                 email);
     }
 
-//    public static Users forUpdate(Users existing, String updatedBy) {
-//        return new Users(
-//                existing.username,
-//                existing.password,
-//                existing.name,
-//                existing.email,
-//                existing.registeredAt,
-//                LocalDateTime.now(),
-//                updatedBy
-//        );
-//    }
+    /**
+     * 사용자 정보 업데이트 (null이 아닌 필드만 업데이트)
+     * @param req 업데이트 요청 DTO
+     * @return 변경된 필드가 있는지 여부
+     */
+    public boolean updateUserInfo(UpdateRequestDto req) {
+        boolean hasChanges = false;
+        
+        // if (req.getUsername() != null && !req.getUsername().equals(this.username)) {
+        //     this.username = req.getUsername();
+        //     hasChanges = true;
+        // }
+        
+        if (req.getName() != null && !req.getName().equals(this.name)) {
+            this.name = req.getName();
+            hasChanges = true;
+        }
+        
+        if (req.getEmail() != null && !req.getEmail().equals(this.email)) {
+            this.email = req.getEmail();
+            hasChanges = true;
+        }
+        
+        return hasChanges;
+    }
+
 }
