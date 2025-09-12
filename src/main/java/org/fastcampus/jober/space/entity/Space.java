@@ -26,10 +26,8 @@ public class Space extends BaseEntity {
     @NotBlank(message = "스페이스 이름은 필수입니다.")
     private String spaceName;
 
-    private Long adminUserId;
-
-    @OneToOne
-    @JoinColumn(name = "id")
+    @ManyToOne
+    @JoinColumn(name = "admin_user_id")
     private Users admin;
 
     private String ownerName;
@@ -42,8 +40,8 @@ public class Space extends BaseEntity {
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL)
     private List<SpaceMember> spaceMembers;
 
-    public void isAdminUser(long userId) {
-        if (!(this.adminUserId.equals(userId))) {
+    public void validateAdminUser(long userId) {
+        if (!(admin.isSameUser(userId))) {
             throw new BusinessException(ErrorCode.FORBIDDEN, "스페이스 관리자만 가능합니다.");
         }
     }
@@ -52,12 +50,6 @@ public class Space extends BaseEntity {
     public void updateSpaceFromDto(SpaceUpdateRequestDto dto) {
         if (dto.getSpaceName() != null && !dto.getSpaceName().isBlank()) {
             this.spaceName = dto.getSpaceName();
-        }
-        if (dto.getOwnerName() != null && !dto.getOwnerName().isBlank()) {
-            this.ownerName = dto.getOwnerName();
-        }
-        if (dto.getOwnerNum() != null) {
-            this.ownerNum = dto.getOwnerNum();
         }
     }
 }
