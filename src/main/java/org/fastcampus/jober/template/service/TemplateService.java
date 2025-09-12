@@ -9,9 +9,11 @@ import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
+import org.fastcampus.jober.template.dto.response.TemplateListResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.util.ExternalApiUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,14 +69,14 @@ public class TemplateService {
 
         // ExternalApiUtil을 통해 AI Flask 서버로 요청 전송
         Object aiResponse = externalApiUtil.postJson(url, requestBody, Object.class, "AI Flask 서버");
-        
+
         // AI 응답을 구조화된 DTO로 파싱
         return parseAiResponse(aiResponse);
     }
-    
+
     /**
      * AI 서버의 원시 응답을 TemplateCreateResponseDto로 파싱합니다.
-     * 
+     *
      * @param aiResponse AI 서버의 원시 응답
      * @return 구조화된 템플릿 생성 응답 DTO
      */
@@ -83,56 +85,56 @@ public class TemplateService {
             // Object를 Map으로 변환
             @SuppressWarnings("unchecked")
             Map<String, Object> responseMap = objectMapper.convertValue(aiResponse, Map.class);
-            
+
             log.info("AI 서버 응답 파싱 시작: {}", responseMap);
-            
+
             TemplateCreateResponseDto response = new TemplateCreateResponseDto();
-            
+
             // AI 서버 실제 응답 구조에 맞게 파싱
             response.setMessage((String) responseMap.get("response"));  // "response" 필드가 메시지
             response.setTemplateContent((String) responseMap.get("template"));  // "template" 필드
             response.setHtmlPreview((String) responseMap.get("htmlPreview"));
             response.setFinalTemplate((String) responseMap.get("structured_template"));  // "structured_template"
             response.setParameterizedTemplate((String) responseMap.get("parameterizedTemplate"));
-            
+
             // editable_variables를 JSON 문자열로 변환
             Object editableVars = responseMap.get("editable_variables");
             if (editableVars != null) {
                 response.setExtractedVariables(objectMapper.writeValueAsString(editableVars));
             }
-            
+
             // options 파싱 (AI 서버에서 "options" 필드로 보냄)
             @SuppressWarnings("unchecked")
             List<String> options = (List<String>) responseMap.get("options");
             response.setTemplateOptions(options);
-            
+
             // AI 응답의 state 정보 파싱
             @SuppressWarnings("unchecked")
             Map<String, Object> aiStateMap = (Map<String, Object>) responseMap.get("state");
-            
+
             TemplateState state = new TemplateState();
-            
+
             if (aiStateMap != null) {
                 // AI state에서 직접 정보 추출
                 state.setNextAction((String) aiStateMap.get("next_action"));
-                
+
                 // template_pipeline_state에서 상세 정보 추출
                 @SuppressWarnings("unchecked")
                 Map<String, Object> pipelineState = (Map<String, Object>) aiStateMap.get("template_pipeline_state");
                 state.setTemplatePipelineState(pipelineState);
-                
+
                 if (pipelineState != null) {
                     state.setOriginalRequest((String) pipelineState.get("original_request"));
                 }
             }
-            
+
             response.setState(state);
-            
-            log.info("AI 응답 파싱 완료: message={}, next_action={}, original_request={}", 
-                response.getMessage(), 
-                state.getNextAction(), 
+
+            log.info("AI 응답 파싱 완료: message={}, next_action={}, original_request={}",
+                response.getMessage(),
+                state.getNextAction(),
                 state.getOriginalRequest());
-            
+
             return response;
         } catch (Exception e) {
             log.error("AI 응답 파싱 실패: {}", e.getMessage(), e);
@@ -188,5 +190,9 @@ public class TemplateService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
 
         return template.updateIsSaved(isSaved);
+    }
+
+    public List<TemplateListResponseDto> getTemlpateList(CustomUserDetails principal) {
+        return templateRepository.findTemplateByUserId(principal.getUserId());
     }
 }

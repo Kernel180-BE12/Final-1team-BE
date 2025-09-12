@@ -2,7 +2,9 @@ package org.fastcampus.jober.template.repository;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.fastcampus.jober.template.dto.response.TemplateListResponseDto;
 import org.fastcampus.jober.template.entity.Template;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -58,4 +60,13 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
         @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId
     );
+
+    @Query(value = """
+                SELECT t.title, t.parameterized_template
+                FROM template t
+                JOIN space s ON t.space_id = s.id
+                JOIN space_member sm ON sm.space_id = s.id
+                WHERE sm.user_id = :userId
+            """, nativeQuery = true)
+    List<TemplateListResponseDto> findTemplateByUserId(@Param("userId") Long userId);
 }
