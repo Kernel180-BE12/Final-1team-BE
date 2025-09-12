@@ -4,13 +4,17 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
+import org.fastcampus.jober.space.dto.response.SpaceListResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.mapper.SpaceMapper;
+import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
+import org.fastcampus.jober.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +41,7 @@ public class SpaceService {
 
         Long userId = principal.getUserId();
         // 2. 관리자인지 체크
-        existingSpace.isAdminUser(userId);
+        existingSpace.validateAdminUser(userId);
         // 3. 엔티티 업데이트
         existingSpace.updateSpaceFromDto(dto);
         // 4. Entity to DTO
@@ -48,26 +52,17 @@ public class SpaceService {
     public void deleteSpace(Long spaceId, CustomUserDetails principal) {
         Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 
-        existingSpace.isAdminUser(principal.getUserId());
+        existingSpace.validateAdminUser(principal.getUserId());
 
         spaceRepository.deleteById(existingSpace.getSpaceId());
     }
+
+    public List<SpaceListResponseDto> getSpaceList(CustomUserDetails principal) {
+        return spaceRepository.findSpacesByUserId(principal.getUserId());
+    }
 }
 
-//
-//    // 특정 유저의 스페이스 목록 조회
-//    public List<SpaceResponseDto> findById(Long userId) {
-//        // 유저 아이디로 객체 조회한 목록
-//        List<Space> spaces = spaceRepository.findById(userId);
-//        // 저장된 객체들 dto로 변경해서 담을 리스트
-//        List<SpaceResponseDto> result = new ArrayList<>();
-//
-//        for (Space space : spaces) {
-//            SpaceResponseDto dto =
-//            result.add(dto);
-//        }
-//        return result;
-//    }
+
 //
 //    // 스페이스의 멤버목록 조회
 //    public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
