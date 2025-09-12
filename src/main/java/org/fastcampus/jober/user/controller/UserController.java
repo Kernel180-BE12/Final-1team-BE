@@ -1,19 +1,17 @@
 package org.fastcampus.jober.user.controller;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
-import org.fastcampus.jober.user.dto.request.CheckEmailRequestDto;
-import org.fastcampus.jober.user.dto.request.CheckIdRequestDto;
-import org.fastcampus.jober.user.dto.request.LoginRequestDto;
-import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
-import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
+import org.fastcampus.jober.user.dto.request.*;
 import org.fastcampus.jober.user.dto.response.LoginResponseDto;
 import org.fastcampus.jober.user.dto.response.UserInfoResponseDto;
 import org.fastcampus.jober.user.service.UserService;
+import org.fastcampus.jober.util.ClientIpResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,6 +30,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,6 +40,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
 import java.util.List;
 
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -49,6 +50,7 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final SessionRegistry sessionRegistry;
+    private final ClientIpResolver ipResolver;
 
     @PostMapping("/register")
     @Operation(
@@ -152,7 +154,7 @@ public class UserController {
     public ResponseEntity<Void> update(
             @RequestBody UpdateRequestDto req,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        
+
         // // username 중복 검사 (현재 username과 다를 경우에만)
         // if (req.getUsername() != null && !req.getUsername().equals(principal.getUsername())) {
         //     if (userService.isUsernameExists(req.getUsername())) {
@@ -166,15 +168,15 @@ public class UserController {
                 throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
             }
         }
-        
+
         // 사용자 정보 업데이트 (변경사항이 있을 때만)
         boolean hasChanges = userService.update(req, principal);
-        
+
         if (!hasChanges) {
             // 변경사항이 없으면 204 No Content 응답
             return ResponseEntity.noContent().build();
         }
-        
+
         return ResponseEntity.ok().build();
     }
 
@@ -212,5 +214,37 @@ public class UserController {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
         }
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/password")
+    @Operation(summary = "비밀번호 변경 메일 전송", description = "비밀번호 변경 시에 메일")
+    @ApiResponse(responseCode = "200", description = "이메일 전송 성공")
+    @ApiResponse(responseCode = "500", description = "이메일 전송 실패")
+    public ResponseEntity<Boolean> sendPasswordResetEmail(@RequestBody PasswordResetEmailRequestDto passwordResetEmailRequestDto, HttpServletRequest request) throws MessagingException, NoSuchAlgorithmException {
+            String ip = ipResolver.resolve(request);
+            String ua = request.getHeader("User-Agent");
+            if (ua != null && ua.length() > 255) ua = ua.substring(0, 255);
+
+            userService.issueTokenAndSendMail(passwordResetEmailRequestDto, ip, ua);
+            return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/token/check")
+    @Operation(summary = "비밀번호 변경 토큰 검증", description = "비밀번호 변경 시 토큰 검증")
+    @ApiResponse(responseCode = "200", description = "토큰 존재")
+    @ApiResponse(responseCode = "401", description = "토큰 만료")
+    public ResponseEntity<Boolean> checkToken(@RequestBody PasswordResetTokenRequestDto passwordResetTokenRequestDto) {
+        userService.checkToken(passwordResetTokenRequestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/password")
+    @Operation(summary = "비밀번호 변경", description = "새 비밀번호로 변경")
+    @ApiResponse(responseCode = "200", description = "비밀번호 변경 완료")
+    @ApiResponse(responseCode = "401", description = "토큰 만료")
+    @ApiResponse(responseCode = "404", description = "없는 회원")
+    public ResponseEntity<Boolean> changePassword(PasswordResetRequestDto passwordResetRequestDto) {
+        userService.changePassword(passwordResetRequestDto);
+        return  ResponseEntity.ok().build();
     }
 }
