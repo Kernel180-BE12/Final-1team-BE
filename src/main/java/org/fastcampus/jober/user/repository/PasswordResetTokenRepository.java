@@ -2,9 +2,6 @@ package org.fastcampus.jober.user.repository;
 
 import org.fastcampus.jober.user.entity.PasswordResetToken;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.Optional;
