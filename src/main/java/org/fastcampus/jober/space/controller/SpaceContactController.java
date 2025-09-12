@@ -2,6 +2,7 @@ package org.fastcampus.jober.space.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
@@ -55,7 +56,7 @@ public class SpaceContactController {
 
   /**
    * 연락처 정보 수정 API
-   * 
+   *
    * @param requestDto 수정할 연락처 정보 (스페이스 ID, 연락처 ID, 수정할 정보)
    * @return 수정된 연락처 정보
    */
@@ -69,7 +70,7 @@ public class SpaceContactController {
 
   /**
    * 연락처 삭제 API
-   * 
+   *
    * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
    * @return 삭제 성공 응답
    */
@@ -79,5 +80,29 @@ public class SpaceContactController {
       @RequestBody ContactDeleteRequestDto requestDto) {
     spaceContactService.deleteContact(requestDto);
     return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 스페이스 ID와 tag를 받아 연락처를 조회하는 API
+   * @param spaceId 스페이스 ID
+   * @param tag 태그
+   * @return 연락처 정보
+   */
+  @Operation(summary = "스페이스 ID와 tag를 받아 연락처를 조회합니다.", description = "스페이스 ID와 tag를 받아 연락처를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "404", description = "해당 spaceId의 연락처를 찾을 수 없음")
+  @GetMapping("/contact/{spaceId}/{tag}")
+  public ResponseEntity<ContactResponseDto> getContactsByTag(
+      @Parameter(
+        description = "스페이스 ID", 
+        required = true, 
+        example = "1")
+      @PathVariable(name = "spaceId") Long spaceId,
+        @Parameter(description = "태그", 
+        required = true, 
+        example = "프리랜서")
+      @PathVariable(name = "tag") String tag) {
+    ContactResponseDto response = spaceContactService.getContactsByTag(spaceId, tag);
+    return ResponseEntity.ok(response);
   }
 }
