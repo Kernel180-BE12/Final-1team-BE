@@ -109,4 +109,15 @@ public class SpaceContactService {
     contact.softDelete();
     spaceContactsRepository.save(contact);
   }
+
+  @Transactional
+  public ContactResponseDto getContactsByTag(Long spaceId, String tag) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(spaceId);
+    
+    // 연락처 조회
+    List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceIdAndTag(spaceId, tag);
+    return ContactResponseDto.fromEntities(contacts, spaceId);
+  }
+
 }
