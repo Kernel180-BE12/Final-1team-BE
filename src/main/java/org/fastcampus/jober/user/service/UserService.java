@@ -64,7 +64,7 @@ public class UserService {
     @Transactional
     public boolean update(UpdateRequestDto req, CustomUserDetails principal) {
         // 입력값 형식 검증 (null이 아닌 경우에만)
-        if (req.getUsername() != null && !req.getUsername().matches("^[a-z0-9]{5,15}$")) {
+        if (req.getName() != null && !req.getName().matches("^[a-z0-9]{5,15}$")) {
             throw new BusinessException(ErrorCode.INVALID_USERNAME);
         }
         if (req.getEmail() != null && !req.getEmail().matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
