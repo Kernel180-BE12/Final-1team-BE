@@ -1,6 +1,7 @@
 package org.fastcampus.jober.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.util.TokenGenerator;
 
@@ -11,6 +12,7 @@ import java.time.Instant;
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 
 @Entity
+@Getter
 public class PasswordResetToken extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

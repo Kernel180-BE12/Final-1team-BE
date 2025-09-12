@@ -215,6 +215,9 @@ public class UserController {
     }
 
     @PostMapping("/password")
+    @Operation(summary = "비밀번호 변경 메일 전송", description = "비밀번호 변경 시에 메일")
+    @ApiResponse(responseCode = "200", description = "이메일 전송 성공")
+    @ApiResponse(responseCode = "500", description = "이메일 전송 실패")
     public ResponseEntity<Boolean> sendPasswordResetEmail(@RequestBody PasswordResetEmailRequestDto passwordResetEmailRequestDto, HttpServletRequest request) throws MessagingException, NoSuchAlgorithmException {
             String ip = ipResolver.resolve(request);
             String ua = request.getHeader("User-Agent");

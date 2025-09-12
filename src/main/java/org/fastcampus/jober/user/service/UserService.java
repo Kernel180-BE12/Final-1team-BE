@@ -99,13 +99,13 @@ public class UserService {
         passwordResetTokenRepository.save(token);
 
         // 프론트엔드 비밀번호 변경 페이지 URL 생성
-        String resetUrl = frontUrl + token;
+        String resetUrl = frontUrl + "?token=" + token.getSecretHash();
         String plain = "아래 링크로 비밀번호를 재설정하세요 (30분 유효):\n" + resetUrl;
 
         customMailSender.sendMail(passwordResetEmailRequestDto.email(),
                 resetUrl,
                 "[Jober] 비밀번호 재설정",
-                "mail/password-reset",
+                "mail/password-reset", // server 에 있는 메일 템플릿
                 plain);
     }
 
