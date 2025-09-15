@@ -38,6 +38,10 @@ public class Users extends BaseEntity {
         this.email = email;
     }
 
+    private Users(Long userId) {
+        this.userId = userId;
+    }
+
     // ✅ 상황별 팩토리 메서드
     public static Users forSignup(String username, String password, String name, String email) {
         return new Users(username,
@@ -76,4 +80,11 @@ public class Users extends BaseEntity {
         this.password = PasswordHashing.hash(password);
     }
 
+    public static Users forCreateSpace(Long userId) {
+        return new Users(userId);
+    }
+
+    public boolean isSameUser(final Long userId) {
+        return this.userId.equals(userId);
+    }
 }
