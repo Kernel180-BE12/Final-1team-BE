@@ -24,19 +24,5 @@ public class ContactTag {
 
     @Column(nullable = false)
     private Long spaceId;
-
-    /**
-     * ContactTag 엔티티를 생성하는 빌더 메서드
-     * 
-     * @param tag 태그명
-     * @param spaceId 스페이스 ID
-     * @return ContactTag 엔티티
-     */
-    public static ContactTag create(String tag, Long spaceId) {
-        return ContactTag.builder()
-            .tag(tag)
-            .spaceId(spaceId)
-            .build();
-    }
     
 }

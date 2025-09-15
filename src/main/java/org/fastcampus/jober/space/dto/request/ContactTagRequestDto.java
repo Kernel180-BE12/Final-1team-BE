@@ -23,6 +23,9 @@ public class ContactTagRequestDto {
      * @return ContactTag 엔티티
      */
     public ContactTag toEntity() {
-        return ContactTag.create(this.tag, this.spaceId);
+        return ContactTag.builder()
+            .tag(tag)
+            .spaceId(spaceId)
+            .build();
     }
 }

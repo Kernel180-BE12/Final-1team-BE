@@ -47,7 +47,7 @@ public interface SpaceContactsRepository extends JpaRepository<SpaceContacts, Lo
         summary = "스페이스 ID와 tag를 받아 연락처를 조회합니다.",
         description = "스페이스 ID와 tag를 받아 연락처를 조회합니다."
     )
-    @Query("SELECT sc FROM SpaceContacts sc WHERE sc.spaceId = :spaceId AND sc.tag = :tag AND (sc.isDeleted = false OR sc.isDeleted IS NULL)")
+    @Query("SELECT sc FROM SpaceContacts sc LEFT JOIN FETCH sc.contactTag WHERE sc.spaceId = :spaceId AND sc.contactTag.tag = :tag AND (sc.isDeleted = false OR sc.isDeleted IS NULL)")
     List<SpaceContacts> findBySpaceIdAndTag(
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
         @Parameter(description = "태그", required = true) @Param("tag") String tag
