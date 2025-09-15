@@ -96,12 +96,12 @@ public class SpaceContactController {
   @GetMapping("/contact/{spaceId}/{tag}")
   public ResponseEntity<ContactResponseDto> getContactsByTag(
       @Parameter(
-        description = "스페이스 ID", 
-        required = true, 
+        description = "스페이스 ID",
+        required = true,
         example = "1")
       @PathVariable(name = "spaceId") Long spaceId,
-        @Parameter(description = "태그", 
-        required = true, 
+        @Parameter(description = "태그",
+        required = true,
         example = "프리랜서")
       @PathVariable(name = "tag") String tag) {
     ContactResponseDto response = spaceContactService.getContactsByTag(spaceId, tag);

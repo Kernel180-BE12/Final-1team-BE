@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -227,7 +229,6 @@ class TemplateControllerTest {
         // Given
         when(templateService.saveTemplate(any(TemplateSaveRequestDto.class)))
                 .thenReturn(saveResponseDto);
-
         // JSON으로 직접 요청 데이터 생성
         String saveRequestJson = """
                 {

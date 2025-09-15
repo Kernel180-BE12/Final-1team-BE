@@ -8,6 +8,7 @@ import lombok.Getter;
 import jakarta.persistence.*;
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
+import org.fastcampus.jober.util.PasswordHashing;
 
 
 @Entity
@@ -35,6 +36,10 @@ public class Users extends BaseEntity {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    private Users(Long userId) {
+        this.userId = userId;
     }
 
     // ✅ 상황별 팩토리 메서드
@@ -71,4 +76,15 @@ public class Users extends BaseEntity {
         return hasChanges;
     }
 
+    public void updatePassword(String password) {
+        this.password = PasswordHashing.hash(password);
+    }
+
+    public static Users forCreateSpace(Long userId) {
+        return new Users(userId);
+    }
+
+    public boolean isSameUser(final Long userId) {
+        return this.userId.equals(userId);
+    }
 }
