@@ -26,7 +26,7 @@ public class TemplateTitleResponseDto {
   /**
    * 제목 문자열로부터 DTO를 생성합니다.
    *
-   * @param title 템플릿 제목
+   * @param template 템플릿 제목
    * @return TemplateTitleResponseDto
    */
   public static TemplateTitleResponseDto from(Template template) {

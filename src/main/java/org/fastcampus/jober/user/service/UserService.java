@@ -94,9 +94,8 @@ public class UserService {
             .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
     // DTO를 통해 엔티티 업데이트 (@Transactional로 자동 저장)
-    boolean hasChanges = user.updateUserInfo(req);
 
-    return hasChanges;
+      return user.updateUserInfo(req);
   }
 
   /**

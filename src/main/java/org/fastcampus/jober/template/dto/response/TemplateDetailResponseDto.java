@@ -61,6 +61,6 @@ public class TemplateDetailResponseDto {
    * @return 유효한 경우 true
    */
   public boolean isValid() {
-    return id != null && spaceId != null && title != null && title.trim().length() > 0;
+    return id != null && spaceId != null && title != null && !title.trim().isEmpty();
   }
 }

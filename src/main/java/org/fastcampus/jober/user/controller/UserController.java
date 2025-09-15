@@ -183,7 +183,7 @@ public class UserController {
   /**
    * 아이디 중복 체크
    *
-   * @param req 아이디 중복 체크 요청 데이터
+   * @param checkIdRequestDto 아이디 중복 체크 요청 데이터
    * @return 아이디 중복 체크 결과
    */
   @PostMapping("/id/check")
@@ -202,7 +202,7 @@ public class UserController {
   /**
    * 이메일 중복 체크
    *
-   * @param req 이메일 중복 체크 요청 데이터
+   * @param checkEmailRequestDto 이메일 중복 체크 요청 데이터
    * @return 이메일 중복 체크 결과
    */
   @PostMapping("/email/check")

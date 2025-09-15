@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,9 +18,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +41,7 @@ class TemplateControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
-  @MockBean private TemplateService templateService;
+  @MockitoBean private TemplateService templateService;
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -50,7 +50,6 @@ class TemplateControllerTest {
   private TemplateCreateResponseDto createResponseDto;
   private TemplateSaveResponseDto saveResponseDto;
   private TemplateCreateRequestDto createRequestDto;
-  private TemplateSaveRequestDto saveRequestDto;
 
   @BeforeEach
   void setUp() {
@@ -104,7 +103,7 @@ class TemplateControllerTest {
   void getTemplateTitlesBySpaceId_Success() throws Exception {
     // Given
     Long spaceId = 1L;
-    List<TemplateTitleResponseDto> expectedTitles = Arrays.asList(titleResponseDto);
+    List<TemplateTitleResponseDto> expectedTitles = Collections.singletonList(titleResponseDto);
     when(templateService.getTitlesBySpaceId(spaceId)).thenReturn(expectedTitles);
 
     // When & Then

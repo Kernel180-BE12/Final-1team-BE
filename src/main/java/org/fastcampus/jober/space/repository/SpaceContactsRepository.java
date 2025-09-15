@@ -3,6 +3,7 @@ package org.fastcampus.jober.space.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -36,6 +37,7 @@ public interface SpaceContactsRepository extends JpaRepository<SpaceContacts, Lo
   @Operation(summary = "스페이스 연락처 논리삭제", description = "특정 spaceId의 모든 연락처를 논리삭제합니다.")
   @Query(
       "UPDATE SpaceContacts sc SET sc.isDeleted = true WHERE sc.spaceId = :spaceId AND (sc.isDeleted = false OR sc.isDeleted IS NULL)")
+  @Modifying
   void softDeleteBySpaceId(
       @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId);
 
