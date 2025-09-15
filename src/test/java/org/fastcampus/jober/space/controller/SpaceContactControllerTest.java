@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
-import org.fastcampus.jober.space.dto.request.ContactTagRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactTagAddRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceContactsUpdateResponseDto;
 import org.fastcampus.jober.space.dto.response.ContactTagResponseDto;
@@ -47,7 +47,7 @@ class SpaceContactControllerTest {
     private SpaceContactsUpdateRequestDto updateRequestDto;
     private SpaceContactsUpdateResponseDto updateResponseDto;
     private ContactDeleteRequestDto deleteRequestDto;
-    private ContactTagRequestDto tagRequestDto;
+    private ContactTagAddRequestDto tagRequestDto;
     private ContactTagResponseDto tagResponseDto;
 
     @BeforeEach
@@ -103,7 +103,7 @@ class SpaceContactControllerTest {
                 .build();
 
         // 태그 관련 테스트 데이터 설정
-        tagRequestDto = ContactTagRequestDto.builder()
+        tagRequestDto = ContactTagAddRequestDto.builder()
                 .spaceId(1L)
                 .tag("프리랜서")
                 .build();
@@ -565,7 +565,7 @@ class SpaceContactControllerTest {
     @WithMockUser
     void addContactTag_Success() throws Exception {
         // given
-        when(spaceContactService.addContactTag(any(ContactTagRequestDto.class)))
+        when(spaceContactService.addContactTag(any(ContactTagAddRequestDto.class)))
                 .thenReturn(tagResponseDto);
 
         // when & then
@@ -584,7 +584,7 @@ class SpaceContactControllerTest {
     @WithMockUser
     void addContactTag_SpaceNotFound() throws Exception {
         // given
-        when(spaceContactService.addContactTag(any(ContactTagRequestDto.class)))
+        when(spaceContactService.addContactTag(any(ContactTagAddRequestDto.class)))
                 .thenThrow(new org.fastcampus.jober.error.BusinessException(
                         org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
 
@@ -601,7 +601,7 @@ class SpaceContactControllerTest {
     @WithMockUser
     void addContactTag_DuplicateTag() throws Exception {
         // given
-        when(spaceContactService.addContactTag(any(ContactTagRequestDto.class)))
+        when(spaceContactService.addContactTag(any(ContactTagAddRequestDto.class)))
                 .thenThrow(new org.fastcampus.jober.error.BusinessException(
                         org.fastcampus.jober.error.ErrorCode.DUPLICATE_RESOURCE, "해당 스페이스에 이미 존재하는 태그입니다."));
 

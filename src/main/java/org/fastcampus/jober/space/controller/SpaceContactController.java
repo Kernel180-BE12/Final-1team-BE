@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
-import org.fastcampus.jober.space.dto.request.ContactTagRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactTagAddRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.dto.response.ContactTagResponseDto;
 import org.fastcampus.jober.space.service.SpaceContactService;
@@ -119,7 +119,7 @@ public class SpaceContactController {
   @Operation(summary = "연락처 태그 추가", description = "스페이스 ID와 태그를 받아 해당 스페이스의 연락처 태그를 추가합니다.")
   @PostMapping("/contact/tag")
   public ResponseEntity<ContactTagResponseDto> addContactTag(
-      @RequestBody ContactTagRequestDto requestDto) {
+      @RequestBody ContactTagAddRequestDto requestDto) {
     ContactTagResponseDto response = spaceContactService.addContactTag(requestDto);
     return ResponseEntity.ok(response);
   }
@@ -141,4 +141,12 @@ public class SpaceContactController {
     ContactTagResponseDto response = spaceContactService.getContactTag(spaceId);
     return ResponseEntity.ok(response);
   }
+
+  @PatchMapping("/contact/tag/{spaceId}/{tag}")
+  public ResponseEntity<ContactTagResponseDto> updateContactTag(
+    @RequestBody ContactTagRUpdateDto requestDto) {
+    ContactTagResponseDto response = spaceContactService.updateContactTag(requestDto);
+    return ResponseEntity.ok(response);
+  }
+
 }

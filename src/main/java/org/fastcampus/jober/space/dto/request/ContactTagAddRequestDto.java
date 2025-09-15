@@ -9,7 +9,7 @@ import org.fastcampus.jober.space.entity.ContactTag;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "연락처 태그 추가 요청 DTO")
-public class ContactTagRequestDto {
+public class ContactTagAddRequestDto {
     
     @Schema(description = "태그", example = "프리랜서")
     private String tag;

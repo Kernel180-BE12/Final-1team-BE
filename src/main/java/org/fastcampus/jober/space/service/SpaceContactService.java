@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
-import org.fastcampus.jober.space.dto.request.ContactTagRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactTagAddRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
@@ -149,7 +149,7 @@ public class SpaceContactService {
    * @return 추가된 태그 정보를 포함한 응답 DTO
    */
   @Transactional
-  public ContactTagResponseDto addContactTag(ContactTagRequestDto requestDto) {
+  public ContactTagResponseDto addContactTag(ContactTagAddRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
     
@@ -199,6 +199,14 @@ public class SpaceContactService {
     // 연락처 조회
     List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceIdAndTag(spaceId, tag);
     return ContactResponseDto.fromEntities(contacts, spaceId);
+  }
+
+  public ContactTagResponseDto updateContactTag(ContactTagRequestDto requestDto) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
+    
+    // 연락처 태그 조회
+    ContactTag contactTag = contactTagRepository.findById(requestDto.getId())
   }
 
 }
