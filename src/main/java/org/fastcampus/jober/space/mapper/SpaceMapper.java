@@ -20,6 +20,7 @@ public interface SpaceMapper {
   @Mapping(target = "admin", expression = "java(createUserEntity(adminUserId))")
   @Mapping(target = "spaceUrl", ignore = true)
   @Mapping(target = "spaceMembers", ignore = true)
+  @Mapping(target = "ownerNum", ignore = true)
   Space toEntity(SpaceCreateRequestDto dto, Long adminUserId);
 
   // 생성용: DTO → Entity

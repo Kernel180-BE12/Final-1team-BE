@@ -1,13 +1,17 @@
 package org.fastcampus.jober.space.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.entity.Users;
 
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class SpaceMember extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

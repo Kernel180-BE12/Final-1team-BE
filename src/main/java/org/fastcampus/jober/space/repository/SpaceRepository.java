@@ -21,6 +21,10 @@ public interface SpaceRepository extends JpaRepository<Space, Long> {
   }
 
   @Query(
-      "SELECT new org.fastcampus.jober.space.dto.response.SpaceListResponseDto(s.spaceId, s.spaceName, sm.authority) FROM Space s LEFT JOIN s.spaceMembers sm WHERE sm.user.userId = :userId")
+      """
+            SELECT new org.fastcampus.jober.space.dto.response.SpaceListResponseDto(s.spaceId, s.spaceName, sm.authority)
+            FROM Space s LEFT JOIN s.spaceMembers sm
+            WHERE sm.user.userId = :userId
+            """)
   List<SpaceListResponseDto> findSpacesByUserId(@Param("userId") Long userId);
 }
