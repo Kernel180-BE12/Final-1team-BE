@@ -42,11 +42,21 @@ public class Template extends BaseEntity {
 
     private String parameterizedTemplate;
 
+    // @Builder.Default
     private Integer totalAttempts;
 
+    // @Builder.Default
     private Boolean isSaved; // 0:저장안됨 / 1:저장됨
 
-    private Boolean isAccepted;
+    private String type;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isAccepted = false;
 
 
     public Boolean updateIsSaved(Boolean isSaved) {

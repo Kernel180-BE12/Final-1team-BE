@@ -5,6 +5,7 @@ package org.fastcampus.jober.template.controller;
  */
 import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
+import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
+import org.fastcampus.jober.template.dto.response.TemplateSaveResponseDto;
 import org.fastcampus.jober.template.service.TemplateService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -156,24 +158,42 @@ public class TemplateController {
 
     }
 
-    @PatchMapping("/{templateId}/space/{spaceId}")
+    // @PatchMapping("/{templateId}/space/{spaceId}")
+    // @Operation(
+    //         summary = "템플릿 저장 상태 변경",
+    //         description = "특정 스페이스의 템플릿 저장 여부(`isSaved`)를 업데이트합니다. " +
+    //                 "예를 들어 `isSaved=true`로 호출하면 해당 템플릿은 저장된 상태로 변경됩니다."
+    // )
+    // @ApiResponse(responseCode = "200", description = "성공적으로 저장 상태가 변경됨")
+    // @ApiResponse(responseCode = "404", description = "템플릿을 찾을 수 없음")
+    // public ResponseEntity<Boolean> saveTemplate(
+    //         @Parameter(description = "템플릿 ID", required = true, example = "1")
+    //         @PathVariable Long templateId,
+
+    //         @Parameter(description = "스페이스 ID", required = true, example = "10")
+    //         @PathVariable Long spaceId,
+
+    //         @Parameter(description = "저장 여부 (true=저장, false=삭제)", required = true, example = "true")
+    //         @RequestParam Boolean isSaved) {
+    //     Boolean result = templateService.saveTemplate(templateId, spaceId, isSaved);
+    //     return ResponseEntity.ok(result);
+    // }
+
+    /**
+     * 템플릿 저장 API
+     * @param request 템플릿 저장 요청 DTO
+     * @return 템플릿 저장 응답 DTO
+     */
     @Operation(
-            summary = "템플릿 저장 상태 변경",
-            description = "특정 스페이스의 템플릿 저장 여부(`isSaved`)를 업데이트합니다. " +
-                    "예를 들어 `isSaved=true`로 호출하면 해당 템플릿은 저장된 상태로 변경됩니다."
+        summary = "템플릿 저장",
+        description = "템플릿을 저장합니다."
     )
-    @ApiResponse(responseCode = "200", description = "성공적으로 저장 상태가 변경됨")
-    @ApiResponse(responseCode = "404", description = "템플릿을 찾을 수 없음")
-    public ResponseEntity<Boolean> saveTemplate(
-            @Parameter(description = "템플릿 ID", required = true, example = "1")
-            @PathVariable Long templateId,
-
-            @Parameter(description = "스페이스 ID", required = true, example = "10")
-            @PathVariable Long spaceId,
-
-            @Parameter(description = "저장 여부 (true=저장, false=삭제)", required = true, example = "true")
-            @RequestParam Boolean isSaved) {
-        Boolean result = templateService.saveTemplate(templateId, spaceId, isSaved);
-        return ResponseEntity.ok(result);
+    @ApiResponse(responseCode = "200", description = "성공적으로 템플릿이 저장됨")
+    @ApiResponse(responseCode = "404", description = "템플릿 또는 스페이스를 찾을 수 없음")
+    @PostMapping("/save")
+    public ResponseEntity<TemplateSaveResponseDto> saveTemplate(
+        @RequestBody TemplateSaveRequestDto request) {
+        TemplateSaveResponseDto response = templateService.saveTemplate(request);
+        return ResponseEntity.ok(response);
     }
 }
