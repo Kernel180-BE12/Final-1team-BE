@@ -8,8 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan
 public class JoberServerApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(JoberServerApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(JoberServerApplication.class, args);
+  }
 }

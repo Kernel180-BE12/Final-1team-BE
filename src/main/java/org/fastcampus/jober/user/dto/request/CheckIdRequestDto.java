@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckIdRequestDto {
-    private String username;
+  private String username;
 }
