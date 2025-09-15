@@ -272,7 +272,7 @@ class SpaceContactControllerTest {
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(deleteRequestDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -342,7 +342,7 @@ class SpaceContactControllerTest {
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
+                .andExpect(status().isNoContent()); // validation이 없으므로 200 OK 반환
     }
 
     @Test
@@ -379,35 +379,6 @@ class SpaceContactControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-<<<<<<< HEAD
-    // ========== 태그 관련 테스트 ==========
-
-    @Test
-    @DisplayName("연락처 태그 추가 API 테스트 - 성공")
-    @WithMockUser
-    void addContactTag_Success() throws Exception {
-        // given
-        when(spaceContactService.addContactTag(any(ContactTagRequestDto.class)))
-                .thenReturn(tagResponseDto);
-
-        // when & then
-        mockMvc.perform(post("/space/contact/tag")
-                        .with(csrf())
-                        .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(tagRequestDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tags[0].id").value(1))
-                .andExpect(jsonPath("$.tags[0].tag").value("프리랜서"))
-                .andExpect(jsonPath("$.tags[0].spaceId").value(1));
-    }
-
-    @Test
-    @DisplayName("연락처 태그 추가 API 테스트 - 존재하지 않는 스페이스")
-    @WithMockUser
-    void addContactTag_SpaceNotFound() throws Exception {
-        // given
-        when(spaceContactService.addContactTag(any(ContactTagRequestDto.class)))
-=======
     // ========== 태그로 연락처 조회 테스트 ==========
 
     /**
@@ -460,12 +431,164 @@ class SpaceContactControllerTest {
         String tag = "프리랜서";
         
         when(spaceContactService.getContactsByTag(spaceId, tag))
->>>>>>> 2fd53c395cd4d440a041414132dea14fb14bf2e2
                 .thenThrow(new org.fastcampus.jober.error.BusinessException(
                         org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
 
         // when & then
-<<<<<<< HEAD
+        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
+     * 태그로 연락처 조회 API 테스트 - 빈 결과 (태그에 해당하는 연락처 없음)
+     */
+    @Test
+    @DisplayName("태그로 연락처 조회 API 테스트 - 빈 결과")
+    @WithMockUser
+    void getContactsByTag_EmptyResult() throws Exception {
+        // given
+        Long spaceId = 1L;
+        String tag = "존재하지않는태그";
+        
+        ContactResponseDto emptyResponseDto = ContactResponseDto.builder()
+                .spaceId(spaceId)
+                .contacts(Arrays.asList()) // 빈 리스트
+                .registeredAt(LocalDateTime.now())
+                .build();
+
+        when(spaceContactService.getContactsByTag(spaceId, tag))
+                .thenReturn(emptyResponseDto);
+
+        // when & then
+        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.spaceId").value(spaceId))
+                .andExpect(jsonPath("$.contacts").isArray())
+                .andExpect(jsonPath("$.contacts").isEmpty());
+    }
+
+    /**
+     * 태그로 연락처 조회 API 테스트 - 잘못된 경로 변수 (spaceId)
+     */
+    @Test
+    @DisplayName("태그로 연락처 조회 API 테스트 - 잘못된 spaceId")
+    @WithMockUser
+    void getContactsByTag_InvalidSpaceId() throws Exception {
+        // when & then
+        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", "invalid", "프리랜서"))
+                .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * 태그로 연락처 조회 API 테스트 - 특수문자가 포함된 태그
+     */
+    @Test
+    @DisplayName("태그로 연락처 조회 API 테스트 - 특수문자 태그")
+    @WithMockUser
+    void getContactsByTag_SpecialCharacters() throws Exception {
+        // given
+        Long spaceId = 1L;
+        String tag = "개발자-백엔드";
+        
+        ContactResponseDto.ContactInfo specialTagContactInfo = ContactResponseDto.ContactInfo.builder()
+                .id(3L)
+                .name("박민수")
+                .phoneNum("010-7777-8888")
+                .email("park@example.com")
+                .build();
+
+        ContactResponseDto specialTagResponseDto = ContactResponseDto.builder()
+                .spaceId(spaceId)
+                .contacts(Arrays.asList(specialTagContactInfo))
+                .registeredAt(LocalDateTime.now())
+                .build();
+
+        when(spaceContactService.getContactsByTag(spaceId, tag))
+                .thenReturn(specialTagResponseDto);
+
+        // when & then
+        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.spaceId").value(spaceId))
+                .andExpect(jsonPath("$.contacts[0].name").value("박민수"));
+    }
+
+    /**
+     * 태그로 연락처 조회 API 테스트 - 한글 태그
+     */
+    @Test
+    @DisplayName("태그로 연락처 조회 API 테스트 - 한글 태그")
+    @WithMockUser
+    void getContactsByTag_KoreanTag() throws Exception {
+        // given
+        Long spaceId = 1L;
+        String tag = "웹개발자";
+        
+        ContactResponseDto.ContactInfo koreanTagContactInfo = ContactResponseDto.ContactInfo.builder()
+                .id(4L)
+                .name("최지영")
+                .phoneNum("010-9999-0000")
+                .email("choi@example.com")
+                .build();
+
+        ContactResponseDto koreanTagResponseDto = ContactResponseDto.builder()
+                .spaceId(spaceId)
+                .contacts(Arrays.asList(koreanTagContactInfo))
+                .registeredAt(LocalDateTime.now())
+                .build();
+
+        when(spaceContactService.getContactsByTag(spaceId, tag))
+                .thenReturn(koreanTagResponseDto);
+
+        // when & then
+        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.spaceId").value(spaceId))
+                .andExpect(jsonPath("$.contacts[0].name").value("최지영"));
+    }
+
+    /**
+     * 태그로 연락처 조회 API 테스트 - 인증 없이 요청
+     */
+    @Test
+    @DisplayName("태그로 연락처 조회 API 테스트 - 인증 없이 요청")
+    void getContactsByTag_WithoutAuthentication() throws Exception {
+        // when & then
+        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", 1L, "프리랜서"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    // ========== 태그 관련 테스트 ==========
+
+    @Test
+    @DisplayName("연락처 태그 추가 API 테스트 - 성공")
+    @WithMockUser
+    void addContactTag_Success() throws Exception {
+        // given
+        when(spaceContactService.addContactTag(any(ContactTagRequestDto.class)))
+                .thenReturn(tagResponseDto);
+
+        // when & then
+        mockMvc.perform(post("/space/contact/tag")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(tagRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tags[0].id").value(1))
+                .andExpect(jsonPath("$.tags[0].tag").value("프리랜서"))
+                .andExpect(jsonPath("$.tags[0].spaceId").value(1));
+    }
+
+    @Test
+    @DisplayName("연락처 태그 추가 API 테스트 - 존재하지 않는 스페이스")
+    @WithMockUser
+    void addContactTag_SpaceNotFound() throws Exception {
+        // given
+        when(spaceContactService.addContactTag(any(ContactTagRequestDto.class)))
+                .thenThrow(new org.fastcampus.jober.error.BusinessException(
+                        org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
+
+        // when & then
         mockMvc.perform(post("/space/contact/tag")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
@@ -677,128 +800,3 @@ class SpaceContactControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
-=======
-        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
-                .andExpect(status().isNotFound());
-    }
-
-    /**
-     * 태그로 연락처 조회 API 테스트 - 빈 결과 (태그에 해당하는 연락처 없음)
-     */
-    @Test
-    @DisplayName("태그로 연락처 조회 API 테스트 - 빈 결과")
-    @WithMockUser
-    void getContactsByTag_EmptyResult() throws Exception {
-        // given
-        Long spaceId = 1L;
-        String tag = "존재하지않는태그";
-        
-        ContactResponseDto emptyResponseDto = ContactResponseDto.builder()
-                .spaceId(spaceId)
-                .contacts(Arrays.asList()) // 빈 리스트
-                .registeredAt(LocalDateTime.now())
-                .build();
-
-        when(spaceContactService.getContactsByTag(spaceId, tag))
-                .thenReturn(emptyResponseDto);
-
-        // when & then
-        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.spaceId").value(spaceId))
-                .andExpect(jsonPath("$.contacts").isArray())
-                .andExpect(jsonPath("$.contacts").isEmpty());
-    }
-
-    /**
-     * 태그로 연락처 조회 API 테스트 - 잘못된 경로 변수 (spaceId)
-     */
-    @Test
-    @DisplayName("태그로 연락처 조회 API 테스트 - 잘못된 spaceId")
-    @WithMockUser
-    void getContactsByTag_InvalidSpaceId() throws Exception {
-        // when & then
-        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", "invalid", "프리랜서"))
-                .andExpect(status().isBadRequest());
-    }
-
-    /**
-     * 태그로 연락처 조회 API 테스트 - 특수문자가 포함된 태그
-     */
-    @Test
-    @DisplayName("태그로 연락처 조회 API 테스트 - 특수문자 태그")
-    @WithMockUser
-    void getContactsByTag_SpecialCharacters() throws Exception {
-        // given
-        Long spaceId = 1L;
-        String tag = "개발자-백엔드";
-        
-        ContactResponseDto.ContactInfo specialTagContactInfo = ContactResponseDto.ContactInfo.builder()
-                .id(3L)
-                .name("박민수")
-                .phoneNum("010-7777-8888")
-                .email("park@example.com")
-                .build();
-
-        ContactResponseDto specialTagResponseDto = ContactResponseDto.builder()
-                .spaceId(spaceId)
-                .contacts(Arrays.asList(specialTagContactInfo))
-                .registeredAt(LocalDateTime.now())
-                .build();
-
-        when(spaceContactService.getContactsByTag(spaceId, tag))
-                .thenReturn(specialTagResponseDto);
-
-        // when & then
-        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.spaceId").value(spaceId))
-                .andExpect(jsonPath("$.contacts[0].name").value("박민수"));
-    }
-
-    /**
-     * 태그로 연락처 조회 API 테스트 - 한글 태그
-     */
-    @Test
-    @DisplayName("태그로 연락처 조회 API 테스트 - 한글 태그")
-    @WithMockUser
-    void getContactsByTag_KoreanTag() throws Exception {
-        // given
-        Long spaceId = 1L;
-        String tag = "웹개발자";
-        
-        ContactResponseDto.ContactInfo koreanTagContactInfo = ContactResponseDto.ContactInfo.builder()
-                .id(4L)
-                .name("최지영")
-                .phoneNum("010-9999-0000")
-                .email("choi@example.com")
-                .build();
-
-        ContactResponseDto koreanTagResponseDto = ContactResponseDto.builder()
-                .spaceId(spaceId)
-                .contacts(Arrays.asList(koreanTagContactInfo))
-                .registeredAt(LocalDateTime.now())
-                .build();
-
-        when(spaceContactService.getContactsByTag(spaceId, tag))
-                .thenReturn(koreanTagResponseDto);
-
-        // when & then
-        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", spaceId, tag))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.spaceId").value(spaceId))
-                .andExpect(jsonPath("$.contacts[0].name").value("최지영"));
-    }
-
-    /**
-     * 태그로 연락처 조회 API 테스트 - 인증 없이 요청
-     */
-    @Test
-    @DisplayName("태그로 연락처 조회 API 테스트 - 인증 없이 요청")
-    void getContactsByTag_WithoutAuthentication() throws Exception {
-        // when & then
-        mockMvc.perform(get("/space/contact/{spaceId}/{tag}", 1L, "프리랜서"))
-                .andExpect(status().isUnauthorized());
-    }
-}
->>>>>>> 2fd53c395cd4d440a041414132dea14fb14bf2e2
