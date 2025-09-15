@@ -166,7 +166,7 @@ public class TemplateController {
   /**
    * 템플릿 삭제 API
    *
-   * @param templateId 템플릿 ID
+   * @param request 템플릿 ID
    * @return 템플릿 삭제 응답 DTO
    */
   @Operation(summary = "템플릿 논리 삭제", description = "템플릿을 논리적으로 삭제합니다.")

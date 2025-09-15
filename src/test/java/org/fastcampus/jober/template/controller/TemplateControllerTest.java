@@ -92,7 +92,7 @@ class TemplateControllerTest {
     createRequestDto.setState(null); // state는 null로 설정
 
     // 템플릿 저장 요청 DTO 설정
-    saveRequestDto = new TemplateSaveRequestDto();
+    // saveRequestDto = new TemplateSaveRequestDto();
     // TemplateSaveRequestDto는 @Getter만 있으므로 직접 필드 설정 불가
     // 대신 JSON으로 직렬화해서 테스트
   }
