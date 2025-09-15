@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
+import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
@@ -37,6 +38,7 @@ public class TemplateService {
     private final ExternalApiUtil externalApiUtil;
     private final TemplateRepository templateRepository;
     private final ObjectMapper objectMapper;
+    private final SpaceRepository spaceRepository;
 
     /**
      * AI Flask 서버의 기본 URL
@@ -157,6 +159,9 @@ public class TemplateService {
     public List<TemplateTitleResponseDto> getTitlesBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) Long spaceId
     ) {
+        // 스페이스 존재 여부 검증
+        spaceRepository.findByIdOrThrow(spaceId);
+
         return TemplateTitleResponseDto.fromList(templateRepository.findBySpaceId(spaceId));
     }
 
@@ -170,6 +175,10 @@ public class TemplateService {
         @Parameter(description = "스페이스 ID", required = true) Long spaceId,
         @Parameter(description = "템플릿 ID", required = true) Long templateId
     ) {
+        // 스페이스 존재 여부 검증
+        spaceRepository.findByIdOrThrow(spaceId);
+
+        // 템플릿 존재 여부 검증
         Template template = templateRepository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId);
         if (template == null) {
             return null;
@@ -177,20 +186,20 @@ public class TemplateService {
         return TemplateDetailResponseDto.from(template);
     }
 
-    /**
-     * 템플릿 저장 상태를 변경합니다.
-     * @param id 템플릿 ID
-     * @param spaceId 스페이스 ID
-     * @param isSaved 저장 여부
-     * @return 변경된 저장 상태
-     */
-    @Transactional
-    public Boolean saveTemplate(Long id, Long spaceId, Boolean isSaved) {
-        Template template = templateRepository.findByIdAndSpaceId(id, spaceId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
+    // /**
+    //  * 템플릿 저장 상태를 변경합니다.
+    //  * @param id 템플릿 ID
+    //  * @param spaceId 스페이스 ID
+    //  * @param isSaved 저장 여부
+    //  * @return 변경된 저장 상태
+    //  */
+    // @Transactional
+    // public Boolean saveTemplate(Long id, Long spaceId, Boolean isSaved) {
+    //     Template template = templateRepository.findByIdAndSpaceId(id, spaceId)
+    //             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
 
-        return template.updateIsSaved(isSaved);
-    }
+    //     return template.updateIsSaved(isSaved);
+    // }
 
     /**
      * 템플릿을 저장합니다.
@@ -198,6 +207,11 @@ public class TemplateService {
      * @return 템플릿 저장 응답 DTO
      */
     public TemplateSaveResponseDto saveTemplate(TemplateSaveRequestDto request) {
+
+        // 스페이스 존재 여부 검증
+        spaceRepository.findByIdOrThrow(request.getSpaceId());
+
+        // 템플릿 저장
         Template template = templateRepository.save(request.toEntity());
         return TemplateSaveResponseDto.from(template);
     }
