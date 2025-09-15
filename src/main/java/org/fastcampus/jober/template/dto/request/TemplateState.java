@@ -50,19 +50,37 @@ public class TemplateState {
 
   /**
    * AI Flask 서버가 기대하는 Map 형태로 변환합니다.
+   * 하위 호환성을 보장하기 위해 기존 필드는 기본값으로, 새 필드는 null이 아닐 때만 포함합니다.
    *
    * @return Map 형태의 상태 정보
    */
   public Map<String, Object> toMap() {
     Map<String, Object> stateMap = new HashMap<>();
-    stateMap.put("step", this.step);
-    stateMap.put("original_request", this.originalRequest);
-    stateMap.put("selected_style", this.selectedStyle);
-    stateMap.put("selected_template", this.selectedTemplate);
-    stateMap.put("validation_result", this.validationResult);
-    stateMap.put("correction_attempts", this.correctionAttempts);
-    stateMap.put("next_action", this.nextAction);
-    stateMap.put("template_pipeline_state", this.templatePipelineState);
+
+    // 기존 필드 (하위 호환성 보장 - 기본값 제공)
+    stateMap.put("step", this.step != null ? this.step : "initial");
+    stateMap.put("original_request", this.originalRequest != null ? this.originalRequest : "");
+
+    // 새 필드들 (null이 아닐 때만 추가 - AI 서버 에러 방지)
+    if (this.selectedStyle != null) {
+      stateMap.put("selected_style", this.selectedStyle);
+    }
+    if (this.selectedTemplate != null) {
+      stateMap.put("selected_template", this.selectedTemplate);
+    }
+    if (this.validationResult != null) {
+      stateMap.put("validation_result", this.validationResult);
+    }
+    if (this.correctionAttempts != null) {
+      stateMap.put("correction_attempts", this.correctionAttempts);
+    }
+    if (this.nextAction != null) {
+      stateMap.put("next_action", this.nextAction);
+    }
+    if (this.templatePipelineState != null) {
+      stateMap.put("template_pipeline_state", this.templatePipelineState);
+    }
+
     return stateMap;
   }
 }
