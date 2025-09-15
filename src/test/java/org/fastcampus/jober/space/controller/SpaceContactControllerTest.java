@@ -17,7 +17,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -56,7 +57,7 @@ class SpaceContactControllerTest {
 
         requestDto = ContactRequestDto.builder()
                 .spaceId(1L)
-                .contacts(Arrays.asList(contactInfo))
+                .contacts(Collections.singletonList(contactInfo))
                 .build();
 
         // 테스트용 응답 데이터 설정
@@ -69,7 +70,7 @@ class SpaceContactControllerTest {
 
         responseDto = ContactResponseDto.builder()
                 .spaceId(1L)
-                .contacts(Arrays.asList(responseContactInfo))
+                .contacts(Collections.singletonList(responseContactInfo))
                 .registeredAt(LocalDateTime.now())
                 .build();
 
@@ -250,7 +251,7 @@ class SpaceContactControllerTest {
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(deleteRequestDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().is2xxSuccessful());
     }
 
     @Test
@@ -268,7 +269,7 @@ class SpaceContactControllerTest {
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
+                .andExpect(status().is2xxSuccessful()); // validation이 없으므로 200 OK 반환
     }
 
     @Test
@@ -320,7 +321,7 @@ class SpaceContactControllerTest {
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isOk()); // validation이 없으므로 200 OK 반환
+                .andExpect(status().is2xxSuccessful()); // validation이 없으므로 200 OK 반환
     }
 
     @Test
@@ -380,7 +381,7 @@ class SpaceContactControllerTest {
 
         ContactResponseDto tagResponseDto = ContactResponseDto.builder()
                 .spaceId(spaceId)
-                .contacts(Arrays.asList(tagContactInfo))
+                .contacts(Collections.singletonList(tagContactInfo))
                 .registeredAt(LocalDateTime.now())
                 .build();
 
@@ -430,7 +431,7 @@ class SpaceContactControllerTest {
         
         ContactResponseDto emptyResponseDto = ContactResponseDto.builder()
                 .spaceId(spaceId)
-                .contacts(Arrays.asList()) // 빈 리스트
+                .contacts(List.of()) // 빈 리스트
                 .registeredAt(LocalDateTime.now())
                 .build();
 
@@ -477,7 +478,7 @@ class SpaceContactControllerTest {
 
         ContactResponseDto specialTagResponseDto = ContactResponseDto.builder()
                 .spaceId(spaceId)
-                .contacts(Arrays.asList(specialTagContactInfo))
+                .contacts(Collections.singletonList(specialTagContactInfo))
                 .registeredAt(LocalDateTime.now())
                 .build();
 
@@ -511,7 +512,7 @@ class SpaceContactControllerTest {
 
         ContactResponseDto koreanTagResponseDto = ContactResponseDto.builder()
                 .spaceId(spaceId)
-                .contacts(Arrays.asList(koreanTagContactInfo))
+                .contacts(Collections.singletonList(koreanTagContactInfo))
                 .registeredAt(LocalDateTime.now())
                 .build();
 
