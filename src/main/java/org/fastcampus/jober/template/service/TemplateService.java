@@ -7,12 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
-import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateSaveResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
+import org.fastcampus.jober.template.dto.response.*;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.util.ExternalApiUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -213,5 +211,9 @@ public class TemplateService {
         // 템플릿 저장
         Template template = templateRepository.save(request.toEntity());
         return TemplateSaveResponseDto.from(template);
+    }
+
+    public List<TemplateListResponseDto> getTemlpateList(CustomUserDetails principal) {
+        return templateRepository.findTemplateByUserId(principal.getUserId());
     }
 }
