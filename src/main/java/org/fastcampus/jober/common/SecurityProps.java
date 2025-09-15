@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 public class SecurityProps {
     private List<String> permitAll = List.of();
-    private List<String> permitPostUser = List.of();
+    private List<String> permitUser = List.of();
 }

@@ -35,7 +35,7 @@ logging:
 # AI Flask 서버 설정
 ai:
   flask:
-    base-url: http://15.164.102.187:8000  # AI Flask 서버 URL (추후 실제 URL로 변경)
+    base-url: http://13.209.3.58:8000  # AI Flask 서버 URL (추후 실제 URL로 변경)
     chat-endpoint: /api/chat  # AI 채팅 API 엔드포인트
 
 security:
@@ -45,6 +45,11 @@ security:
     - /v3/api-docs/**
     - /auth/**
     - /h2-console/**
-  permit-post-user:
+    - /admin/sessions/**
+  permit-user:
     - /user/register
     - /user/login
+    - /user/id/check
+    - /user/email/check
+    - /user/password
+    - /user/token/check

@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 public class SessionAdminController {
 
     private final SessionRegistry sessionRegistry;
+    private static final Duration SESSION_TIMEOUT = Duration.ofHours(24);
 
     public SessionAdminController(SessionRegistry sessionRegistry) {
         this.sessionRegistry = sessionRegistry;
@@ -27,11 +28,10 @@ public class SessionAdminController {
     public String sessionsPage(Model model) {
         ZoneId zone = ZoneId.systemDefault();
 
-        @SuppressWarnings("unchecked")
         var principals = sessionRegistry.getAllPrincipals();
 
         var rows = principals.stream()
-                .flatMap(p -> sessionRegistry.getAllSessions(p, false).stream().map(si -> toRow(p, si, zone)))
+                .flatMap(p -> sessionRegistry.getAllSessions(p, true).stream().map(si -> toRow(p, si, zone)))
                 .sorted((a, b) -> b.lastRequestLocal().compareTo(a.lastRequestLocal())) // 최근 순
                 .toList();
 
@@ -57,10 +57,18 @@ public class SessionAdminController {
 
         ZonedDateTime lastLocal = si.getLastRequest().toInstant().atZone(zone);
 
+        boolean expired = si.isExpired();
+
+        ZonedDateTime expiresAtLocal = lastLocal.plus(SESSION_TIMEOUT);
+
+        long remainingSec = java.time.Duration.between(ZonedDateTime.now(zone), expiresAtLocal).getSeconds();
+        if (remainingSec < 0) remainingSec = 0;
+
         long seconds = Duration.between(lastLocal, ZonedDateTime.now(zone)).getSeconds();
         String ago = humanize(seconds);
+        String remaining = expired ? "만료됨(동시로그인)" : humanize(remainingSec);
 
-        return new SessionRow(username, authorities, si.getSessionId(), lastLocal, ago);
+        return new SessionRow(username, authorities, si.getSessionId(), lastLocal, ago, expired, remaining, expiresAtLocal);
     }
 
     private static String humanize(long seconds) {

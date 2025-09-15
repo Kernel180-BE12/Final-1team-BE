@@ -41,6 +41,9 @@ public class ContactResponseDto {
     @Schema(description = "이름", example = "김철수")
     private String name;
 
+    @Schema(description = "태그", example = "프리랜서")
+    private String tag;
+
     @Schema(description = "휴대전화", example = "010-1234-5678")
     private String phoneNum;
 
@@ -56,6 +59,7 @@ public class ContactResponseDto {
    */
   public static ContactResponseDto fromEntities(List<SpaceContacts> contacts, Long spaceId) {
     List<ContactInfo> contactInfos = contacts.stream()
+<<<<<<< HEAD
         .map(contact -> {
           ContactInfo.ContactInfoBuilder builder = ContactInfo.builder()
               .id(contact.getId())
@@ -68,6 +72,15 @@ public class ContactResponseDto {
           
           return builder.build();
         })
+=======
+        .map(contact -> ContactInfo.builder()
+            .id(contact.getId())
+            .name(contact.getName())
+            .tag(contact.getTag())
+            .phoneNum(contact.getPhoneNum())
+            .email(contact.getEmail())
+            .build())
+>>>>>>> 2fd53c395cd4d440a041414132dea14fb14bf2e2
         .collect(Collectors.toList());
     
     return ContactResponseDto.builder()

@@ -8,6 +8,7 @@ import lombok.Getter;
 import jakarta.persistence.*;
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
+import org.fastcampus.jober.util.PasswordHashing;
 
 
 @Entity
@@ -37,6 +38,10 @@ public class Users extends BaseEntity {
         this.email = email;
     }
 
+    private Users(Long userId) {
+        this.userId = userId;
+    }
+
     // ✅ 상황별 팩토리 메서드
     public static Users forSignup(String username, String password, String name, String email) {
         return new Users(username,
@@ -53,17 +58,17 @@ public class Users extends BaseEntity {
     public boolean updateUserInfo(UpdateRequestDto req) {
         boolean hasChanges = false;
         
-        if (req.getUsername() != null) {
-            this.username = req.getUsername();
-            hasChanges = true;
-        }
+        // if (req.getUsername() != null && !req.getUsername().equals(this.username)) {
+        //     this.username = req.getUsername();
+        //     hasChanges = true;
+        // }
         
-        if (req.getName() != null) {
+        if (req.getName() != null && !req.getName().equals(this.name)) {
             this.name = req.getName();
             hasChanges = true;
         }
         
-        if (req.getEmail() != null) {
+        if (req.getEmail() != null && !req.getEmail().equals(this.email)) {
             this.email = req.getEmail();
             hasChanges = true;
         }
@@ -71,4 +76,15 @@ public class Users extends BaseEntity {
         return hasChanges;
     }
 
+    public void updatePassword(String password) {
+        this.password = PasswordHashing.hash(password);
+    }
+
+    public static Users forCreateSpace(Long userId) {
+        return new Users(userId);
+    }
+
+    public boolean isSameUser(final Long userId) {
+        return this.userId.equals(userId);
+    }
 }

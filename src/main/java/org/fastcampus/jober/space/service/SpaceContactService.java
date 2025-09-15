@@ -140,6 +140,7 @@ public class SpaceContactService {
   }
 
   /**
+<<<<<<< HEAD
    * 연락처 태그를 추가하는 비즈니스 로직
    * 
    * 스페이스 ID와 태그명의 중복을 체크하여 중복되지 않는 경우에만 태그를 추가합니다.
@@ -183,4 +184,22 @@ public class SpaceContactService {
     List<ContactTag> contactTags = contactTagRepository.findBySpaceId(spaceId);
     return ContactTagResponseDto.fromEntities(contactTags);
   }
+=======
+   * 스페이스 ID와 tag를 받아 연락처를 조회하는 비즈니스 로직
+   * 
+   * @param spaceId 조회할 스페이스 ID
+   * @param tag 조회할 연락처 tag
+   * @return 조회된 연락처 정보
+   */
+  @Transactional
+  public ContactResponseDto getContactsByTag(Long spaceId, String tag) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(spaceId);
+    
+    // 연락처 조회
+    List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceIdAndTag(spaceId, tag);
+    return ContactResponseDto.fromEntities(contacts, spaceId);
+  }
+
+>>>>>>> 2fd53c395cd4d440a041414132dea14fb14bf2e2
 }
