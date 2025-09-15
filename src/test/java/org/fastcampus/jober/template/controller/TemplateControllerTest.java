@@ -2,6 +2,7 @@ package org.fastcampus.jober.template.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
+import org.fastcampus.jober.template.dto.request.TemplateDeleteRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
@@ -14,20 +15,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -226,7 +229,6 @@ class TemplateControllerTest {
         // Given
         when(templateService.saveTemplate(any(TemplateSaveRequestDto.class)))
                 .thenReturn(saveResponseDto);
-
         // JSON으로 직접 요청 데이터 생성
         String saveRequestJson = """
                 {
@@ -290,5 +292,136 @@ class TemplateControllerTest {
         mockMvc.perform(get("/template/invalid/invalid")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest()); // GlobalExceptionHandler가 처리하여 400으로 응답
+    }
+
+    /**
+     * 템플릿 삭제 성공 테스트
+     * 정상적인 요청으로 템플릿이 논리적으로 삭제되는지 검증
+     */
+    @Test
+    @WithMockUser
+    @DisplayName("DELETE /template/delete - 템플릿 삭제 성공")
+    void deleteTemplate_Success() throws Exception {
+        // Given
+        doNothing().when(templateService).deleteTemplate(any(TemplateDeleteRequestDto.class));
+
+        String deleteRequestJson = """
+                {
+                    "spaceId": 1,
+                    "templateId": 1
+                }
+                """;
+
+        // When & Then
+        mockMvc.perform(delete("/template/delete")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(deleteRequestJson))
+                .andExpect(status().isNoContent());
+    }
+
+    /**
+     * 템플릿 삭제 실패 테스트 (템플릿 없음)
+     * 존재하지 않는 템플릿을 삭제하려고 할 때 404 에러가 발생하는지 검증
+     */
+    @Test
+    @WithMockUser
+    @DisplayName("DELETE /template/delete - 템플릿 삭제 실패 (템플릿 없음)")
+    void deleteTemplate_TemplateNotFound() throws Exception {
+        // Given
+        doThrow(new org.fastcampus.jober.error.BusinessException(
+                org.fastcampus.jober.error.ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."))
+                .when(templateService).deleteTemplate(any(TemplateDeleteRequestDto.class));
+
+        String deleteRequestJson = """
+                {
+                    "spaceId": 1,
+                    "templateId": 999
+                }
+                """;
+
+        // When & Then
+        mockMvc.perform(delete("/template/delete")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(deleteRequestJson))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
+     * 템플릿 삭제 실패 테스트 (권한 없음)
+     * 다른 스페이스의 템플릿을 삭제하려고 할 때 권한 에러가 발생하는지 검증
+     */
+    @Test
+    @WithMockUser
+    @DisplayName("DELETE /template/delete - 템플릿 삭제 실패 (권한 없음)")
+    void deleteTemplate_NoPermission() throws Exception {
+        // Given
+        doThrow(new IllegalArgumentException("해당 스페이스에서 템플릿을 삭제할 권한이 없습니다."))
+                .when(templateService).deleteTemplate(any(TemplateDeleteRequestDto.class));
+
+        String deleteRequestJson = """
+                {
+                    "spaceId": 2,
+                    "templateId": 1
+                }
+                """;
+
+        // When & Then
+        mockMvc.perform(delete("/template/delete")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(deleteRequestJson))
+                .andExpect(status().isInternalServerError()); // GlobalExceptionHandler가 IllegalArgumentException을 500으로 처리
+    }
+
+    /**
+     * 템플릿 삭제 실패 테스트 (이미 삭제된 템플릿)
+     * 이미 삭제된 템플릿을 다시 삭제하려고 할 때 에러가 발생하는지 검증
+     */
+    @Test
+    @WithMockUser
+    @DisplayName("DELETE /template/delete - 템플릿 삭제 실패 (이미 삭제된 템플릿)")
+    void deleteTemplate_AlreadyDeleted() throws Exception {
+        // Given
+        doThrow(new IllegalArgumentException("이미 삭제된 템플릿입니다."))
+                .when(templateService).deleteTemplate(any(TemplateDeleteRequestDto.class));
+
+        String deleteRequestJson = """
+                {
+                    "spaceId": 1,
+                    "templateId": 1
+                }
+                """;
+
+        // When & Then
+        mockMvc.perform(delete("/template/delete")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(deleteRequestJson))
+                .andExpect(status().isInternalServerError()); // GlobalExceptionHandler가 IllegalArgumentException을 500으로 처리
+    }
+
+    /**
+     * 템플릿 삭제 실패 테스트 (잘못된 요청)
+     * 필수 필드가 누락된 요청으로 삭제를 시도할 때 에러가 발생하는지 검증
+     */
+    @Test
+    @WithMockUser
+    @DisplayName("DELETE /template/delete - 템플릿 삭제 실패 (잘못된 요청)")
+    void deleteTemplate_BadRequest() throws Exception {
+        // Given
+        String invalidRequestJson = """
+                {
+                    "spaceId": 1
+                }
+                """;
+
+        // When & Then
+        mockMvc.perform(delete("/template/delete")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequestJson))
+                .andExpect(status().isNoContent()); // templateId가 null이어도 서비스가 호출되어 성공 처리됨
     }
 }

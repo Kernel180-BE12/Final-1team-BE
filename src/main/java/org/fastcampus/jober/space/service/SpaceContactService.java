@@ -110,6 +110,13 @@ public class SpaceContactService {
     spaceContactsRepository.save(contact);
   }
 
+  /**
+   * 스페이스 ID와 tag를 받아 연락처를 조회하는 비즈니스 로직
+   * 
+   * @param spaceId 조회할 스페이스 ID
+   * @param tag 조회할 연락처 tag
+   * @return 조회된 연락처 정보
+   */
   @Transactional
   public ContactResponseDto getContactsByTag(Long spaceId, String tag) {
     // Space 존재 여부 검증

@@ -5,6 +5,7 @@ package org.fastcampus.jober.template.controller;
  */
 import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
+import org.fastcampus.jober.template.dto.request.TemplateDeleteRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -195,5 +196,23 @@ public class TemplateController {
         @RequestBody TemplateSaveRequestDto request) {
         TemplateSaveResponseDto response = templateService.saveTemplate(request);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 템플릿 삭제 API
+     * @param templateId 템플릿 ID
+     * @return 템플릿 삭제 응답 DTO
+     */
+    @Operation(
+        summary = "템플릿 논리 삭제",
+        description = "템플릿을 논리적으로 삭제합니다."
+    )
+    @ApiResponse(responseCode = "204", description = "성공적으로 템플릿이 삭제됨")
+    @ApiResponse(responseCode = "404", description = "템플릿을 찾을 수 없음")
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteTemplate(
+        @RequestBody TemplateDeleteRequestDto request) {
+        templateService.deleteTemplate(request);
+        return ResponseEntity.noContent().build();
     }
 }
