@@ -76,10 +76,12 @@ public class SpaceContactController {
    */
   @Operation(summary = "연락처 삭제", description = "스페이스 ID와 연락처 ID를 받아 해당 연락처를 삭제합니다.")
   @DeleteMapping("/contact")
+  @ApiResponse(responseCode = "204", description = "성공적으로 연락처가 삭제됨")
+  @ApiResponse(responseCode = "404", description = "연락처를 찾을 수 없음")
   public ResponseEntity<Void> deleteContact(
       @RequestBody ContactDeleteRequestDto requestDto) {
     spaceContactService.deleteContact(requestDto);
-    return ResponseEntity.ok().build();
+    return ResponseEntity.noContent().build();
   }
 
   /**
