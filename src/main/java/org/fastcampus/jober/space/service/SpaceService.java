@@ -1,20 +1,20 @@
 package org.fastcampus.jober.space.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceListResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.mapper.SpaceMapper;
-import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
-import org.fastcampus.jober.user.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +62,3 @@ public class SpaceService {
     return spaceRepository.findSpacesByUserId(principal.getUserId());
   }
 }
-
-

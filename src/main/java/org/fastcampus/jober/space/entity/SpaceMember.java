@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.entity.Users;
 
-
 @Entity
 @Getter
 @AllArgsConstructor
