@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.fastcampus.jober.space.entity.ContactTag;
 import org.fastcampus.jober.space.entity.SpaceContacts;
 
 import java.time.LocalDateTime;
@@ -48,6 +49,9 @@ public class ContactResponseDto {
 
     @Schema(description = "이메일", example = "kim@example.com")
     private String email;
+    
+    @Schema(description = "태그 정보")
+    private ContactTag tag;
   }
   
   /**
@@ -55,6 +59,20 @@ public class ContactResponseDto {
    */
   public static ContactResponseDto fromEntities(List<SpaceContacts> contacts, Long spaceId) {
     List<ContactInfo> contactInfos = contacts.stream()
+<<<<<<< HEAD
+        .map(contact -> {
+          ContactInfo.ContactInfoBuilder builder = ContactInfo.builder()
+              .id(contact.getId())
+              .name(contact.getName())
+              .phoneNum(contact.getPhoneNum())
+              .email(contact.getEmail());
+              
+          // 태그 정보 추가
+          builder.tag(contact.getContactTag());
+          
+          return builder.build();
+        })
+=======
         .map(contact -> ContactInfo.builder()
             .id(contact.getId())
             .name(contact.getName())
@@ -62,6 +80,7 @@ public class ContactResponseDto {
             .phoneNum(contact.getPhoneNum())
             .email(contact.getEmail())
             .build())
+>>>>>>> 2fd53c395cd4d440a041414132dea14fb14bf2e2
         .collect(Collectors.toList());
     
     return ContactResponseDto.builder()

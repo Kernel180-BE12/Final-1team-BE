@@ -32,11 +32,12 @@ public class SpaceContactsUpdateRequestDto {
     @Schema(description = "연락처 이메일", example = "hong@example.com")
     private String email;
     
-    @Schema(description = "연락처 태그", example = "프리랜서")
+    @Schema(description = "연락처 태그명", example = "프리랜서")
     private String tag;
 
     /**
      * 기존 연락처 엔티티의 정보를 업데이트
+     * 태그는 서비스 레이어에서 검증 후 설정됩니다.
      * @param existingContact 기존 연락처 엔티티
      * @return 업데이트된 연락처 엔티티
      */
@@ -46,8 +47,8 @@ public class SpaceContactsUpdateRequestDto {
             throw new IllegalArgumentException("해당 스페이스의 연락처가 아닙니다.");
         }
         
-        // 연락처 정보 업데이트
-        existingContact.updateContactInfo(this.name, this.phoneNumber, this.email, this.tag);
+        // 연락처 정보 업데이트 (태그는 null로 전달하여 서비스에서 처리)
+        existingContact.updateContactInfo(this.name, this.phoneNumber, this.email, null);
         
         return existingContact;
     }

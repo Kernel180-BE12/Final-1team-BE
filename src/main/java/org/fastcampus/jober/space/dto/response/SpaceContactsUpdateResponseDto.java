@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import org.fastcampus.jober.space.entity.ContactTag;
 import org.fastcampus.jober.space.entity.SpaceContacts;
 
 /**
@@ -32,8 +33,8 @@ public class SpaceContactsUpdateResponseDto {
     @Schema(description = "연락처 이메일", example = "hong@example.com")
     private String email;
     
-    @Schema(description = "연락처 태그", example = "프리랜서")
-    private String tag;
+    @Schema(description = "태그 정보")
+    private ContactTag tag;
 
     @Schema(description = "수정된 시간")
     private LocalDateTime updatedAt;
@@ -43,13 +44,17 @@ public class SpaceContactsUpdateResponseDto {
      * SpaceContacts 엔티티로부터 SpaceContactsUpdateResponseDto 생성
      */
     public static SpaceContactsUpdateResponseDto fromEntities(SpaceContacts spaceContacts) {
-        return SpaceContactsUpdateResponseDto.builder()
-            .id(spaceContacts.getId())
-            .name(spaceContacts.getName())
-            .phoneNumber(spaceContacts.getPhoneNum())
-            .email(spaceContacts.getEmail())
-            .tag(spaceContacts.getTag())
-            .updatedAt(spaceContacts.getUpdatedAt())
-            .build();
+        SpaceContactsUpdateResponseDto.SpaceContactsUpdateResponseDtoBuilder builder = 
+            SpaceContactsUpdateResponseDto.builder()
+                .id(spaceContacts.getId())
+                .name(spaceContacts.getName())
+                .phoneNumber(spaceContacts.getPhoneNum())
+                .email(spaceContacts.getEmail())
+                .updatedAt(spaceContacts.getUpdatedAt());
+                
+        // 태그 정보 추가
+        builder.tag(spaceContacts.getContactTag());
+        
+        return builder.build();
     }
 }
