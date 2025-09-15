@@ -26,14 +26,14 @@ public class SpaceContactService {
 
   /**
    * 스페이스에 연락처를 조회하는 비즈니스 로직
-   * 
+   *
    * @param spaceId 조회할 스페이스 ID
    * @return 조회된 연락처 정보
    */
   public ContactResponseDto getContacts(Long spaceId) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(spaceId);
-    
+
     // 연락처 조회
     List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceId(spaceId);
     return ContactResponseDto.fromEntities(contacts, spaceId);
@@ -52,7 +52,7 @@ public class SpaceContactService {
   public ContactResponseDto addContacts(ContactRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
-    
+
     // DTO를 엔티티로 변환하고 유효성 검증
     List<SpaceContacts> contacts = requestDto.toValidateEntities();
 
@@ -65,7 +65,7 @@ public class SpaceContactService {
   
   /**
    * 연락처 정보를 수정하는 비즈니스 로직
-   * 
+   *
    * @param requestDto 수정할 연락처 정보 (스페이스 ID, 연락처 ID, 수정할 정보)
    * @return 수정된 연락처 정보를 포함한 응답 DTO
    */
@@ -73,40 +73,51 @@ public class SpaceContactService {
   public SpaceContactsUpdateResponseDto updateContactInfo(SpaceContactsUpdateRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
-    
+
     // 연락처 ID로 연락처 조회
     SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
-    
+
     // DTO를 사용하여 엔티티 업데이트 및 검증
     SpaceContacts updatedContact = requestDto.updateExistingContact(contact);
-    
+
     // 수정된 연락처 저장
     SpaceContacts savedContact = spaceContactsRepository.save(updatedContact);
-    
+
     // 응답 DTO 생성
     return SpaceContactsUpdateResponseDto.fromEntities(savedContact);
   }
 
   /**
    * 연락처를 논리삭제하는 비즈니스 로직
-   * 
+   *
    * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
    */
   @Transactional
   public void deleteContact(ContactDeleteRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
-    
+
     // 연락처 ID로 연락처 조회
     SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
-    
+
     // DTO를 통해 권한 검증 및 삭제 준비
     requestDto.validateAndPrepareForDeletion(contact);
-    
+
     // 연락처 논리삭제 (isDeleted를 true로 설정)
     contact.softDelete();
     spaceContactsRepository.save(contact);
   }
+
+  @Transactional
+  public ContactResponseDto getContactsByTag(Long spaceId, String tag) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(spaceId);
+
+    // 연락처 조회
+    List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceIdAndTag(spaceId, tag);
+    return ContactResponseDto.fromEntities(contacts, spaceId);
+  }
+
 }

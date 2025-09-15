@@ -46,7 +46,15 @@ public class Template extends BaseEntity {
 
     private Boolean isSaved; // 0:저장안됨 / 1:저장됨
 
-    private Boolean isAccepted;
+    private String type;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isDeleted = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isAccepted = false;
 
 
     public Boolean updateIsSaved(Boolean isSaved) {
@@ -54,4 +62,35 @@ public class Template extends BaseEntity {
         return this.isSaved;
     }
 
+    /**
+     * 특정 spaceId와 templateId의 템플릿을 조회합니다.
+     * @param repository TemplateRepository
+     * @param spaceId 스페이스 ID
+     * @param templateId 템플릿 ID
+     * @return Template 엔티티
+     */
+    public static Template findBySpaceIdAndTemplateId(
+            org.fastcampus.jober.template.repository.TemplateRepository repository,
+            Long spaceId,
+            Long templateId) {
+        return repository.findBySpaceIdAndTemplateId(spaceId, templateId);
+    }
+
+    /**
+     * 특정 spaceId와 templateId의 템플릿을 조회하고 상세 응답 DTO로 변환합니다.
+     * @param repository TemplateRepository
+     * @param spaceId 스페이스 ID
+     * @param templateId 템플릿 ID
+     * @return TemplateDetailResponseDto
+     */
+    public static org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto findDetailBySpaceIdAndTemplateId(
+            org.fastcampus.jober.template.repository.TemplateRepository repository,
+            Long spaceId,
+            Long templateId) {
+        Template template = repository.findBySpaceIdAndTemplateIdWithAllFields(spaceId, templateId);
+        if (template == null) {
+            return null;
+        }
+        return org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto.from(template);
+    }
 }

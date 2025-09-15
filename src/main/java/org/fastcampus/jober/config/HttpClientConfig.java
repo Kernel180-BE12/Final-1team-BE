@@ -19,6 +19,7 @@ public class HttpClientConfig {
      */
     @Bean
     public RestTemplate restTemplate() {
+        // WebClient 쓰기
         return new RestTemplate();
     }
 }
