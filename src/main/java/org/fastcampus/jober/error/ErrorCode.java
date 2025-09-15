@@ -20,7 +20,8 @@ public enum ErrorCode {
     // 사용자 입력 검증
     INVALID_USERNAME("USER-400-01", "사용자명은 영문 소문자와 숫자 조합으로 5~15자여야 합니다.", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD("USER-400-02", "비밀번호는 영문, 숫자, 특수문자 조합으로 8~16자여야 합니다.", HttpStatus.BAD_REQUEST),
-    INVALID_EMAIL("USER-400-03", "올바른 이메일 형식이 아닙니다.", HttpStatus.BAD_REQUEST);
+    INVALID_EMAIL("USER-400-03", "올바른 이메일 형식이 아닙니다.", HttpStatus.BAD_REQUEST),
+    EMAIL_ALREADY_EXIST("USER-409-04", "이미 존재하는 이메일입니다.", HttpStatus.CONFLICT);
 
     private final String code;
     private final String message;

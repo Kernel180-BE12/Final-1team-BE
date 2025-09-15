@@ -15,6 +15,7 @@ import org.fastcampus.jober.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +59,9 @@ public class SpaceService {
     }
 
     public List<SpaceListResponseDto> getSpaceList(CustomUserDetails principal) {
-        return spaceRepository.findSpacesByUserId(principal.getUserId());
+        return spaceRepository.findSpacesByUserId(principal.getUserId()).stream()
+                .map(SpaceListResponseDto::from)
+                .collect(Collectors.toList());
     }
 }
 

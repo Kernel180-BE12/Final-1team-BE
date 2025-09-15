@@ -4,10 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.fastcampus.jober.space.entity.Authority;
+import org.fastcampus.jober.space.repository.dto.SpaceEntityDto;
 
 @Getter
 @AllArgsConstructor
 public class SpaceListResponseDto {
+
     @Schema(description = "스페이스 ID", example = "1")
     private Long spaceId;
 
@@ -16,4 +18,13 @@ public class SpaceListResponseDto {
 
     @Schema(description = "내 역할", example = "ADMIN")
     private Authority authority;
+
+    public static SpaceListResponseDto from(SpaceEntityDto spaceEntityDto) {
+        return new SpaceListResponseDto(
+                spaceEntityDto.spaceId(),
+                spaceEntityDto.spaceName(),
+                spaceEntityDto.authority()
+        );
+    }
+
 }

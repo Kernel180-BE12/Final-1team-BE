@@ -14,6 +14,7 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 @Entity
 @Getter
 public class PasswordResetToken extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,7 +36,9 @@ public class PasswordResetToken extends BaseEntity {
 
     protected PasswordResetToken() {}
 
-    private PasswordResetToken(String secretHash, Instant expiresAt, Instant usedAt, String issuedIp, String issuedUserAgent, String email) {
+    private PasswordResetToken(
+            String secretHash, Instant expiresAt, Instant usedAt, String issuedIp, String issuedUserAgent, String email
+    ) {
         this.secretHash = secretHash;
         this.expiresAt = expiresAt;
         this.usedAt = usedAt;
@@ -57,5 +60,9 @@ public class PasswordResetToken extends BaseEntity {
 
     public void updateIsUsedAt(Instant usedAt) {
         this.usedAt = usedAt;
+    }
+
+    public boolean isNotExpired(Instant now) {
+        return this.expiresAt.isAfter(now);
     }
 }

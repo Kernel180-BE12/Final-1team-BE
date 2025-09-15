@@ -1,8 +1,13 @@
 package org.fastcampus.jober.user.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
@@ -10,8 +15,8 @@ import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.dto.request.*;
 import org.fastcampus.jober.user.dto.response.LoginResponseDto;
 import org.fastcampus.jober.user.dto.response.UserInfoResponseDto;
+import org.fastcampus.jober.user.entity.PasswordResetToken;
 import org.fastcampus.jober.user.service.UserService;
-import org.fastcampus.jober.util.ClientIpResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,33 +29,23 @@ import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.List;
-
-import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
 @Tag(name = "User", description = "사용자 회원가입, 로그인 API")
 public class UserController {
+
     private final UserService userService;
+
     private final AuthenticationManager authenticationManager;
+
     private final SessionRegistry sessionRegistry;
-    private final ClientIpResolver ipResolver;
 
     @PostMapping("/register")
     @Operation(
@@ -59,7 +54,7 @@ public class UserController {
     )
     @ApiResponse(responseCode = "200", description = "회원가입 성공")
     @ApiResponse(responseCode = "400", description = "요청 데이터가 잘못되었거나 이미 존재하는 사용자")
-    public ResponseEntity<Void> register(@RequestBody RegisterRequestDto req) {
+    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequestDto req) {
         userService.register(req);
         return ResponseEntity.ok().build();
     }
@@ -79,7 +74,7 @@ public class UserController {
         if (!loginRequestDto.password().matches("^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$")) {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
         }
-        
+
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequestDto.username(), loginRequestDto.password())
@@ -125,6 +120,7 @@ public class UserController {
 
     /**
      * 회원 정보 조회
+     *
      * @return 조회된 회원 정보
      */
     @GetMapping("/info")
@@ -135,10 +131,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
     /**
      * 회원 정보 수정
-     * @param req 수정할 회원 정보
+     *
+     * @param req       수정할 회원 정보
      * @param principal 현재 로그인된 사용자 정보
      * @return 수정된 회원 정보
      */
@@ -152,36 +148,17 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     @ApiResponse(responseCode = "204", description = "변경사항이 없음")
     public ResponseEntity<Void> update(
-            @RequestBody UpdateRequestDto req,
-            @AuthenticationPrincipal CustomUserDetails principal) {
-
-        // // username 중복 검사 (현재 username과 다를 경우에만)
-        // if (req.getUsername() != null && !req.getUsername().equals(principal.getUsername())) {
-        //     if (userService.isUsernameExists(req.getUsername())) {
-        //         throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
-        //     }
-        // }
-
-        // email 중복 검사 (현재 email과 다를 경우에만)
-        if (req.getEmail() != null && !req.getEmail().equals(userService.getUserInfo(principal).getEmail())) {
-            if (userService.isEmailExists(req.getEmail())) {
-                throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
-            }
-        }
-
-        // 사용자 정보 업데이트 (변경사항이 있을 때만)
-        boolean hasChanges = userService.update(req, principal);
-
-        if (!hasChanges) {
-            // 변경사항이 없으면 204 No Content 응답
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok().build();
+            @Valid @RequestBody UpdateRequestDto req,
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        return userService.update(req, principal)
+               ? ResponseEntity.ok().build()
+               : ResponseEntity.noContent().build();
     }
 
     /**
      * 아이디 중복 체크
+     *
      * @param req 아이디 중복 체크 요청 데이터
      * @return 아이디 중복 체크 결과
      */
@@ -191,15 +168,15 @@ public class UserController {
     @ApiResponse(responseCode = "400", description = "아이디 중복 체크 실패")
     public ResponseEntity<Void> checkId(
             @Parameter(description = "아이디 중복 체크 요청 데이터", required = true)
-            @RequestBody CheckIdRequestDto checkIdRequestDto) {
-        if (userService.isUsernameExists(checkIdRequestDto.getUsername())) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
-        }
+            @RequestBody CheckIdRequestDto checkIdRequestDto
+    ) {
+        userService.checkDuplicatedEmail(checkIdRequestDto.getUsername());
         return ResponseEntity.ok().build();
     }
 
     /**
      * 이메일 중복 체크
+     *
      * @param req 이메일 중복 체크 요청 데이터
      * @return 이메일 중복 체크 결과
      */
@@ -209,7 +186,8 @@ public class UserController {
     @ApiResponse(responseCode = "400", description = "이메일 중복 체크 실패")
     public ResponseEntity<Void> checkEmail(
             @Parameter(description = "이메일 중복 체크 요청 데이터", required = true)
-            @RequestBody CheckEmailRequestDto checkEmailRequestDto) {
+            @RequestBody CheckEmailRequestDto checkEmailRequestDto
+    ) {
         if (userService.isEmailExists(checkEmailRequestDto.getEmail())) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
         }
@@ -220,13 +198,15 @@ public class UserController {
     @Operation(summary = "비밀번호 변경 메일 전송", description = "비밀번호 변경 시에 메일")
     @ApiResponse(responseCode = "200", description = "이메일 전송 성공")
     @ApiResponse(responseCode = "500", description = "이메일 전송 실패")
-    public ResponseEntity<Boolean> sendPasswordResetEmail(@RequestBody PasswordResetEmailRequestDto passwordResetEmailRequestDto, HttpServletRequest request) throws MessagingException, NoSuchAlgorithmException {
-            String ip = ipResolver.resolve(request);
-            String ua = request.getHeader("User-Agent");
-            if (ua != null && ua.length() > 255) ua = ua.substring(0, 255);
-
-            userService.issueTokenAndSendMail(passwordResetEmailRequestDto, ip, ua);
-            return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> sendPasswordResetEmail(
+            @RequestBody PasswordResetEmailRequestDto passwordResetEmailRequestDto,
+            @UserIp String ip,
+            @UserAgent String ua
+    ) throws MessagingException, NoSuchAlgorithmException {
+        final PasswordResetToken token = PasswordResetToken.forGenerateToken(ip, ua, passwordResetEmailRequestDto.email());
+        final PasswordResetToken savedPasswordResetToken = userService.saveToken(token);
+        userService.sendPasswordResetMail(passwordResetEmailRequestDto, savedPasswordResetToken);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/token/check")
@@ -245,6 +225,6 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "없는 회원")
     public ResponseEntity<Boolean> changePassword(PasswordResetRequestDto passwordResetRequestDto) {
         userService.changePassword(passwordResetRequestDto);
-        return  ResponseEntity.ok().build();
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,5 +1,8 @@
 package org.fastcampus.jober.user.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +14,13 @@ import org.fastcampus.jober.user.entity.Users;
 public class UpdateRequestDto {
 
     // private String username;
+
+    @NotBlank
+    @Pattern(regexp = Users.USER_NAME_PATTERN)
     private String name;
+
+    @NotBlank
+    @Pattern(regexp = Users.USER_EMAIL_PATTERN)
     private String email;
 
     // /**

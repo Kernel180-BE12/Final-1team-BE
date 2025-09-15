@@ -15,7 +15,9 @@ import java.util.Locale;
 @Component
 @RequiredArgsConstructor
 public class CustomMailSender {
+
     private final JavaMailSender javaMailSender;
+
     private final SpringTemplateEngine templateEngine;
 
     @Value("${app.mail.from}")
@@ -35,5 +37,16 @@ public class CustomMailSender {
         helper.setText(plainText, html);
 
         javaMailSender.send(mime);
+    }
+
+    public void sendPasswordResetMail(final String email, final String resetUrl, final String plain) throws MessagingException {
+        this.sendMail(
+                email,
+                resetUrl,
+                "[Jober] 비밀번호 재설정",
+                "mail/password-reset",
+                plain
+        );
+
     }
 }

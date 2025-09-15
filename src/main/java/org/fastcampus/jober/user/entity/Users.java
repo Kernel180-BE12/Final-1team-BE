@@ -7,13 +7,23 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import jakarta.persistence.*;
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.error.BusinessException;
+import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
 import org.fastcampus.jober.util.PasswordHashing;
 
+import java.time.Instant;
 
 @Entity
 @Getter
 public class Users extends BaseEntity {
+
+    public static final String USER_NAME_PATTERN = "^[a-z0-9]{5,15}$";
+
+    public static final String USER_PASSWORD_PATTERN = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$";
+
+    public static final String USER_EMAIL_PATTERN = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -44,7 +54,17 @@ public class Users extends BaseEntity {
 
     // ✅ 상황별 팩토리 메서드
     public static Users forSignup(String username, String password, String name, String email) {
-        return new Users(username,
+        if (!username.matches(USER_NAME_PATTERN)) {
+            throw new BusinessException(ErrorCode.INVALID_USERNAME);
+        }
+        if (!password.matches(USER_PASSWORD_PATTERN)) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD);
+        }
+        if (!email.matches(USER_EMAIL_PATTERN)) {
+            throw new BusinessException(ErrorCode.INVALID_EMAIL);
+        }
+        return new Users(
+                username,
                 password,
                 name,
                 email);
@@ -76,7 +96,8 @@ public class Users extends BaseEntity {
         return hasChanges;
     }
 
-    public void updatePassword(String password) {
+    public void updatePassword(final PasswordResetToken token, String password) {
+        token.updateIsUsedAt(Instant.now());
         this.password = PasswordHashing.hash(password);
     }
 
