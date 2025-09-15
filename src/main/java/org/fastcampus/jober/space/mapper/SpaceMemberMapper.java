@@ -2,6 +2,7 @@ package org.fastcampus.jober.space.mapper;
 
 import java.util.List;
 
+import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -20,4 +21,8 @@ public interface SpaceMemberMapper {
   SpaceMemberResponseDto toResponseDto(SpaceMember member);
 
   List<SpaceMemberResponseDto> toResponseDtoList(List<SpaceMember> spaceMembers);
+
+  @Mapping(target = "space", expression = "java(createSpaceEntity(spaceMemberRequestDto.getSpaceID()))")
+  SpaceMember toEntity(SpaceMemberRequestDto spaceMemberRequestDto);
+
 }

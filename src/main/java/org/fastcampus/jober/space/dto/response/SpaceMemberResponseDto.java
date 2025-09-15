@@ -22,4 +22,7 @@ public class SpaceMemberResponseDto {
 
   @Schema(description = "사용자 ID", example = "2002")
   private Long userId;
+
+  @Schema(description = "스페이스 ID", example = "10")
+  private Long spaceId;
 }

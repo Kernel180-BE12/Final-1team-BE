@@ -2,6 +2,10 @@ package org.fastcampus.jober.space.service;
 
 import java.util.List;
 
+import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
+import org.fastcampus.jober.space.entity.SpaceMember;
+import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
+import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -21,11 +25,21 @@ import org.fastcampus.jober.user.dto.CustomUserDetails;
 public class SpaceService {
   private final SpaceRepository spaceRepository;
   private final SpaceMapper spaceMapper; // Mapper 주입
+  private final SpaceMemberMapper spaceMemberMapper;
+  private final SpaceMemberRepository spaceMemberRepository;
 
   @Transactional
   public void createSpace(SpaceCreateRequestDto dto, CustomUserDetails principal) {
     Space space = spaceMapper.toEntity(dto, principal.getUserId());
-    spaceRepository.save(space);
+    Space savedSpace = spaceRepository.save(space);
+
+    SpaceMemberRequestDto adminUser = SpaceMemberRequestDto.builder()
+            .spaceId(savedSpace.getSpaceId())
+            .userId(principal.getUserId())
+            .build();
+
+    SpaceMember spaceMember = spaceMemberMapper.toEntity(adminUser);
+    spaceMemberRepository.save(spaceMember);
   }
 
   public SpaceResponseDto getSpace(Long id) {
