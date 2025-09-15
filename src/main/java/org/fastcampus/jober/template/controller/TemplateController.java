@@ -189,7 +189,7 @@ public class TemplateController {
         description = "템플릿을 저장합니다."
     )
     @ApiResponse(responseCode = "200", description = "성공적으로 템플릿이 저장됨")
-    @ApiResponse(responseCode = "404", description = "템플릿을 찾을 수 없음")
+    @ApiResponse(responseCode = "404", description = "템플릿 또는 스페이스를 찾을 수 없음")
     @PostMapping("/save")
     public ResponseEntity<TemplateSaveResponseDto> saveTemplate(
         @RequestBody TemplateSaveRequestDto request) {
