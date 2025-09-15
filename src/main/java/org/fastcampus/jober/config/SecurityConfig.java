@@ -58,7 +58,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         var conf = new CorsConfiguration();
         // ★ 배포 환경에선 와일드카드(*) 대신 '정확한 오리진'만 허용
-        conf.setAllowedOrigins(List.of("http://localhost:5173", "https://www.jober-1team.com", "https://api.jober-1team.com"));
+        conf.setAllowedOrigins(props.getCorsAllowedOrigins());
         conf.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         conf.setAllowedHeaders(List.of("Content-Type","Authorization","X-XSRF-TOKEN"));
         conf.setAllowCredentials(true); // 쿠키/인증 포함 요청이면 필수
@@ -99,7 +99,7 @@ public class SecurityConfig {
 //        requestHandler.setCsrfRequestAttributeName("_csrf");
 
         http
-                .cors(_ -> {})
+                .cors(configurer -> {})
                 .csrf(AbstractHttpConfigurer::disable)
                 // .csrf(csrf -> csrf
                 //         .csrfTokenRequestHandler(requestHandler)
@@ -121,7 +121,7 @@ public class SecurityConfig {
                 .logout(l -> l
                         .logoutUrl("/user/logout")     // POST
                         // 1) 세션레지스트리에서 제거
-                        .addLogoutHandler((request, _, _) -> {
+                        .addLogoutHandler((request, response, auth) -> {
                             var session = request.getSession(false);
                             if (session != null) {
                                 sessionRegistry().removeSessionInformation(session.getId());
@@ -132,7 +132,7 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                         // 3) JSON 응답
-                        .logoutSuccessHandler((_, res, _) -> {
+                        .logoutSuccessHandler((req, res, auth) -> {
                             res.setContentType("application/json");
                             res.setStatus(200);
                             res.getWriter().write("{\"success\":true}");
