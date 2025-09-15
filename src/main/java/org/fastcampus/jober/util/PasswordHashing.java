@@ -6,18 +6,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PasswordHashing {
-    private static PasswordEncoder encoder;
+  private static PasswordEncoder encoder;
 
-    @Autowired
-    public PasswordHashing(PasswordEncoder passwordEncoder) {
-        PasswordHashing.encoder = passwordEncoder;
-    }
+  @Autowired
+  public PasswordHashing(PasswordEncoder passwordEncoder) {
+    PasswordHashing.encoder = passwordEncoder;
+  }
 
-    public static String hash(String rawPassword) {
-        return encoder.encode(rawPassword);
-    }
+  public static String hash(String rawPassword) {
+    return encoder.encode(rawPassword);
+  }
 
-//    public static boolean matches(String rawPassword, String encoded) {
-//        return encoder.matches(rawPassword, encoded);
-//    }
+  //    public static boolean matches(String rawPassword, String encoded) {
+  //        return encoder.matches(rawPassword, encoded);
+  //    }
 }

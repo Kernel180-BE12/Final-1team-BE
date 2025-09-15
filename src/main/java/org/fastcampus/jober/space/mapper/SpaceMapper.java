@@ -8,10 +8,12 @@ import org.fastcampus.jober.space.entity.SpaceMember;
 import org.fastcampus.jober.user.entity.Users;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SpaceMapper {
 
-//    SpaceMapper INSTANCE = Mappers.getMapper(SpaceMapper.class);
+  //    SpaceMapper INSTANCE = Mappers.getMapper(SpaceMapper.class);
 
     @Mapping(target = "spaceId", ignore = true)
     @Mapping(target = "admin", expression = "java(createUserEntity(adminUserId))")
@@ -21,18 +23,18 @@ public interface SpaceMapper {
     Space toEntity(SpaceCreateRequestDto dto, Long adminUserId);
     // 생성용: DTO → Entity
 
-    // 조회용: Entity → DTO
-    @Mapping(target = "adminName", source = "ownerName")
-    @Mapping(target = "adminNum", source = "ownerNum")
-    SpaceResponseDto toResponseDto(Space space);
+  // 조회용: Entity → DTO
+  @Mapping(target = "adminName", source = "ownerName")
+  @Mapping(target = "adminNum", source = "ownerNum")
+  SpaceResponseDto toResponseDto(Space space);
 
-    @Mapping(source = "space.spaceId", target = "spaceId")
-    @Mapping(source = "space.spaceName", target = "spaceName")
-    @Mapping(source = "authority", target = "authority")
-    SpaceListResponseDto fromMember(SpaceMember member);
+  @Mapping(source = "space.spaceId", target = "spaceId")
+  @Mapping(source = "space.spaceName", target = "spaceName")
+  @Mapping(source = "authority", target = "authority")
+  SpaceListResponseDto fromMember(SpaceMember member);
 
-    default Users createUserEntity(Long userId) {
-        if (userId == null) return null;
-        return Users.forCreateSpace(userId);
-    }
+  default Users createUserEntity(Long userId) {
+    if (userId == null) return null;
+    return Users.forCreateSpace(userId);
+  }
 }

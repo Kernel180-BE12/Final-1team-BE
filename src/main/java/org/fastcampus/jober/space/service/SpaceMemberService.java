@@ -1,12 +1,14 @@
 package org.fastcampus.jober.space.service;
 
+import org.springframework.stereotype.Service;
+
 import lombok.RequiredArgsConstructor;
+
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.entity.SpaceMember;
 import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;

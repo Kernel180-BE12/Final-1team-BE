@@ -18,7 +18,7 @@ spring:
 
 app:
   mail:
-    from: "no-reply@your-domain.com"
+    from: "no-reply@jober-1team.com"
   reset:
     url: "https://www.jober-1team.com/reset-password/"
 

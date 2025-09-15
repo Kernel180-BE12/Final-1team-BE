@@ -53,3 +53,7 @@ security:
     - /user/email/check
     - /user/password
     - /user/token/check
+  cors-allowed-origins:
+    - http://localhost:5173
+    - https://www.jober-1team.com
+    - https://api.jober-1team.com

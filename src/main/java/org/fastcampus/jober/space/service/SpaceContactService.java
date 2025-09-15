@@ -1,20 +1,22 @@
 package org.fastcampus.jober.space.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
+
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
-import org.fastcampus.jober.space.dto.request.ContactRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceContactsUpdateResponseDto;
 import org.fastcampus.jober.space.entity.SpaceContacts;
 import org.fastcampus.jober.space.repository.SpaceContactsRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +43,9 @@ public class SpaceContactService {
 
   /**
    * 스페이스에 연락처를 추가하는 비즈니스 로직
-   * 
-   * 기존 연락처를 유지하면서 새로운 연락처들을 추가합니다.
-   * 트랜잭션으로 처리되어 모든 연락처 등록이 성공하거나 모두 실패합니다.
-   * 
+   *
+   * <p>기존 연락처를 유지하면서 새로운 연락처들을 추가합니다. 트랜잭션으로 처리되어 모든 연락처 등록이 성공하거나 모두 실패합니다.
+   *
    * @param requestDto 연락처 추가 요청 데이터
    * @return 추가된 연락처 정보를 포함한 응답 DTO
    */
@@ -62,7 +63,7 @@ public class SpaceContactService {
     // 응답 DTO 생성
     return ContactResponseDto.fromEntities(savedContacts, requestDto.getSpaceId());
   }
-  
+
   /**
    * 연락처 정보를 수정하는 비즈니스 로직
    *
@@ -70,13 +71,16 @@ public class SpaceContactService {
    * @return 수정된 연락처 정보를 포함한 응답 DTO
    */
   @Transactional
-  public SpaceContactsUpdateResponseDto updateContactInfo(SpaceContactsUpdateRequestDto requestDto) {
+  public SpaceContactsUpdateResponseDto updateContactInfo(
+      SpaceContactsUpdateRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
 
     // 연락처 ID로 연락처 조회
-    SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
-        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
+    SpaceContacts contact =
+        spaceContactsRepository
+            .findById(requestDto.getContactId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
 
     // DTO를 사용하여 엔티티 업데이트 및 검증
     SpaceContacts updatedContact = requestDto.updateExistingContact(contact);
@@ -99,8 +103,10 @@ public class SpaceContactService {
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
 
     // 연락처 ID로 연락처 조회
-    SpaceContacts contact = spaceContactsRepository.findById(requestDto.getContactId())
-        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
+    SpaceContacts contact =
+        spaceContactsRepository
+            .findById(requestDto.getContactId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
 
     // DTO를 통해 권한 검증 및 삭제 준비
     requestDto.validateAndPrepareForDeletion(contact);
@@ -110,6 +116,13 @@ public class SpaceContactService {
     spaceContactsRepository.save(contact);
   }
 
+  /**
+   * 스페이스 ID와 tag를 받아 연락처를 조회하는 비즈니스 로직
+   *
+   * @param spaceId 조회할 스페이스 ID
+   * @param tag 조회할 연락처 tag
+   * @return 조회된 연락처 정보
+   */
   @Transactional
   public ContactResponseDto getContactsByTag(Long spaceId, String tag) {
     // Space 존재 여부 검증
@@ -119,5 +132,4 @@ public class SpaceContactService {
     List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceIdAndTag(spaceId, tag);
     return ContactResponseDto.fromEntities(contacts, spaceId);
   }
-
 }

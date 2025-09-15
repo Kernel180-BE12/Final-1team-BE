@@ -1,23 +1,24 @@
 package org.fastcampus.jober.space.repository;
 
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.response.SpaceListResponseDto;
 import org.fastcampus.jober.space.entity.Space;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
+public interface SpaceRepository extends JpaRepository<Space, Long> {
 
-public interface SpaceRepository extends JpaRepository<Space,Long> {
+  //    Optional<Space> findBySpaceName(String spaceName);
 
-//    Optional<Space> findBySpaceName(String spaceName);
-
-    default Space findByIdOrThrow(Long id) {
-        return findById(id).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
-    }
+  default Space findByIdOrThrow(Long id) {
+    return findById(id)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
+  }
 
     @Query("""
             SELECT new org.fastcampus.jober.space.dto.response.SpaceListResponseDto(s.spaceId, s.spaceName, sm.authority) 
