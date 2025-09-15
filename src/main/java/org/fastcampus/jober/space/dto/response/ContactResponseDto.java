@@ -41,8 +41,8 @@ public class ContactResponseDto {
     @Schema(description = "이름", example = "김철수")
     private String name;
 
-    @Schema(description = "태그", example = "프리랜서")
-    private String tag;
+    // @Schema(description = "태그", example = "프리랜서")
+    // private String tag;
 
     @Schema(description = "휴대전화", example = "010-1234-5678")
     private String phoneNum;
