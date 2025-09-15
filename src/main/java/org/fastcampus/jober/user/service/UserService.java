@@ -95,7 +95,7 @@ public class UserService {
 
     // DTO를 통해 엔티티 업데이트 (@Transactional로 자동 저장)
 
-      return user.updateUserInfo(req);
+    return user.updateUserInfo(req);
   }
 
   /**

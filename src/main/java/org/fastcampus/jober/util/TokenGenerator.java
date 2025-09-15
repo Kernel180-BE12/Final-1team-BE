@@ -9,6 +9,6 @@ public class TokenGenerator {
     byte[] secretBytes = new byte[32];
     SecureRandom.getInstanceStrong().nextBytes(secretBytes);
 
-      return Base64.getUrlEncoder().withoutPadding().encodeToString(secretBytes);
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(secretBytes);
   }
 }
