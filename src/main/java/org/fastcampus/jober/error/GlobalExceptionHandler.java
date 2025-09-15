@@ -54,14 +54,14 @@ public class GlobalExceptionHandler {
                     .collect(Collectors.toMap(
                             FieldError::getField,
                             DefaultMessageSourceResolvable::getDefaultMessage,
-                            (a, _) -> a // 중복키 무시
+                            (a, o) -> a // 중복키 무시
                     ));
         } else if (ex instanceof BindException e) {
             details = e.getBindingResult().getFieldErrors().stream()
                     .collect(Collectors.toMap(
                             FieldError::getField,
                             DefaultMessageSourceResolvable::getDefaultMessage,
-                            (a, _) -> a
+                            (a, o) -> a
                     ));
         }
         log.debug("[VALIDATION] {}", ex.getMessage());
