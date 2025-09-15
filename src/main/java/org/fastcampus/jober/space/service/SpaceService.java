@@ -63,10 +63,3 @@ public class SpaceService {
 }
 
 
-//
-//    // 스페이스의 멤버목록 조회
-//    public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
-//        spaceMemberRepository.findById(spaceId);
-//        List<SpaceMemberResponseDto> result = new ArrayList<>();
-//    }
-

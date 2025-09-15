@@ -2,13 +2,20 @@ package org.fastcampus.jober.space.service;
 
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
+import org.fastcampus.jober.space.entity.SpaceMember;
+import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SpaceMemberService {
     private final SpaceMemberRepository spaceMemberRepository;
+    private final SpaceMemberMapper spaceMemberMapper;
 
     public void addSpaceMember(SpaceMemberAddRequestDto dto) {
 /**
@@ -23,6 +30,11 @@ public class SpaceMemberService {
  *  - 행 추가 가능
  * 2-2 <1-1>과 동일한 로직으로 진행
  **/
+    }
+
+    public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
+        List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
+        return spaceMemberMapper.toResponseDtoList(spaceMembers);
     }
 
 }
