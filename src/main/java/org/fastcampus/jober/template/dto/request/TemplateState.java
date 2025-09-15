@@ -49,8 +49,7 @@ public class TemplateState {
   private Map<String, Object> templatePipelineState;
 
   /**
-   * AI Flask 서버가 기대하는 Map 형태로 변환합니다.
-   * 하위 호환성을 보장하기 위해 기존 필드는 기본값으로, 새 필드는 null이 아닐 때만 포함합니다.
+   * AI Flask 서버가 기대하는 Map 형태로 변환합니다. 하위 호환성을 보장하기 위해 기존 필드는 기본값으로, 새 필드는 null이 아닐 때만 포함합니다.
    *
    * @return Map 형태의 상태 정보
    */

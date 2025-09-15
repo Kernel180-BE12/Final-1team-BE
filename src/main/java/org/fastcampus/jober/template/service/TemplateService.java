@@ -71,8 +71,7 @@ public class TemplateService {
   }
 
   /**
-   * AI 서버의 원시 응답을 TemplateCreateResponseDto로 파싱합니다.
-   * 안전한 타입 캐스팅과 null 처리를 통해 파싱 오류를 방지합니다.
+   * AI 서버의 원시 응답을 TemplateCreateResponseDto로 파싱합니다. 안전한 타입 캐스팅과 null 처리를 통해 파싱 오류를 방지합니다.
    *
    * @param aiResponse AI 서버의 원시 응답
    * @return 구조화된 템플릿 생성 응답 DTO
@@ -112,17 +111,13 @@ public class TemplateService {
     }
   }
 
-  /**
-   * Map에서 문자열 값을 안전하게 추출합니다.
-   */
+  /** Map에서 문자열 값을 안전하게 추출합니다. */
   private String safeGetString(Map<String, Object> map, String key) {
     Object value = map.get(key);
     return value != null ? value.toString() : null;
   }
 
-  /**
-   * Map에서 JSON 변환을 안전하게 수행합니다.
-   */
+  /** Map에서 JSON 변환을 안전하게 수행합니다. */
   private String safeConvertToJson(Map<String, Object> map, String key) {
     Object value = map.get(key);
     if (value == null) return null;
@@ -135,9 +130,7 @@ public class TemplateService {
     }
   }
 
-  /**
-   * Map에서 문자열 리스트를 안전하게 추출합니다.
-   */
+  /** Map에서 문자열 리스트를 안전하게 추출합니다. */
   @SuppressWarnings("unchecked")
   private List<String> safeGetStringList(Map<String, Object> map, String key) {
     Object value = map.get(key);
@@ -152,9 +145,7 @@ public class TemplateService {
     return null;
   }
 
-  /**
-   * Map에서 TemplateState를 안전하게 파싱합니다.
-   */
+  /** Map에서 TemplateState를 안전하게 파싱합니다. */
   private TemplateState safeParseState(Map<String, Object> map, String key) {
     @SuppressWarnings("unchecked")
     Map<String, Object> stateMap = (Map<String, Object>) map.get(key);
@@ -166,7 +157,8 @@ public class TemplateService {
         state.setNextAction(safeGetString(stateMap, "next_action"));
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> pipelineState = (Map<String, Object>) stateMap.get("template_pipeline_state");
+        Map<String, Object> pipelineState =
+            (Map<String, Object>) stateMap.get("template_pipeline_state");
         state.setTemplatePipelineState(pipelineState);
 
         if (pipelineState != null) {
@@ -180,9 +172,7 @@ public class TemplateService {
     return state;
   }
 
-  /**
-   * 파싱 실패 시 반환할 기본 응답을 생성합니다.
-   */
+  /** 파싱 실패 시 반환할 기본 응답을 생성합니다. */
   private TemplateCreateResponseDto createFallbackResponse() {
     TemplateCreateResponseDto fallback = new TemplateCreateResponseDto();
     fallback.setMessage("AI 응답 처리 중 오류가 발생했습니다.");
