@@ -8,6 +8,7 @@ import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
+import org.fastcampus.jober.template.dto.request.TemplateDeleteRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
@@ -206,6 +207,7 @@ public class TemplateService {
      * @param request 템플릿 저장 요청 DTO
      * @return 템플릿 저장 응답 DTO
      */
+    @Transactional
     public TemplateSaveResponseDto saveTemplate(TemplateSaveRequestDto request) {
 
         // 스페이스 존재 여부 검증
@@ -214,5 +216,25 @@ public class TemplateService {
         // 템플릿 저장
         Template template = templateRepository.save(request.toEntity());
         return TemplateSaveResponseDto.from(template);
+    }
+
+    /**
+     * 템플릿을 논리적으로 삭제합니다.
+     * @param request 템플릿 삭제 요청 DTO
+     */
+    @Transactional
+    public void deleteTemplate(TemplateDeleteRequestDto request) {
+        // 스페이스 존재 여부 검증
+        spaceRepository.findByIdOrThrow(request.getSpaceId());
+
+        // 템플릿 존재 여부 검증
+        Template template = templateRepository.findByIdAndSpaceId(request.getTemplateId(), request.getSpaceId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
+        
+        // DTO를 통해 권한 검증 및 삭제 준비
+        request.validateAndPrepareForDeletion(template);
+
+        // 템플릿 삭제
+        template.softDelete();
     }
 }

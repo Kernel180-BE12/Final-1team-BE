@@ -59,9 +59,31 @@ public class Template extends BaseEntity {
     private Boolean isAccepted = false;
 
 
-    public Boolean updateIsSaved(Boolean isSaved) {
-        this.isSaved = isSaved;
-        return this.isSaved;
+    // public Boolean updateIsSaved(Boolean isSaved) {
+    //     this.isSaved = isSaved;
+    //     return this.isSaved;
+    // }
+
+
+    /**
+     * 템플릿 삭제 권한 검증
+     * @param spaceId 검증할 스페이스 ID
+     * @throws IllegalArgumentException 권한이 없는 경우
+     */
+    public void validateDeletePermission(Long spaceId) {
+        if (this.isDeleted) {
+            throw new IllegalArgumentException("이미 삭제된 템플릿입니다.");
+        }
+        if (!this.spaceId.equals(spaceId)) {
+            throw new IllegalArgumentException("해당 스페이스에서 템플릿을 삭제할 권한이 없습니다.");
+        }
+    }
+
+    /**
+     * 템플릿을 논리적으로 삭제합니다.
+     */
+    public void softDelete() {
+        this.isDeleted = true;
     }
 
 }
