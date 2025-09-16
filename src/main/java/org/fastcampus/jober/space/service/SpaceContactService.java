@@ -5,6 +5,7 @@ import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactTagAddRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactTagUpdateRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
@@ -201,12 +202,25 @@ public class SpaceContactService {
     return ContactResponseDto.fromEntities(contacts, spaceId);
   }
 
-  public ContactTagResponseDto updateContactTag(ContactTagRequestDto requestDto) {
+  /**
+   * 연락처 태그를 수정하는 비즈니스 로직
+   * 
+   * @param requestDto 연락처 태그 수정 요청 데이터 (스페이스 ID, 태그)
+   * @return 수정된 연락처 태그 정보
+   */
+  @Transactional
+  public ContactTagResponseDto updateContactTag(ContactTagUpdateRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
     
     // 연락처 태그 조회
     ContactTag contactTag = contactTagRepository.findById(requestDto.getId())
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처 태그를 찾을 수 없습니다."));
+    
+    // 연락처 태그 수정
+    contactTag.updateTag(requestDto.getTag());
+    
+    return ContactTagResponseDto.fromEntity(contactTag);
   }
 
 }

@@ -35,19 +35,19 @@ public class ContactResponseDto {
   @AllArgsConstructor
   public static class ContactInfo {
 
-    @Schema(description = "연락처 ID", example = "1")
+    @Schema(description = "연락처 ID", example = "1", required = true)
     private Long id;
 
-    @Schema(description = "이름", example = "김철수")
+    @Schema(description = "이름", example = "김철수", required = true)
     private String name;
 
-    @Schema(description = "휴대전화", example = "010-1234-5678")
+    @Schema(description = "휴대전화", example = "010-1234-5678", required = true)
     private String phoneNum;
 
-    @Schema(description = "이메일", example = "kim@example.com")
+    @Schema(description = "이메일", example = "kim@example.com", required = true)
     private String email;
     
-    @Schema(description = "태그 정보")
+    @Schema(description = "태그 정보", example = "1", required = false)
     private ContactTag tag;
   }
   
