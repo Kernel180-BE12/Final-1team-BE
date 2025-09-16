@@ -40,6 +40,34 @@ public class TemplateController {
   private final TemplateService templateService;
 
   /**
+   * AI를 통한 템플릿 생성 요청 API 사용자의 메시지를 받아서 AI Flask 서버로 전달하고, 구조화된 템플릿 응답을 반환합니다.
+   *
+   * @param request 템플릿 생성 요청 DTO (사용자 메시지와 AI 세션 상태 포함)
+   * @return AI가 생성한 구조화된 템플릿 응답 DTO
+   */
+  @Operation(
+      summary = "AI 템플릿 생성 요청",
+      description =
+          "사용자 메시지를 기반으로 AI가 템플릿을 생성합니다. " + "리액트에서 사용자 입력을 받아 AI Flask 서버로 전달하고 구조화된 응답을 반환합니다.")
+  @ApiResponse(
+      responseCode = "200",
+      description = "AI 템플릿 생성 성공",
+      content = @Content(schema = @Schema(implementation = TemplateCreateResponseDto.class)))
+  @PostMapping("/create-template")
+  public ResponseEntity<TemplateCreateResponseDto> createTemplate(
+      @org.springframework.web.bind.annotation.RequestBody TemplateCreateRequestDto request) {
+
+    log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}, state: {}", request.getMessage(), request.getState());
+
+    // TemplateService를 통해 AI Flask 서버로 요청 전달
+    TemplateCreateResponseDto aiResponse = templateService.createTemplate(request);
+
+    log.info("AI Flask 서버로부터 응답 수신 완료");
+
+    return ResponseEntity.ok(aiResponse);
+  }
+
+  /**
    * GET 방식으로 spaceId를 받아서 해당 spaceId의 템플릿 title들을 조회하는 API
    *
    * @param spaceId 스페이스 ID
@@ -95,34 +123,6 @@ public class TemplateController {
       return ResponseEntity.notFound().build();
     }
     return ResponseEntity.ok(template);
-  }
-
-  /**
-   * AI를 통한 템플릿 생성 요청 API 사용자의 메시지를 받아서 AI Flask 서버로 전달하고, 구조화된 템플릿 응답을 반환합니다.
-   *
-   * @param request 템플릿 생성 요청 DTO (사용자 메시지와 AI 세션 상태 포함)
-   * @return AI가 생성한 구조화된 템플릿 응답 DTO
-   */
-  @Operation(
-      summary = "AI 템플릿 생성 요청",
-      description =
-          "사용자 메시지를 기반으로 AI가 템플릿을 생성합니다. " + "리액트에서 사용자 입력을 받아 AI Flask 서버로 전달하고 구조화된 응답을 반환합니다.")
-  @ApiResponse(
-      responseCode = "200",
-      description = "AI 템플릿 생성 성공",
-      content = @Content(schema = @Schema(implementation = TemplateCreateResponseDto.class)))
-  @PostMapping("/create-template")
-  public ResponseEntity<TemplateCreateResponseDto> createTemplate(
-      @org.springframework.web.bind.annotation.RequestBody TemplateCreateRequestDto request) {
-
-    log.info("템플릿 생성 요청 수신 - 사용자 메시지: {}, state: {}", request.getMessage(), request.getState());
-
-    // TemplateService를 통해 AI Flask 서버로 요청 전달
-    TemplateCreateResponseDto aiResponse = templateService.createTemplate(request);
-
-    log.info("AI Flask 서버로부터 응답 수신 완료");
-
-    return ResponseEntity.ok(aiResponse);
   }
 
   // @PatchMapping("/{templateId}/space/{spaceId}")
