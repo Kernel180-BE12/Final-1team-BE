@@ -78,7 +78,8 @@ public class TemplateService {
     
     /**
      * AI 서버의 원시 응답을 TemplateCreateResponseDto로 파싱합니다.
-     * 
+     * 안전한 타입 캐스팅과 null 처리를 통해 파싱 오류를 방지합니다.
+     *
      * @param aiResponse AI 서버의 원시 응답
      * @return 구조화된 템플릿 생성 응답 DTO
      */
@@ -87,64 +88,103 @@ public class TemplateService {
             // Object를 Map으로 변환
             @SuppressWarnings("unchecked")
             Map<String, Object> responseMap = objectMapper.convertValue(aiResponse, Map.class);
-            
+
             log.info("AI 서버 응답 파싱 시작: {}", responseMap);
-            
+
             TemplateCreateResponseDto response = new TemplateCreateResponseDto();
-            
-            // AI 서버 실제 응답 구조에 맞게 파싱
-            response.setMessage((String) responseMap.get("response"));  // "response" 필드가 메시지
-            response.setTemplateContent((String) responseMap.get("template"));  // "template" 필드
-            response.setHtmlPreview((String) responseMap.get("htmlPreview"));
-            response.setFinalTemplate((String) responseMap.get("structured_template"));  // "structured_template"
-            response.setParameterizedTemplate((String) responseMap.get("parameterizedTemplate"));
-            
-            // editable_variables를 JSON 문자열로 변환
-            Object editableVars = responseMap.get("editable_variables");
-            if (editableVars != null) {
-                response.setExtractedVariables(objectMapper.writeValueAsString(editableVars));
-            }
-            
-            // options 파싱 (AI 서버에서 "options" 필드로 보냄)
-            @SuppressWarnings("unchecked")
-            List<String> options = (List<String>) responseMap.get("options");
-            response.setTemplateOptions(options);
-            
-            // AI 응답의 state 정보 파싱
-            @SuppressWarnings("unchecked")
-            Map<String, Object> aiStateMap = (Map<String, Object>) responseMap.get("state");
-            
-            TemplateState state = new TemplateState();
-            
-            if (aiStateMap != null) {
-                // AI state에서 직접 정보 추출
-                state.setNextAction((String) aiStateMap.get("next_action"));
-                
-                // template_pipeline_state에서 상세 정보 추출
-                @SuppressWarnings("unchecked")
-                Map<String, Object> pipelineState = (Map<String, Object>) aiStateMap.get("template_pipeline_state");
-                state.setTemplatePipelineState(pipelineState);
-                
-                if (pipelineState != null) {
-                    state.setOriginalRequest((String) pipelineState.get("original_request"));
-                }
-            }
-            
-            response.setState(state);
-            
-            log.info("AI 응답 파싱 완료: message={}, next_action={}, original_request={}", 
-                response.getMessage(), 
-                state.getNextAction(), 
-                state.getOriginalRequest());
-            
+
+            // 안전한 문자열 추출 (null 처리 포함)
+            response.setMessage(safeGetString(responseMap, "response"));
+            response.setTemplateContent(safeGetString(responseMap, "template"));
+            response.setHtmlPreview(safeGetString(responseMap, "htmlPreview"));
+            response.setFinalTemplate(safeGetString(responseMap, "structured_template"));
+            response.setParameterizedTemplate(safeGetString(responseMap, "parameterizedTemplate"));
+
+            // 안전한 JSON 변환
+            response.setExtractedVariables(safeConvertToJson(responseMap, "editable_variables"));
+
+            // 안전한 리스트 추출
+            response.setTemplateOptions(safeGetStringList(responseMap, "options"));
+
+            // 안전한 state 파싱
+            response.setState(safeParseState(responseMap, "state"));
+
+            log.info("AI 응답 파싱 완료: message={}", response.getMessage());
             return response;
+
         } catch (Exception e) {
             log.error("AI 응답 파싱 실패: {}", e.getMessage(), e);
-            // 파싱 실패 시 기본 응답 반환
-            TemplateCreateResponseDto fallbackResponse = new TemplateCreateResponseDto();
-            fallbackResponse.setMessage("AI 응답 처리 중 오류가 발생했습니다.");
-            return fallbackResponse;
+            return createFallbackResponse();
         }
+    }
+
+    /** Map에서 문자열 값을 안전하게 추출합니다. */
+    private String safeGetString(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        return value != null ? value.toString() : null;
+    }
+
+    /** Map에서 JSON 변환을 안전하게 수행합니다. */
+    private String safeConvertToJson(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        if (value == null) return null;
+
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (Exception e) {
+            log.warn("JSON 변환 실패 - key: {}, value: {}", key, value);
+            return null;
+        }
+    }
+
+    /** Map에서 문자열 리스트를 안전하게 추출합니다. */
+    @SuppressWarnings("unchecked")
+    private List<String> safeGetStringList(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        if (value instanceof List) {
+            try {
+                return (List<String>) value;
+            } catch (ClassCastException e) {
+                log.warn("리스트 타입 캐스팅 실패 - key: {}, value: {}", key, value);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    /** Map에서 TemplateState를 안전하게 파싱합니다. */
+    private TemplateState safeParseState(Map<String, Object> map, String key) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> stateMap = (Map<String, Object>) map.get(key);
+
+        TemplateState state = new TemplateState();
+
+        if (stateMap != null) {
+            try {
+                state.setNextAction(safeGetString(stateMap, "next_action"));
+
+                @SuppressWarnings("unchecked")
+                Map<String, Object> pipelineState =
+                        (Map<String, Object>) stateMap.get("template_pipeline_state");
+                state.setTemplatePipelineState(pipelineState);
+
+                if (pipelineState != null) {
+                    state.setOriginalRequest(safeGetString(pipelineState, "original_request"));
+                }
+            } catch (Exception e) {
+                log.warn("State 파싱 중 오류 발생: {}", e.getMessage());
+            }
+        }
+
+        return state;
+    }
+
+    /** 파싱 실패 시 반환할 기본 응답을 생성합니다. */
+    private TemplateCreateResponseDto createFallbackResponse() {
+        TemplateCreateResponseDto fallback = new TemplateCreateResponseDto();
+        fallback.setMessage("AI 응답 처리 중 오류가 발생했습니다.");
+        fallback.setState(new TemplateState()); // 빈 state 객체
+        return fallback;
     }
 
     /**
