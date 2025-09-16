@@ -1,72 +1,78 @@
 package org.fastcampus.jober.space.service;
 
+import java.util.List;
+
+import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
+import org.springframework.stereotype.Service;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceListResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.mapper.SpaceMapper;
+import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
-import org.fastcampus.jober.user.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SpaceService {
-    private final SpaceRepository spaceRepository;
-    private final SpaceMapper spaceMapper; // Mapper 주입
+  private final SpaceRepository spaceRepository;
+  private final SpaceMapper spaceMapper; // Mapper 주입
+  private final SpaceMemberMapper spaceMemberMapper;
+  private final SpaceMemberRepository spaceMemberRepository;
 
-    @Transactional
-    public void createSpace(SpaceCreateRequestDto dto, CustomUserDetails principal) {
-        Space space = spaceMapper.toEntity(dto, principal.getUserId());
-        spaceRepository.save(space);
-    }
+  @Transactional
+  public void createSpace(SpaceCreateRequestDto dto, CustomUserDetails principal) {
+    Space space = spaceMapper.toEntity(dto, principal.getUserId());
+    Space savedSpace = spaceRepository.save(space);
 
-    public SpaceResponseDto getSpace(Long id) {
-        Space space = spaceRepository.findByIdOrThrow(id);
-        return spaceMapper.toResponseDto(space);
-    }
+    SpaceMemberRequestDto adminUser =
+        SpaceMemberRequestDto.builder()
+            .spaceId(savedSpace.getSpaceId())
+            .userId(principal.getUserId())
+            .build();
 
-    @Transactional
-    public SpaceResponseDto updateSpace(Long spaceId, SpaceUpdateRequestDto dto, CustomUserDetails principal) {
+    SpaceMember spaceMember = spaceMemberMapper.toEntity(adminUser);
+    spaceMemberRepository.save(spaceMember);
+  }
 
-        // 1. 데이터 조회
-        Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+  public SpaceResponseDto getSpace(Long id) {
+    Space space = spaceRepository.findByIdOrThrow(id);
+    return spaceMapper.toResponseDto(space);
+  }
 
-        Long userId = principal.getUserId();
-        // 2. 관리자인지 체크
-        existingSpace.validateAdminUser(userId);
-        // 3. 엔티티 업데이트
-        existingSpace.updateSpaceFromDto(dto);
-        // 4. Entity to DTO
-        return spaceMapper.toResponseDto(existingSpace);
-    }
+  @Transactional
+  public SpaceResponseDto updateSpace(
+      Long spaceId, SpaceUpdateRequestDto dto, CustomUserDetails principal) {
 
-    @Transactional
-    public void deleteSpace(Long spaceId, CustomUserDetails principal) {
-        Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+    // 1. 데이터 조회
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 
-        existingSpace.validateAdminUser(principal.getUserId());
+    Long userId = principal.getUserId();
+    // 2. 관리자인지 체크
+    existingSpace.validateAdminUser(userId);
+    // 3. 엔티티 업데이트
+    existingSpace.updateSpaceFromDto(dto);
+    // 4. Entity to DTO
+    return spaceMapper.toResponseDto(existingSpace);
+  }
 
-        spaceRepository.deleteById(existingSpace.getSpaceId());
-    }
+  @Transactional
+  public void deleteSpace(Long spaceId, CustomUserDetails principal) {
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 
-    public List<SpaceListResponseDto> getSpaceList(CustomUserDetails principal) {
-        return spaceRepository.findSpacesByUserId(principal.getUserId());
-    }
+    existingSpace.validateAdminUser(principal.getUserId());
+
+    spaceRepository.deleteById(existingSpace.getSpaceId());
+  }
+
+  public List<SpaceListResponseDto> getSpaceList(CustomUserDetails principal) {
+    return spaceRepository.findSpacesByUserId(principal.getUserId());
+  }
 }
-
-
-//
-//    // 스페이스의 멤버목록 조회
-//    public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
-//        spaceMemberRepository.findById(spaceId);
-//        List<SpaceMemberResponseDto> result = new ArrayList<>();
-//    }
-
