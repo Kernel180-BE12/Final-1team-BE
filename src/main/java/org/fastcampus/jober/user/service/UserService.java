@@ -50,8 +50,8 @@ public class UserService {
         }
         
         // 중복 검증
-        if (userRepository.existsByUsername(req.username())) {
-            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        if (userRepository.existsByUsername(req.username()) && userRepository.existsByEmail(req.email())) {
+            throw new IllegalArgumentException("이미 존재하는 아이디와 이메일입니다.");
         }
 
         userRepository.save(req.toEntity());
