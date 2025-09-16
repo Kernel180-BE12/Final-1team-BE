@@ -5,6 +5,7 @@ import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactTagAddRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactTagDeleteRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactTagUpdateRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactDeleteRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceContactsUpdateRequestDto;
@@ -61,19 +62,6 @@ public class SpaceContactService {
     
     // DTO를 엔티티로 변환하고 유효성 검증
     List<SpaceContacts> contacts = requestDto.toValidateEntities();
-    
-    // 각 연락처에 태그 설정
-    // for (int i = 0; i < contacts.size(); i++) {
-    //   SpaceContacts contact = contacts.get(i);
-      // String tagName = requestDto.getContacts().get(i).getTag();
-      
-      // if (tagName != null && !tagName.trim().isEmpty()) {
-      //   ContactTag contactTag = contactTagRepository.findBySpaceIdAndTag(requestDto.getSpaceId(), tagName)
-      //       .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, 
-      //           "해당 스페이스에 존재하지 않는 태그입니다: " + tagName));
-      //   contact.updateContactInfo(null, null, null, contactTag);
-      // }
-    // }
 
     // 연락처 저장
     List<SpaceContacts> savedContacts = spaceContactsRepository.saveAll(contacts);
@@ -153,6 +141,14 @@ public class SpaceContactService {
   public ContactTagResponseDto addContactTag(ContactTagAddRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
+
+    if (contactTagRepository.existsBySpaceIdAndTagIsDeletedTrue(requestDto.getSpaceId(), requestDto.getTag())) {
+      ContactTag contactTag = contactTagRepository.findBySpaceIdAndTagIsDeletedTrue(requestDto.getSpaceId(), requestDto.getTag())
+          .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처 태그를 찾을 수 없습니다."));
+      contactTag.restore();
+      contactTagRepository.save(contactTag);
+      return ContactTagResponseDto.fromEntity(contactTag);
+    }
     
     // 스페이스 ID와 태그명 중복 체크
     if (contactTagRepository.existsBySpaceIdAndTag(requestDto.getSpaceId(), requestDto.getTag())) {
@@ -196,6 +192,10 @@ public class SpaceContactService {
   public ContactResponseDto getContactsByTag(Long spaceId, String tag) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(spaceId);
+
+    // 연락처 태그 존재 여부 검증
+    contactTagRepository.findBySpaceIdAndTag(spaceId, tag)
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처 태그를 찾을 수 없습니다."));
     
     // 연락처 조회
     List<SpaceContacts> contacts = spaceContactsRepository.findBySpaceIdAndTag(spaceId, tag);
@@ -213,7 +213,7 @@ public class SpaceContactService {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
     
-    // 연락처 태그 조회
+    // 연락처 태그 존재 여부 검증
     ContactTag contactTag = contactTagRepository.findById(requestDto.getId())
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처 태그를 찾을 수 없습니다."));
     
@@ -221,6 +221,40 @@ public class SpaceContactService {
     contactTag.updateTag(requestDto.getTag());
     
     return ContactTagResponseDto.fromEntity(contactTag);
+  }
+
+  /**
+   * 연락처 태그를 삭제하는 비즈니스 로직
+   * 
+   * 태그를 논리삭제하고, 해당 태그를 참조하는 모든 연락처의 contactTag를 null로 설정합니다.
+   * 
+   * @param requestDto 연락처 태그 삭제 요청 데이터 (스페이스 ID, 태그 ID)
+   */
+  @Transactional
+  public void deleteContactTag(ContactTagDeleteRequestDto requestDto) {
+    // Space 존재 여부 검증
+    spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
+    
+    // 연락처 태그 존재 여부 검증
+    ContactTag contactTag = contactTagRepository.findById(requestDto.getId())
+        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처 태그를 찾을 수 없습니다."));
+    
+    // 해당 태그를 참조하는 연락처들의 contactTag를 null로 설정
+    List<SpaceContacts> contactsWithTag = spaceContactsRepository.findByContactTagId(contactTag.getId());
+    
+    // 소량 데이터(100개 이하)는 엔티티 방식, 대량 데이터는 @Modifying 방식 사용
+    if (contactsWithTag.size() <= 100) {
+      // JPA 표준 방식: 1차 캐시 일관성 보장, 비즈니스 로직 적용 가능
+      contactsWithTag.forEach(SpaceContacts::removeTagReference);
+      spaceContactsRepository.saveAll(contactsWithTag);
+    } else {
+      // 대량 처리 방식: 성능 우선, 1차 캐시 무시
+      spaceContactsRepository.removeContactTagReferenceBulk(contactTag.getId());
+    }
+    
+    // 연락처 태그 논리삭제
+    contactTag.softDelete();
+    contactTagRepository.save(contactTag);
   }
 
 }

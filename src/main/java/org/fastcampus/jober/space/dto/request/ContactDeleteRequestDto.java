@@ -11,8 +11,8 @@ import org.fastcampus.jober.space.entity.SpaceContacts;
 @Schema(description = "연락처 삭제 요청 DTO")
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ContactDeleteRequestDto {
 
   @Schema(description = "스페이스 ID", example = "1")

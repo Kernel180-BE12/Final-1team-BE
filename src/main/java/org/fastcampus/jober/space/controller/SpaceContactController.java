@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.fastcampus.jober.space.dto.request.ContactRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactTagAddRequestDto;
+import org.fastcampus.jober.space.dto.request.ContactTagDeleteRequestDto;
 import org.fastcampus.jober.space.dto.request.ContactTagUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.ContactResponseDto;
 import org.fastcampus.jober.space.dto.response.ContactTagResponseDto;
@@ -157,4 +158,19 @@ public class SpaceContactController {
     return ResponseEntity.ok(response);
   }
 
+  /**
+   * 연락처 태그 삭제 API
+   * 
+   * @param requestDto 연락처 태그 삭제 요청 데이터 (스페이스 ID, 태그 ID)
+   * @return 삭제된 연락처 태그 정보
+   */
+  @Operation(summary = "연락처 태그 삭제", description = "스페이스 ID와 태그 ID를 받아 해당 스페이스의 연락처 태그를 삭제합니다.")
+  @ApiResponse(responseCode = "204", description = "성공적으로 연락처 태그가 삭제됨")
+  @ApiResponse(responseCode = "404", description = "연락처 태그를 찾을 수 없음")
+  @DeleteMapping("/contact/tag/delete")
+  public ResponseEntity<Void> deleteContactTag(
+    @RequestBody ContactTagDeleteRequestDto requestDto) {
+    spaceContactService.deleteContactTag(requestDto);
+    return ResponseEntity.noContent().build();
+  }
 }

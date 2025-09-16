@@ -26,6 +26,7 @@ public class ContactTagAddRequestDto {
         return ContactTag.builder()
             .tag(tag)
             .spaceId(spaceId)
+            .isDeleted(false)  // isDeleted 필드를 false로 초기화
             .build();
     }
 }

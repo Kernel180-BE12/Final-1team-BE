@@ -147,4 +147,11 @@ public class SpaceContacts extends BaseEntity {
         this.isDeleted = true;
     }
     
+    /**
+     * 연락처의 태그 참조를 제거합니다 (contactTag를 null로 설정)
+     */
+    public void removeTagReference() {
+        this.contactTag = null;
+    }
+    
 }

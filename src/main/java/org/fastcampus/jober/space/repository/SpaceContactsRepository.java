@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.fastcampus.jober.space.entity.SpaceContacts;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,7 @@ public interface SpaceContactsRepository extends JpaRepository<SpaceContacts, Lo
         summary = "스페이스 연락처 논리삭제",
         description = "특정 spaceId의 모든 연락처를 논리삭제합니다."
     )
+    @Modifying
     @Query("UPDATE SpaceContacts sc SET sc.isDeleted = true WHERE sc.spaceId = :spaceId AND (sc.isDeleted = false OR sc.isDeleted IS NULL)")
     void softDeleteBySpaceId(
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId
@@ -51,5 +53,33 @@ public interface SpaceContactsRepository extends JpaRepository<SpaceContacts, Lo
     List<SpaceContacts> findBySpaceIdAndTag(
         @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
         @Parameter(description = "태그", required = true) @Param("tag") String tag
+    );
+
+    /**
+     * 특정 ContactTag를 참조하는 연락처들을 조회
+     * @param contactTagId 조회할 ContactTag ID
+     * @return 해당 태그를 참조하는 연락처 목록
+     */
+    @Operation(
+        summary = "태그를 참조하는 연락처 조회",
+        description = "특정 ContactTag를 참조하는 연락처들을 조회합니다."
+    )
+    @Query("SELECT sc FROM SpaceContacts sc WHERE sc.contactTag.id = :contactTagId")
+    List<SpaceContacts> findByContactTagId(
+        @Parameter(description = "ContactTag ID", required = true) @Param("contactTagId") Long contactTagId
+    );
+
+    /**
+     * 특정 ContactTag를 참조하는 연락처들의 contactTag를 null로 설정 (대량 처리용)
+     * @param contactTagId null로 설정할 ContactTag ID
+     */
+    @Operation(
+        summary = "연락처 태그 참조 제거 (대량 처리)",
+        description = "특정 ContactTag를 참조하는 연락처들의 contactTag를 null로 설정합니다. (대량 데이터 처리용)"
+    )
+    @Modifying
+    @Query("UPDATE SpaceContacts sc SET sc.contactTag = null WHERE sc.contactTag.id = :contactTagId")
+    void removeContactTagReferenceBulk(
+        @Parameter(description = "ContactTag ID", required = true) @Param("contactTagId") Long contactTagId
     );
 }

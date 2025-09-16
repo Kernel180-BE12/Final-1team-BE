@@ -19,8 +19,6 @@ public class TemplateDetailResponseDto {
     private String title;
     private String status;
     private String extractedVariables;
-    // 상세 조회에서 생성일시(completedAt) 조회 제외 - 사용자 요구사항에 따라 제외
-    // private LocalDateTime completedAt; 
     private String sessionId;
     private String finalTemplate;
     private String htmlPreview;
