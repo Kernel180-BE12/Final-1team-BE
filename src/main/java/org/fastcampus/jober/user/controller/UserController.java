@@ -229,7 +229,7 @@ public class UserController {
             return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/token/check")
+    @GetMapping("/validate-token")
     @Operation(summary = "비밀번호 변경 토큰 검증", description = "비밀번호 변경 시 토큰 검증")
     @ApiResponse(responseCode = "200", description = "토큰 존재")
     @ApiResponse(responseCode = "401", description = "토큰 만료")
@@ -243,7 +243,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "비밀번호 변경 완료")
     @ApiResponse(responseCode = "401", description = "토큰 만료")
     @ApiResponse(responseCode = "404", description = "없는 회원")
-    public ResponseEntity<Boolean> changePassword(PasswordResetRequestDto passwordResetRequestDto) {
+    public ResponseEntity<Boolean> changePassword(@RequestBody PasswordResetRequestDto passwordResetRequestDto) {
         userService.changePassword(passwordResetRequestDto);
         return  ResponseEntity.ok().build();
     }
