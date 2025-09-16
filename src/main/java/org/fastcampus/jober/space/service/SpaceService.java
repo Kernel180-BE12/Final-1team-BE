@@ -3,6 +3,7 @@ package org.fastcampus.jober.space.service;
 import java.util.List;
 
 import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
+import org.fastcampus.jober.space.entity.SpaceMember;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
