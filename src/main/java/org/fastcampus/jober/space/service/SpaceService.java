@@ -2,18 +2,18 @@ package org.fastcampus.jober.space.service;
 
 import java.util.List;
 
-import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
-import org.fastcampus.jober.space.entity.SpaceMember;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
+import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceListResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
 import org.fastcampus.jober.space.entity.Space;
+import org.fastcampus.jober.space.entity.SpaceMember;
 import org.fastcampus.jober.space.mapper.SpaceMapper;
 import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;

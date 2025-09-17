@@ -1,23 +1,23 @@
-//package org.fastcampus.jober.space;
+// package org.fastcampus.jober.space;
 //
-//import jakarta.transaction.Transactional;
-//import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
-//import org.fastcampus.jober.space.dto.request.SpaceRequestDto;
-//import org.fastcampus.jober.space.entity.Space;
-//import org.fastcampus.jober.space.repository.SpaceRepository;
-//import org.fastcampus.jober.space.service.SpaceService;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
+// import jakarta.transaction.Transactional;
+// import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
+// import org.fastcampus.jober.space.dto.request.SpaceRequestDto;
+// import org.fastcampus.jober.space.entity.Space;
+// import org.fastcampus.jober.space.repository.SpaceRepository;
+// import org.fastcampus.jober.space.service.SpaceService;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
 //
-//import java.util.Optional;
+// import java.util.Optional;
 //
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
+// import static org.assertj.core.api.Assertions.assertThat;
+// import static org.junit.jupiter.api.Assertions.assertThrows;
 //
-//@SpringBootTest
-//@Transactional
-//public class SpaceTest {
+// @SpringBootTest
+// @Transactional
+// public class SpaceTest {
 //
 //    @Autowired
 //    private SpaceRepository spaceRepository;
@@ -61,4 +61,4 @@
 //
 //        assertThrows(IllegalArgumentException.class, () -> spaceService.createSpace(dto));
 //    }
-//}
+// }
