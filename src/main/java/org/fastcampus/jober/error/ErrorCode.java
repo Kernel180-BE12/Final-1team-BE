@@ -22,8 +22,7 @@ public enum ErrorCode {
   INVALID_USERNAME("USER-400-01", "사용자명은 영문 소문자와 숫자 조합으로 5~15자여야 합니다.", HttpStatus.BAD_REQUEST),
   INVALID_PASSWORD("USER-400-02", "비밀번호는 영문, 숫자, 특수문자 조합으로 8~16자여야 합니다.", HttpStatus.BAD_REQUEST),
   INVALID_EMAIL("USER-400-03", "올바른 이메일 형식이 아닙니다.", HttpStatus.BAD_REQUEST),
-  INVALID_NAME("USER-400-04", "이름은 2자 이상이어야 합니다.", HttpStatus.BAD_REQUEST),
-  EMAIL_MATCH("USER-400-05", "이메일이 변경 전과 동일합니다.", HttpStatus.BAD_REQUEST);
+  INVALID_NAME("USER-400-04", "이름은 2자 이상이어야 합니다.", HttpStatus.BAD_REQUEST);
 
   private final String code;
   private final String message;
