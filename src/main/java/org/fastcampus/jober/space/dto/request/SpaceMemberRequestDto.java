@@ -3,6 +3,7 @@ package org.fastcampus.jober.space.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import org.fastcampus.jober.space.entity.Authority;
 
 @Getter
 @Builder
@@ -12,16 +13,13 @@ public class SpaceMemberRequestDto {
   private Long id;
 
   @Schema(description = "구성원 권한", example = "ADMIN")
-  private String authority;
+  private Authority authority;
 
   @Schema(description = "구성원 상태", example = "초대완료")
   private String status;
 
   @Schema(description = "구성원 태그", example = "재직자")
   private String tag;
-
-  @Schema(description = "문서 권한", example = "READ_WRITE")
-  private String documentPermission;
 
   @Schema(description = "스페이스 ID", example = "1001")
   private Long spaceId;
