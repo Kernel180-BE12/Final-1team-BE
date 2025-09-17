@@ -42,6 +42,9 @@ public class UserService {
     if (!req.username().matches("^[a-z0-9]{5,15}$")) {
       throw new BusinessException(ErrorCode.INVALID_USERNAME);
     }
+    if (!req.name().matches("^.{2,}$")) {
+      throw new BusinessException(ErrorCode.INVALID_NAME);
+    }
     if (!req.password().matches("^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$")) {
       throw new BusinessException(ErrorCode.INVALID_PASSWORD);
     }
@@ -50,9 +53,8 @@ public class UserService {
     }
 
     // 중복 검증
-    if (userRepository.existsByUsername(req.username())) {
-      throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
-    }
+    isUsernameExists(req.username());
+    isEmailExists(req.email());
 
     userRepository.save(req.toEntity());
   }
@@ -81,12 +83,17 @@ public class UserService {
   @Transactional
   public boolean update(UpdateRequestDto req, CustomUserDetails principal) {
     // 입력값 형식 검증 (null이 아닌 경우에만)
-    if (req.getName() != null && !req.getName().matches("^[a-z0-9]{5,15}$")) {
-      throw new BusinessException(ErrorCode.INVALID_USERNAME);
+    if (req.getName() != null && !req.getName().matches("^.{2,}$")) {
+      throw new BusinessException(ErrorCode.INVALID_NAME);
     }
     if (req.getEmail() != null && !req.getEmail().matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
       throw new BusinessException(ErrorCode.INVALID_EMAIL);
     }
+    if (!req.getEmail().equals(getUserInfo(principal).getEmail())) {
+      isEmailExists(req.getEmail());
+    }
+
+    
 
     Users user =
         userRepository
@@ -104,8 +111,10 @@ public class UserService {
    * @param username 확인할 사용자명
    * @return 중복 여부
    */
-  public boolean isUsernameExists(String username) {
-    return userRepository.existsByUsername(username);
+  public void isUsernameExists(String username) {
+    if (userRepository.existsByUsername(username)) {
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
+    }
   }
 
   /**
@@ -114,8 +123,10 @@ public class UserService {
    * @param email 확인할 이메일
    * @return 중복 여부
    */
-  public boolean isEmailExists(String email) {
-    return userRepository.existsByEmail(email);
+  public void isEmailExists(String email) {
+    if (userRepository.existsByEmail(email)) {
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
+    }
   }
 
   @Transactional
