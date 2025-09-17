@@ -3,6 +3,7 @@ package org.fastcampus.jober.template.service;
 import java.util.List;
 import java.util.Map;
 
+import org.fastcampus.jober.template.dto.response.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +21,9 @@ import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateDeleteRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateState;
-import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateSaveResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.util.ExternalApiUtil;
 
 /** 템플릿 관련 비즈니스 로직을 처리하는 서비스 클래스 AI Flask 서버와의 통신을 통해 템플릿 생성 등의 기능을 제공합니다. */
@@ -245,21 +243,6 @@ public class TemplateService {
     return TemplateDetailResponseDto.from(template);
   }
 
-  // /**
-  //  * 템플릿 저장 상태를 변경합니다.
-  //  * @param id 템플릿 ID
-  //  * @param spaceId 스페이스 ID
-  //  * @param isSaved 저장 여부
-  //  * @return 변경된 저장 상태
-  //  */
-  // @Transactional
-  // public Boolean saveTemplate(Long id, Long spaceId, Boolean isSaved) {
-  //     Template template = templateRepository.findByIdAndSpaceId(id, spaceId)
-  //             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
-
-  //     return template.updateIsSaved(isSaved);
-  // }
-
   /**
    * 템플릿을 저장합니다.
    *
@@ -299,4 +282,8 @@ public class TemplateService {
     // 템플릿 삭제
     template.softDelete();
   }
+
+    public List<TemplateListResponseDto> getTemlpateList(CustomUserDetails principal) {
+        return templateRepository.findTemplateByUserId(principal.getUserId());
+    }
 }

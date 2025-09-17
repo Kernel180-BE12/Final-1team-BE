@@ -1,35 +1,34 @@
-// package org.fastcampus.jober.user;
+//package org.fastcampus.jober.user;
 //
-// import com.fasterxml.jackson.databind.ObjectMapper;
-// import org.fastcampus.jober.user.dto.request.LoginRequestDto;
-// import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
-// import org.junit.jupiter.api.DisplayName;
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-// import org.springframework.boot.test.context.SpringBootTest;
-// import org.springframework.http.MediaType;
-// import org.springframework.mock.web.MockHttpSession;
-// import org.springframework.test.web.servlet.MvcResult;
-// import org.springframework.test.web.servlet.MockMvc;
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import org.fastcampus.jober.user.dto.request.LoginRequestDto;
+//import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.http.MediaType;
+//import org.springframework.mock.web.MockHttpSession;
+//import org.springframework.test.web.servlet.MvcResult;
+//import org.springframework.test.web.servlet.MockMvc;
 //
-// import jakarta.servlet.http.HttpSession;
-// import org.springframework.transaction.annotation.Transactional;
+//import jakarta.servlet.http.HttpSession;
+//import org.springframework.transaction.annotation.Transactional;
 //
-// import static org.assertj.core.api.Assertions.assertThat;
-// import static
-// org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+//import static org.assertj.core.api.Assertions.assertThat;
+//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 //
-/// **
+///**
 // * 로그인은 컨트롤러에서 처리,
 // * 로그아웃은 Security LogoutFilter(/user/logout)로 처리하는 통합 테스트.
 // */
-// @SpringBootTest
-// @AutoConfigureMockMvc
-// @Transactional
-// class UserControllerTest {
+//@SpringBootTest
+//@AutoConfigureMockMvc
+//@Transactional
+//class UserControllerTest {
 //
 //    @Autowired MockMvc mockMvc;
 //    @Autowired ObjectMapper objectMapper;
@@ -160,4 +159,4 @@
 //                )
 //                .andExpect(status().isUnauthorized());
 //    }
-// }
+//}

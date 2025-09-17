@@ -2,7 +2,7 @@ spring:
   application:
     name: jober-server
   profiles:
-    active: develop
+    active: production
 
   mail:
     host: smtp.gmail.com
@@ -18,7 +18,7 @@ spring:
 
 app:
   mail:
-    from: "no-reply@jober-1team.com"
+    from: "no-reply@your-domain.com"
   reset:
     url: "https://www.jober-1team.com/reset-password/"
 
