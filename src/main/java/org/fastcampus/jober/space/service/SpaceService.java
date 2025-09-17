@@ -2,6 +2,7 @@ package org.fastcampus.jober.space.service;
 
 import java.util.List;
 
+import org.fastcampus.jober.space.entity.Authority;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -37,6 +38,7 @@ public class SpaceService {
         SpaceMemberRequestDto.builder()
             .spaceId(savedSpace.getSpaceId())
             .userId(principal.getUserId())
+                .authority(Authority.ADMIN)
             .build();
 
     SpaceMember spaceMember = spaceMemberMapper.toEntity(adminUser);
