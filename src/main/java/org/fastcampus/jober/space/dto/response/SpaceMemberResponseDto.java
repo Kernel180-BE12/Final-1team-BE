@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.fastcampus.jober.space.entity.Authority;
 
 @Getter
 @NoArgsConstructor
@@ -15,14 +16,11 @@ public class SpaceMemberResponseDto {
   private Long id;
 
   @Schema(description = "구성원 권한", example = "ADMIN")
-  private String authority;
+  private Authority authority;
 
   @Schema(description = "구성원 태그", example = "마케팅팀")
   private String tag;
 
   @Schema(description = "사용자 ID", example = "2002")
   private Long userId;
-
-  @Schema(description = "스페이스 ID", example = "10")
-  private Long spaceId;
 }
