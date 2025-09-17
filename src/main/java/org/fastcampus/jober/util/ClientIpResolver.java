@@ -1,8 +1,7 @@
 package org.fastcampus.jober.util;
 
-import org.springframework.stereotype.Component;
-
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ClientIpResolver {

@@ -1,9 +1,5 @@
 package org.fastcampus.jober.space.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import org.fastcampus.jober.space.entity.SpaceContacts;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Schema(description = "연락처 등록 응답 DTO")
 @Data
