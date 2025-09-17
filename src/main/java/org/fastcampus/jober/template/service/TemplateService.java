@@ -71,7 +71,7 @@ public class TemplateService {
   }
 
   /**
-   * AI 서버의 원시 응답을 TemplateCreateResponseDto로 파싱합니다. 안전한 타입 캐스팅과 null 처리를 통해 파싱 오류를 방지합니다.
+   * AI 서버의 원시 응답을 TemplateCreateResponseDto로 파싱합니다. AI 응답 구조를 그대로 프론트엔드로 전달하도록 직접 매핑합니다.
    *
    * @param aiResponse AI 서버의 원시 응답
    * @return 구조화된 템플릿 생성 응답 DTO
@@ -86,23 +86,21 @@ public class TemplateService {
 
       TemplateCreateResponseDto response = new TemplateCreateResponseDto();
 
-      // 안전한 문자열 추출 (null 처리 포함)
-      response.setMessage(safeGetString(responseMap, "response"));
-      response.setTemplateContent(safeGetString(responseMap, "template"));
-      response.setHtmlPreview(safeGetString(responseMap, "htmlPreview"));
-      response.setFinalTemplate(safeGetString(responseMap, "structured_template"));
-      response.setParameterizedTemplate(safeGetString(responseMap, "parameterizedTemplate"));
+      // AI 응답을 그대로 매핑 (프론트엔드가 기대하는 필드명과 일치)
+      response.setSuccess(safeGetBoolean(responseMap, "success"));
+      response.setResponse(safeGetString(responseMap, "response"));
+      response.setState(safeGetMap(responseMap, "state"));
+      response.setOptions(safeGetStringList(responseMap, "options"));
+      response.setTemplate(safeGetString(responseMap, "template"));
+      response.setStructuredTemplate(responseMap.get("structured_template"));
+      response.setEditableVariables(safeGetMap(responseMap, "editable_variables"));
+      response.setStructuredTemplates(safeGetList(responseMap, "structured_templates"));
+      response.setHasImage(safeGetBoolean(responseMap, "hasImage"));
 
-      // 안전한 JSON 변환
-      response.setExtractedVariables(safeConvertToJson(responseMap, "editable_variables"));
-
-      // 안전한 리스트 추출
-      response.setTemplateOptions(safeGetStringList(responseMap, "options"));
-
-      // 안전한 state 파싱
-      response.setState(safeParseState(responseMap, "state"));
-
-      log.info("AI 응답 파싱 완료: message={}", response.getMessage());
+      log.info(
+          "AI 응답 파싱 완료: success={}, response={}",
+          response.getSuccess(),
+          response.getResponse());
       return response;
 
     } catch (Exception e) {
@@ -117,17 +115,46 @@ public class TemplateService {
     return value != null ? value.toString() : null;
   }
 
-  /** Map에서 JSON 변환을 안전하게 수행합니다. */
-  private String safeConvertToJson(Map<String, Object> map, String key) {
+  /** Map에서 Boolean 값을 안전하게 추출합니다. */
+  private Boolean safeGetBoolean(Map<String, Object> map, String key) {
     Object value = map.get(key);
-    if (value == null) return null;
-
-    try {
-      return objectMapper.writeValueAsString(value);
-    } catch (Exception e) {
-      log.warn("JSON 변환 실패 - key: {}, value: {}", key, value);
-      return null;
+    if (value instanceof Boolean) {
+      return (Boolean) value;
     }
+    if (value != null) {
+      return Boolean.parseBoolean(value.toString());
+    }
+    return null;
+  }
+
+  /** Map에서 Map 값을 안전하게 추출합니다. */
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> safeGetMap(Map<String, Object> map, String key) {
+    Object value = map.get(key);
+    if (value instanceof Map) {
+      try {
+        return (Map<String, Object>) value;
+      } catch (ClassCastException e) {
+        log.warn("Map 타입 캐스팅 실패 - key: {}, value: {}", key, value);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /** Map에서 List 값을 안전하게 추출합니다. */
+  @SuppressWarnings("unchecked")
+  private List<Object> safeGetList(Map<String, Object> map, String key) {
+    Object value = map.get(key);
+    if (value instanceof List) {
+      try {
+        return (List<Object>) value;
+      } catch (ClassCastException e) {
+        log.warn("List 타입 캐스팅 실패 - key: {}, value: {}", key, value);
+        return null;
+      }
+    }
+    return null;
   }
 
   /** Map에서 문자열 리스트를 안전하게 추출합니다. */
@@ -175,8 +202,9 @@ public class TemplateService {
   /** 파싱 실패 시 반환할 기본 응답을 생성합니다. */
   private TemplateCreateResponseDto createFallbackResponse() {
     TemplateCreateResponseDto fallback = new TemplateCreateResponseDto();
-    fallback.setMessage("AI 응답 처리 중 오류가 발생했습니다.");
-    fallback.setState(new TemplateState()); // 빈 state 객체
+    fallback.setSuccess(false);
+    fallback.setResponse("AI 응답 처리 중 오류가 발생했습니다.");
+    fallback.setState(Map.of()); // 빈 state 맵
     return fallback;
   }
 
