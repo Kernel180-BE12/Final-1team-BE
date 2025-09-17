@@ -153,22 +153,6 @@ public class UserController {
   @ApiResponse(responseCode = "204", description = "변경사항이 없음")
   public ResponseEntity<Void> update(
       @RequestBody UpdateRequestDto req, @AuthenticationPrincipal CustomUserDetails principal) {
-
-    // // username 중복 검사 (현재 username과 다를 경우에만)
-    // if (req.getUsername() != null && !req.getUsername().equals(principal.getUsername())) {
-    //     if (userService.isUsernameExists(req.getUsername())) {
-    //         throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
-    //     }
-    // }
-
-    // email 중복 검사 (현재 email과 다를 경우에만)
-    if (req.getEmail() != null
-        && !req.getEmail().equals(userService.getUserInfo(principal).getEmail())) {
-      if (userService.isEmailExists(req.getEmail())) {
-        throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
-      }
-    }
-
     // 사용자 정보 업데이트 (변경사항이 있을 때만)
     boolean hasChanges = userService.update(req, principal);
 
@@ -176,45 +160,7 @@ public class UserController {
       // 변경사항이 없으면 204 No Content 응답
       return ResponseEntity.noContent().build();
     }
-
-    return ResponseEntity.ok().build();
-  }
-
-  /**
-   * 아이디 중복 체크
-   *
-   * @param checkIdRequestDto 아이디 중복 체크 요청 데이터
-   * @return 아이디 중복 체크 결과
-   */
-  @PostMapping("/id/check")
-  @Operation(summary = "아이디 중복 체크", description = "아이디 중복 체크를 합니다.")
-  @ApiResponse(responseCode = "200", description = "아이디 중복 체크 성공")
-  @ApiResponse(responseCode = "400", description = "아이디 중복 체크 실패")
-  public ResponseEntity<Void> checkId(
-      @Parameter(description = "아이디 중복 체크 요청 데이터", required = true) @RequestBody
-          CheckIdRequestDto checkIdRequestDto) {
-    if (userService.isUsernameExists(checkIdRequestDto.getUsername())) {
-      throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
-    }
-    return ResponseEntity.ok().build();
-  }
-
-  /**
-   * 이메일 중복 체크
-   *
-   * @param checkEmailRequestDto 이메일 중복 체크 요청 데이터
-   * @return 이메일 중복 체크 결과
-   */
-  @PostMapping("/email/check")
-  @Operation(summary = "이메일 중복 체크", description = "이메일 중복 체크를 합니다.")
-  @ApiResponse(responseCode = "200", description = "이메일 중복 체크 성공")
-  @ApiResponse(responseCode = "400", description = "이메일 중복 체크 실패")
-  public ResponseEntity<Void> checkEmail(
-      @Parameter(description = "이메일 중복 체크 요청 데이터", required = true) @RequestBody
-          CheckEmailRequestDto checkEmailRequestDto) {
-    if (userService.isEmailExists(checkEmailRequestDto.getEmail())) {
-      throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
-    }
+    
     return ResponseEntity.ok().build();
   }
 
