@@ -153,7 +153,6 @@ public class UserController {
   @ApiResponse(responseCode = "204", description = "변경사항이 없음")
   public ResponseEntity<Void> update(
       @RequestBody UpdateRequestDto req, @AuthenticationPrincipal CustomUserDetails principal) {
-
     // 사용자 정보 업데이트 (변경사항이 있을 때만)
     boolean hasChanges = userService.update(req, principal);
 
@@ -161,7 +160,7 @@ public class UserController {
       // 변경사항이 없으면 204 No Content 응답
       return ResponseEntity.noContent().build();
     }
-
+    
     return ResponseEntity.ok().build();
   }
 
