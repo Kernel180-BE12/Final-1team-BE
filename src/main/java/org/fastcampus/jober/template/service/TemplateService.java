@@ -8,9 +8,11 @@ import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
+import org.fastcampus.jober.template.dto.response.TemplateListResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.util.ExternalApiUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -109,5 +111,9 @@ public class TemplateService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "템플릿을 찾을 수 없습니다."));
 
         return template.updateIsSaved(isSaved);
+    }
+
+    public List<TemplateListResponseDto> getTemlpateList(CustomUserDetails principal) {
+        return templateRepository.findTemplateByUserId(principal.getUserId());
     }
 }
