@@ -36,8 +36,8 @@ public class SpaceController {
   @ApiResponse(responseCode = "201", description = "스페이스 생성 성공")
   @PostMapping
   public ResponseEntity<Void> createSpace(
-      @Valid @RequestBody SpaceCreateRequestDto dto,
-      @AuthenticationPrincipal CustomUserDetails principal) {
+          @Valid @RequestBody SpaceCreateRequestDto dto,
+          @AuthenticationPrincipal CustomUserDetails principal) {
     spaceService.createSpace(dto, principal);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
