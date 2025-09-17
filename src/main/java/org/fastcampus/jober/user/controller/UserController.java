@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -198,4 +199,39 @@ public class UserController {
     userService.changePassword(passwordResetRequestDto);
     return ResponseEntity.ok().build();
   }
+
+    /**
+   * 아이디 중복 체크
+   *
+   * @param checkIdRequestDto 아이디 중복 체크 요청 데이터
+   * @return 아이디 중복 체크 결과
+   */
+  @PostMapping("/id/check")
+  @Operation(summary = "아이디 중복 체크", description = "아이디 중복 체크를 합니다.")
+  @ApiResponse(responseCode = "200", description = "중복되지 않는 아이디입니다.")
+  @ApiResponse(responseCode = "400", description = "이미 존재하는 아이디입니다.")
+  public ResponseEntity<Void> checkId(
+      @Parameter(description = "아이디 중복 체크 요청 데이터", required = true) @RequestBody
+          CheckIdRequestDto checkIdRequestDto) {
+    userService.isUsernameExists(checkIdRequestDto.getUsername());
+    return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 이메일 중복 체크
+   *
+   * @param checkEmailRequestDto 이메일 중복 체크 요청 데이터
+   * @return 이메일 중복 체크 결과
+   */
+  @PostMapping("/email/check")
+  @Operation(summary = "이메일 중복 체크", description = "이메일 중복 체크를 합니다.")
+  @ApiResponse(responseCode = "200", description = "중복되지 않는 이메일입니다.")
+  @ApiResponse(responseCode = "400", description = "이미 존재하는 이메일입니다.")
+  public ResponseEntity<Void> checkEmail(
+      @Parameter(description = "이메일 중복 체크 요청 데이터", required = true) @RequestBody
+          CheckEmailRequestDto checkEmailRequestDto) {
+    userService.isEmailExists(checkEmailRequestDto.getEmail());
+    return ResponseEntity.ok().build();
+  }
+
 }
