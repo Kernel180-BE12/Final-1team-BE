@@ -89,11 +89,11 @@ public class UserService {
     if (req.getEmail() != null && !req.getEmail().matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
       throw new BusinessException(ErrorCode.INVALID_EMAIL);
     }
-    if (req.getEmail().equals(getUserInfo(principal).getEmail())) {
-      throw new BusinessException(ErrorCode.EMAIL_MATCH);
+    if (!req.getEmail().equals(getUserInfo(principal).getEmail())) {
+      isEmailExists(req.getEmail());
     }
 
-    isEmailExists(req.getEmail());
+    
 
     Users user =
         userRepository
