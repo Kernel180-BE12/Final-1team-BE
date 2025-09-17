@@ -1,12 +1,13 @@
 package org.fastcampus.jober.template.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import org.fastcampus.jober.template.entity.Template;
 
 @Getter
@@ -15,42 +16,52 @@ import org.fastcampus.jober.template.entity.Template;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class TemplateSaveResponseDto {
 
-  @Schema(description = "스페이스 ID", example = "1")
-  private Long spaceId;
+    @Schema(description = "저장된 템플릿의 고유 ID", example = "101")
+    private Long id;
 
-  @Schema(description = "템플릿 제목", example = "템플릿 제목")
-  private String title;
+    @Schema(description = "스페이스 ID", example = "1")
+    private Long spaceId;
 
-  @Schema(description = "추출된 변수", example = "추출된 변수")
-  private String extractedVariables;
+    @Schema(description = "템플릿 제목", example = "저장된 템플릿 제목")
+    private String title;
 
-  @Schema(description = "최종 템플릿", example = "최종 템플릿")
-  private String finalTemplate;
+    @Schema(description = "템플릿 설명", example = "신규 가입 고객에게 보내는 환영 메시지입니다.")
+    private String description;
 
-  @Schema(description = "HTML 미리보기", example = "HTML 미리보기")
-  private String htmlPreview;
+    @Schema(description = "템플릿 타입", example = "환영 메시지")
+    private String type;
 
-  @Schema(description = "파라미터화된 템플릿", example = "파라미터화된 템플릿")
-  private String parameterizedTemplate;
+    // --- ▼▼▼ AI 생성 데이터와 필드명을 일치시킵니다. ▼▼▼ ---
 
-  @Schema(description = "타입", example = "타입")
-  private String type;
+    @Schema(description = "템플릿 원본 내용", example = "안녕하세요, #{고객명}님!")
+    private String template;
 
-  /**
-   * Template 엔티티를 TemplateSaveResponseDto로 변환합니다.
-   *
-   * @param template 템플릿 엔티티
-   * @return TemplateSaveResponseDto
-   */
-  public static TemplateSaveResponseDto from(Template template) {
-    return TemplateSaveResponseDto.builder()
-        .spaceId(template.getSpaceId())
-        .title(template.getTitle())
-        .extractedVariables(template.getExtractedVariables())
-        .finalTemplate(template.getFinalTemplate())
-        .htmlPreview(template.getHtmlPreview())
-        .parameterizedTemplate(template.getParameterizedTemplate())
-        .type(template.getType())
-        .build();
-  }
+    @Schema(description = "구조화된 템플릿 객체 (JSON 문자열 형태)")
+    private String structuredTemplate; // DB에는 보통 JSON 문자열로 저장됩니다.
+
+    @Schema(description = "편집 가능한 변수 객체 (JSON 문자열 형태)")
+    private String editableVariables; // DB에는 보통 JSON 문자열로 저장됩니다.
+
+    @Schema(description = "이미지 포함 여부", example = "false")
+    private Boolean hasImage;
+
+    /**
+     * Template 엔티티를 TemplateSaveResponseDto로 변환합니다.
+     *
+     * @param template 템플릿 엔티티
+     * @return TemplateSaveResponseDto
+     */
+    public static TemplateSaveResponseDto from(Template template) {
+        return TemplateSaveResponseDto.builder()
+                .id(template.getId()) // ID 필드 추가
+                .spaceId(template.getSpaceId())
+                .title(template.getTitle())
+                .description(template.getDescription())
+                .type(template.getType())
+                .template(template.getTemplate())
+                .structuredTemplate(template.getStructuredTemplate())
+                .editableVariables(template.getEditableVariables())
+                .hasImage(template.getHasImage())
+                .build();
+    }
 }
