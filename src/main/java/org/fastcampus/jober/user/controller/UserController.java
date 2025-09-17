@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -195,7 +194,7 @@ public class UserController {
   @ApiResponse(responseCode = "200", description = "비밀번호 변경 완료")
   @ApiResponse(responseCode = "401", description = "토큰 만료")
   @ApiResponse(responseCode = "404", description = "없는 회원")
-  public ResponseEntity<Boolean> changePassword(PasswordResetRequestDto passwordResetRequestDto) {
+  public ResponseEntity<Boolean> changePassword(@RequestBody PasswordResetRequestDto passwordResetRequestDto) {
     userService.changePassword(passwordResetRequestDto);
     return ResponseEntity.ok().build();
   }
