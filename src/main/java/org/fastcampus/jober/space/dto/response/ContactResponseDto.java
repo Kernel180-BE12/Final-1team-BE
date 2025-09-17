@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import org.fastcampus.jober.space.entity.SpaceContacts;
 
 import java.time.LocalDateTime;
@@ -20,9 +21,6 @@ public class ContactResponseDto {
 
   @Schema(description = "스페이스 ID", example = "1")
   private Long spaceId;
-
-  @Schema(description = "스페이스 이름", example = "테스트 회사")
-  private String spaceName;
 
   @Schema(description = "등록된 연락처 목록")
   private List<ContactInfo> contacts;
@@ -43,26 +41,31 @@ public class ContactResponseDto {
     @Schema(description = "이름", example = "김철수")
     private String name;
 
+    @Schema(description = "태그", example = "프리랜서")
+    private String tag;
+
     @Schema(description = "휴대전화", example = "010-1234-5678")
     private String phoneNum;
 
     @Schema(description = "이메일", example = "kim@example.com")
     private String email;
   }
-  
-  /**
-   * SpaceContacts 엔티티 리스트로부터 ContactResponseDto 생성
-   */
+
+  /** SpaceContacts 엔티티 리스트로부터 ContactResponseDto 생성 */
   public static ContactResponseDto fromEntities(List<SpaceContacts> contacts, Long spaceId) {
-    List<ContactInfo> contactInfos = contacts.stream()
-        .map(contact -> ContactInfo.builder()
-            .id(contact.getId())
-            .name(contact.getName())
-            .phoneNum(contact.getPhoneNum())
-            .email(contact.getEmail())
-            .build())
-        .collect(Collectors.toList());
-    
+    List<ContactInfo> contactInfos =
+        contacts.stream()
+            .map(
+                contact ->
+                    ContactInfo.builder()
+                        .id(contact.getId())
+                        .name(contact.getName())
+                        .tag(contact.getTag())
+                        .phoneNum(contact.getPhoneNum())
+                        .email(contact.getEmail())
+                        .build())
+            .collect(Collectors.toList());
+
     return ContactResponseDto.builder()
         .spaceId(spaceId)
         .contacts(contactInfos)

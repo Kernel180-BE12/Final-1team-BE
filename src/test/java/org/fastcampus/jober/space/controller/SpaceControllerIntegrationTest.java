@@ -1,36 +1,39 @@
-//package org.fastcampus.jober.space.controller;
+// package org.fastcampus.jober.space.controller;
 //
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
-//import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
-//import org.fastcampus.jober.space.entity.Space;
-//import org.fastcampus.jober.space.repository.SpaceRepository;
-//import org.fastcampus.jober.user.entity.Users;
-//import org.fastcampus.jober.user.repository.UserRepository;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.MediaType;
-//import org.springframework.security.test.context.support.WithMockUser;
-//import org.springframework.test.context.TestPropertySource;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-//import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.web.context.WebApplicationContext;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
+// import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
+// import org.fastcampus.jober.space.entity.Space;
+// import org.fastcampus.jober.space.repository.SpaceRepository;
+// import org.fastcampus.jober.user.entity.Users;
+// import org.fastcampus.jober.user.repository.UserRepository;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.http.MediaType;
+// import org.springframework.security.test.context.support.WithMockUser;
+// import org.springframework.test.context.TestPropertySource;
+// import org.springframework.test.web.servlet.MockMvc;
+// import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+// import org.springframework.transaction.annotation.Transactional;
+// import org.springframework.web.context.WebApplicationContext;
 //
-//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
-//import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-//import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+// import static
+// org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+// import static
+// org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+// import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 //
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@AutoConfigureWebMvc
-//@TestPropertySource(properties = {
-//        "spring.datasource.url=jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
+// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+// @AutoConfigureWebMvc
+// @TestPropertySource(properties = {
+//
+// "spring.datasource.url=jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
 //        "spring.datasource.username=sa",
 //        "spring.datasource.password=",
 //        "spring.datasource.driver-class-name=org.h2.Driver",
@@ -41,9 +44,9 @@
 //        "spring.h2.console.enabled=true",
 //        "logging.level.org.springframework.security=DEBUG",
 //        "logging.level.org.springframework.web=DEBUG"
-//})
-//@Transactional
-//class SpaceControllerIntegrationTest {
+// })
+// @Transactional
+// class SpaceControllerIntegrationTest {
 //
 //    @Autowired
 //    private WebApplicationContext context;
@@ -83,7 +86,8 @@
 //        return userRepository.save(user);
 //    }
 //
-//    private Space createTestSpace(String spaceName, String adminName, String adminNum, Users user) {
+//    private Space createTestSpace(String spaceName, String adminName, String adminNum, Users user)
+// {
 //        // Space @Builder 사용
 //        Space space = Space.builder()
 //                .spaceName(spaceName)
@@ -383,4 +387,4 @@
 //                .andDo(print())
 //                .andExpect(status().isForbidden()); // 권한 부족으로 403 예상
 //    }
-//}
+// }

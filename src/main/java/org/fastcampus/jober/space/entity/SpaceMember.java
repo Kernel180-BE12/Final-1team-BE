@@ -1,34 +1,36 @@
 package org.fastcampus.jober.space.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.entity.Users;
 
-
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class SpaceMember extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Authority authority;
+  @Enumerated(EnumType.STRING)
+  private Authority authority;
 
-    private InviteStatus inviteStatus;
+  private InviteStatus inviteStatus;
 
-    private String tag;
+  private String tag;
 
-    // 관리자, 참여문서 관리자, 권한해제 3개인데 이걸 구현해야 할까........
-//    private String documentPermission;
+  @ManyToOne
+  @JoinColumn(name = "spaceId")
+  private Space space;
 
-    @ManyToOne
-    @JoinColumn(name = "spaceId")
-    private Space space;
-
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private Users user;
-
-
+  @ManyToOne
+  @JoinColumn(name = "userId")
+  private Users user;
 }

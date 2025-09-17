@@ -1,32 +1,32 @@
-//package org.fastcampus.jober.space;
+// package org.fastcampus.jober.space;
 //
-//import org.fastcampus.jober.error.BusinessException;
-//import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
-//import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
-//import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
-//import org.fastcampus.jober.space.entity.Space;
-//import org.fastcampus.jober.space.mapper.SpaceMapper;
-//import org.fastcampus.jober.space.repository.SpaceMemberRepository;
-//import org.fastcampus.jober.space.repository.SpaceRepository;
-//import org.fastcampus.jober.space.service.SpaceService;
-//import org.fastcampus.jober.user.entity.Users;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.ArgumentCaptor;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.MockitoAnnotations;
-//import org.springframework.security.core.Authentication;
+// import org.fastcampus.jober.error.BusinessException;
+// import org.fastcampus.jober.space.dto.request.SpaceCreateRequestDto;
+// import org.fastcampus.jober.space.dto.request.SpaceUpdateRequestDto;
+// import org.fastcampus.jober.space.dto.response.SpaceResponseDto;
+// import org.fastcampus.jober.space.entity.Space;
+// import org.fastcampus.jober.space.mapper.SpaceMapper;
+// import org.fastcampus.jober.space.repository.SpaceMemberRepository;
+// import org.fastcampus.jober.space.repository.SpaceRepository;
+// import org.fastcampus.jober.space.service.SpaceService;
+// import org.fastcampus.jober.user.entity.Users;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.mockito.ArgumentCaptor;
+// import org.mockito.InjectMocks;
+// import org.mockito.Mock;
+// import org.mockito.MockitoAnnotations;
+// import org.springframework.security.core.Authentication;
 //
-//import java.util.Collections;
-//import java.util.Optional;
+// import java.util.Collections;
+// import java.util.Optional;
 //
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.*;
+// import static org.junit.jupiter.api.Assertions.*;
+// import static org.mockito.Mockito.*;
 //
  // User 엔티티 업뎃 후 테스트 예정
 
-//class SpaceServiceTest {
+// class SpaceServiceTest {
 //
 //    @Mock
 //    private SpaceRepository spaceRepository;
@@ -128,4 +128,4 @@
 //
 //        assertEquals("스페이스 수정 권한이 없습니다.", ex.getMessage());
 //    }
-//}
+// }

@@ -7,10 +7,10 @@ import jakarta.persistence.Id;
 
 @Entity
 public class SpaceTemplate {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Long spaceId;
-    private Long templateId;
+  private Long spaceId;
+  private Long templateId;
 }
