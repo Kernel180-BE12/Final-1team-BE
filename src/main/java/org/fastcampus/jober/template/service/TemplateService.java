@@ -3,6 +3,7 @@ package org.fastcampus.jober.template.service;
 import java.util.List;
 import java.util.Map;
 
+import org.fastcampus.jober.template.dto.response.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +21,6 @@ import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateDeleteRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateState;
-import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateSaveResponseDto;
-import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
