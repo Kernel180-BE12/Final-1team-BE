@@ -119,12 +119,21 @@ public class SpaceContacts extends BaseEntity {
   /** 연락처 정보 수정 */
   public void updateContactInfo(String name, String phoneNumber, String email, String tag) {
     if (name != null && !name.trim().isEmpty()) {
+      if (!name.matches("^.{2,}$")) {
+        throw new BusinessException(ErrorCode.INVALID_NAME);
+      }
       this.name = name;
     }
     if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+      if (!phoneNumber.matches("^010-[0-9]{4}-[0-9]{4}$")) {
+        throw new BusinessException(ErrorCode.INVALID_PHONE_NUMBER);
+      }
       this.phoneNum = phoneNumber;
     }
     if (email != null && !email.trim().isEmpty()) {
+      if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+        throw new BusinessException(ErrorCode.INVALID_EMAIL);
+      }
       this.email = email;
     }
     if (tag != null && !tag.trim().isEmpty()) {
