@@ -1,37 +1,36 @@
-// package org.fastcampus.jober.user;
+//package org.fastcampus.jober.user;
 //
-// import com.fasterxml.jackson.databind.ObjectMapper;
-// import org.fastcampus.jober.user.dto.request.LoginRequestDto;
-// import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
-// import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
-// import org.fastcampus.jober.user.dto.response.UserInfoResponseDto;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.DisplayName;
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-// import org.springframework.boot.test.context.SpringBootTest;
-// import org.springframework.http.MediaType;
-// import org.springframework.mock.web.MockHttpSession;
-// import org.springframework.test.context.ActiveProfiles;
-// import org.springframework.test.web.servlet.MvcResult;
-// import org.springframework.test.web.servlet.MockMvc;
-// import org.springframework.transaction.annotation.Transactional;
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import org.fastcampus.jober.user.dto.request.LoginRequestDto;
+//import org.fastcampus.jober.user.dto.request.RegisterRequestDto;
+//import org.fastcampus.jober.user.dto.request.UpdateRequestDto;
+//import org.fastcampus.jober.user.dto.response.UserInfoResponseDto;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.http.MediaType;
+//import org.springframework.mock.web.MockHttpSession;
+//import org.springframework.test.context.ActiveProfiles;
+//import org.springframework.test.web.servlet.MvcResult;
+//import org.springframework.test.web.servlet.MockMvc;
+//import org.springframework.transaction.annotation.Transactional;
 //
-// import static org.assertj.core.api.Assertions.assertThat;
-// import static
-// org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+//import static org.assertj.core.api.Assertions.assertThat;
+//import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 //
-/// **
+///**
 // * 회원정보 조회 및 수정 기능 테스트
 // */
-// @SpringBootTest
-// @AutoConfigureMockMvc
-// @Transactional
-// @ActiveProfiles("test")
-// class UserControllerInfoTest {
+//@SpringBootTest
+//@AutoConfigureMockMvc
+//@Transactional
+//@ActiveProfiles("test")
+//class UserControllerInfoTest {
 //
 //    @Autowired MockMvc mockMvc;
 //    @Autowired ObjectMapper objectMapper;
@@ -86,8 +85,7 @@
 //
 //        // 응답 데이터 검증
 //        String responseBody = result.getResponse().getContentAsString();
-//        UserInfoResponseDto response = objectMapper.readValue(responseBody,
-// UserInfoResponseDto.class);
+//        UserInfoResponseDto response = objectMapper.readValue(responseBody, UserInfoResponseDto.class);
 //
 //        assertThat(response.getUsername()).isEqualTo("testuser");
 //        assertThat(response.getName()).isEqualTo("테스트사용자");
@@ -245,4 +243,4 @@
 //        )
 //        .andExpect(status().isInternalServerError());
 //    }
-// }
+//}
