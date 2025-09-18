@@ -45,9 +45,6 @@ public class Template extends BaseEntity {
 
     private Integer totalAttempts;
 
-    @Builder.Default
-    private Boolean isSaved = false;
-
     private String type;
 
     // --- ▼▼▼ 여기가 수정/추가된 필드입니다 ▼▼▼ ---
