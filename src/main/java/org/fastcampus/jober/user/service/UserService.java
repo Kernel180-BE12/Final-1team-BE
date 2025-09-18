@@ -33,7 +33,7 @@ public class UserService {
   private String frontUrl;
 
   public Long getUserId(String username) throws UsernameNotFoundException {
-    return userRepository.findByUsername(username).orElseThrow().getUserId();
+    return userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow().getUserId();
   }
 
   @Transactional
@@ -68,8 +68,8 @@ public class UserService {
   public UserInfoResponseDto getUserInfo(CustomUserDetails principal) {
     Users user =
         userRepository
-            .findById(principal.getUserId())
-            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+            .findByUserIdAndIsDeletedFalse(principal.getUserId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
     return UserInfoResponseDto.fromEntity(user);
   }
 
@@ -96,8 +96,8 @@ public class UserService {
 
     Users user =
         userRepository
-            .findById(principal.getUserId())
-            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+            .findByUserIdAndIsDeletedFalse(principal.getUserId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
     // DTO를 통해 엔티티 업데이트 (@Transactional로 자동 저장)
 
@@ -111,7 +111,7 @@ public class UserService {
    * @return 중복 여부
    */
   public void isUsernameExists(String username) {
-    if (userRepository.existsByUsername(username)) {
+    if (userRepository.existsByUsernameAndIsDeletedFalse(username)) {
       throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 아이디입니다.");
     }
   }
@@ -123,7 +123,7 @@ public class UserService {
    * @return 중복 여부
    */
   public void isEmailExists(String email) {
-    if (userRepository.existsByEmail(email)) {
+    if (userRepository.existsByEmailAndIsDeletedFalse(email)) {
       throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 존재하는 이메일입니다.");
     }
   }
@@ -165,7 +165,7 @@ public class UserService {
 
     Users u =
         userRepository
-            .findByEmail(token.getEmail())
+            .findByEmailAndIsDeletedFalse(token.getEmail())
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다"));
 
     token.updateIsUsedAt(Instant.now());
@@ -181,7 +181,7 @@ public class UserService {
   public void delete(CustomUserDetails principal) {
     Users u =
         userRepository
-            .findById(principal.getUserId())
+            .findByUserIdAndIsDeletedFalse(principal.getUserId())
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다"));
     u.deleteUser();
   }
