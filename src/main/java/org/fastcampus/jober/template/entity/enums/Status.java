@@ -7,5 +7,5 @@ public enum Status {
   PENDING_MOCK,
   APPROVED_MOCK,
   REJECTED_MOCK,
-  ARCHIVED
+  ARCHIVED 
 }

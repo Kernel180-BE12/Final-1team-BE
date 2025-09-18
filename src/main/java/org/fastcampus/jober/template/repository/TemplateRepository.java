@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
 /** 템플릿 데이터 접근을 위한 Repository */
 @Repository
 public interface TemplateRepository extends JpaRepository<Template, Long> {
@@ -43,7 +42,7 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
     );
 
     @Query(value = """
-                SELECT t.title, t.parameterized_template
+                SELECT t.title, t.template
                 FROM template t
                 JOIN space s ON t.space_id = s.id
                 JOIN space_member sm ON sm.space_id = s.id
