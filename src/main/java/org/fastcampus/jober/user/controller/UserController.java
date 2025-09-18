@@ -234,4 +234,13 @@ public class UserController {
     return ResponseEntity.ok().build();
   }
 
+  @DeleteMapping("/delete")
+  @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 합니다.")
+  @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공")
+  @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+  public ResponseEntity<Void> delete(@AuthenticationPrincipal CustomUserDetails principal) {
+    userService.delete(principal);
+    return ResponseEntity.ok().build();
+  }
+
 }

@@ -27,15 +27,18 @@ public class Users extends BaseEntity {
 
   private String email;
 
+  private Boolean isDeleted;
+
   // ✅ 기본 생성자 (JPA 필수)
   protected Users() {}
 
   // ✅ private 생성자
-  private Users(String username, String password, String name, String email) {
+  private Users(String username, String password, String name, String email, Boolean isDeleted) {
     this.username = username;
     this.password = password;
     this.name = name;
     this.email = email;
+    this.isDeleted = isDeleted;
   }
 
   private Users(Long userId) {
@@ -44,7 +47,7 @@ public class Users extends BaseEntity {
 
   // ✅ 상황별 팩토리 메서드
   public static Users forSignup(String username, String password, String name, String email) {
-    return new Users(username, password, name, email);
+    return new Users(username, password, name, email, false);
   }
 
   /**
@@ -84,5 +87,9 @@ public class Users extends BaseEntity {
 
   public boolean isSameUser(final Long userId) {
     return this.userId.equals(userId);
+  }
+
+  public void deleteUser() {
+    this.isDeleted = true;
   }
 }

@@ -171,4 +171,18 @@ public class UserService {
     token.updateIsUsedAt(Instant.now());
     u.updatePassword(passwordResetRequestDto.newPassword());
   }
+
+  /**
+   * 사용자 탈퇴
+   *
+   * @param principal 현재 로그인된 사용자 정보
+   */
+  @Transactional
+  public void delete(CustomUserDetails principal) {
+    Users u =
+        userRepository
+            .findById(principal.getUserId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 사용자입니다"));
+    u.deleteUser();
+  }
 }
