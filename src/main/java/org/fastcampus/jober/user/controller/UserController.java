@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
+import org.fastcampus.jober.common.service.LogoutService;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.dto.request.*;
 import org.fastcampus.jober.user.dto.response.LoginResponseDto;
@@ -51,6 +52,7 @@ public class UserController {
   private final AuthenticationManager authenticationManager;
   private final SessionRegistry sessionRegistry;
   private final ClientIpResolver ipResolver;
+  private final LogoutService logoutService;
 
   @PostMapping("/register")
   @Operation(
@@ -238,8 +240,14 @@ public class UserController {
   @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 합니다.")
   @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공")
   @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
-  public ResponseEntity<Void> delete(@AuthenticationPrincipal CustomUserDetails principal) {
+  public ResponseEntity<Void> delete(@AuthenticationPrincipal CustomUserDetails principal, 
+                                   HttpServletRequest request, HttpServletResponse response) {
+    // 1. 회원 탈퇴 처리
     userService.delete(principal);
+    
+    // 2. 중앙화된 로그아웃 서비스 사용 (SecurityConfig와 동일한 로직)
+    logoutService.performLogout(request, response);
+    
     return ResponseEntity.ok().build();
   }
 

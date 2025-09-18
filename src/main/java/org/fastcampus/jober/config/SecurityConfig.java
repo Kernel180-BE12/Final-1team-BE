@@ -31,6 +31,7 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.common.SecurityProps;
+import org.fastcampus.jober.common.service.LogoutService;
 import org.fastcampus.jober.error.RestInvalidSessionStrategy;
 import org.fastcampus.jober.error.RestSessionExpiredStrategy;
 import org.fastcampus.jober.filter.CsrfCookieFilter;
@@ -40,6 +41,7 @@ import org.fastcampus.jober.filter.CsrfCookieFilter;
 public class SecurityConfig {
   private final UserDetailsService userDetailsService;
   private final SecurityProps props;
+  private final LogoutService logoutService;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -136,18 +138,11 @@ public class SecurityConfig {
         .logout(
             l ->
                 l.logoutUrl("/user/logout") // POST
-                    // 1) 세션레지스트리에서 제거
+                    // LogoutService를 사용하여 중앙화된 로그아웃 처리
                     .addLogoutHandler(
                         (request, response, auth) -> {
-                          var session = request.getSession(false);
-                          if (session != null) {
-                            sessionRegistry().removeSessionInformation(session.getId());
-                          }
+                          logoutService.performLogout(request, response);
                         })
-                    // 2) 표준 처리
-                    .deleteCookies("JSESSIONID")
-                    .clearAuthentication(true)
-                    .invalidateHttpSession(true)
                     // 3) JSON 응답
                     .logoutSuccessHandler(
                         (req, res, auth) -> {
