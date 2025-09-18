@@ -41,7 +41,6 @@ import org.fastcampus.jober.filter.CsrfCookieFilter;
 public class SecurityConfig {
   private final UserDetailsService userDetailsService;
   private final SecurityProps props;
-  private final LogoutService logoutService;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -53,6 +52,7 @@ public class SecurityConfig {
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
   }
+
 
   @Bean
   public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
@@ -108,7 +108,8 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       RestInvalidSessionStrategy invalidSessionStrategy,
-      RestSessionExpiredStrategy expiredStrategy)
+      RestSessionExpiredStrategy expiredStrategy,
+      LogoutService logoutService)
       throws Exception {
     //        CsrfTokenRequestAttributeHandler requestHandler = new
     // CsrfTokenRequestAttributeHandler();
