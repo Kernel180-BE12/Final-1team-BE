@@ -3,6 +3,9 @@ package org.fastcampus.jober.space.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.fastcampus.jober.error.BusinessException;
+import org.fastcampus.jober.error.ErrorCode;
+import org.fastcampus.jober.space.entity.Authority;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
@@ -42,23 +45,35 @@ public class SpaceMemberService {
     Space space = spaceRepository.findByIdOrThrow(spaceId);
 
     // 관리자인지 검증
+    space.validateAdminUser(principal.getUserId());
 
     // 이메일 발송(토근 포함)
 
     // 사용자 조회
     for (SpaceMemberAddRequestDto dto : dtos) {
-      Optional<Users> users = userRepository.findByEmail(dto.getEmail());
+      Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
 
-      // 회원 -> 중복초대 체크
-      if (users != null && users.isPresent()) {
-        // 중복이면 에러 던지기
-        userRepository.findByEmailAndSpaceId(dto.getEmail(), spaceId)
-                .orElse
-       // 중복 아니면 멤버 테이블에 추가
-      } dto.add
+      if (userOpt.isPresent()) {
+        Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
+        // 회원 -> 중복초대 체크
+        if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
+          throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "이미 멤버인 회원입니다");
+        }
+        // 중복 아니면 멤버 테이블에 추가
+        /** 이때 바로 태그를 추가할건지? **/
+        SpaceMember member = SpaceMember.builder()
+                .space(space)
+                .authority(Authority.MEMBER)
+                .email(dto.getEmail())
+                .user(user)
+                .build();
+        spaceMemberRepository.save(member);
+      }
 
-      // 비회원 -> 로그인 화면 이동 -> 멤버 테이블에 추가
-    }
+        // 비회원 -> 로그인 화면 이동 -> 멤버 테이블에 추가
+
+      }
+
   }
 
   public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
