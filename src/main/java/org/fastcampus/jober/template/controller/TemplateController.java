@@ -1,9 +1,15 @@
 package org.fastcampus.jober.template.controller;
 
-/** 템플릿 관련 HTTP 요청을 처리하는 컨트롤러 */
+
+import lombok.extern.slf4j.Slf4j;
+import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
+import org.fastcampus.jober.template.dto.response.TemplateListResponseDto;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateDeleteRequestDto;
 import org.fastcampus.jober.template.dto.request.TemplateSaveRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateCreateResponseDto;
@@ -125,27 +129,6 @@ public class TemplateController {
     return ResponseEntity.ok(template);
   }
 
-  // @PatchMapping("/{templateId}/space/{spaceId}")
-  // @Operation(
-  //         summary = "템플릿 저장 상태 변경",
-  //         description = "특정 스페이스의 템플릿 저장 여부(`isSaved`)를 업데이트합니다. " +
-  //                 "예를 들어 `isSaved=true`로 호출하면 해당 템플릿은 저장된 상태로 변경됩니다."
-  // )
-  // @ApiResponse(responseCode = "200", description = "성공적으로 저장 상태가 변경됨")
-  // @ApiResponse(responseCode = "404", description = "템플릿을 찾을 수 없음")
-  // public ResponseEntity<Boolean> saveTemplate(
-  //         @Parameter(description = "템플릿 ID", required = true, example = "1")
-  //         @PathVariable Long templateId,
-
-  //         @Parameter(description = "스페이스 ID", required = true, example = "10")
-  //         @PathVariable Long spaceId,
-
-  //         @Parameter(description = "저장 여부 (true=저장, false=삭제)", required = true, example =
-  // "true")
-  //         @RequestParam Boolean isSaved) {
-  //     Boolean result = templateService.saveTemplate(templateId, spaceId, isSaved);
-  //     return ResponseEntity.ok(result);
-  // }
 
   /**
    * 템플릿 저장 API
@@ -177,4 +160,22 @@ public class TemplateController {
     templateService.deleteTemplate(request);
     return ResponseEntity.noContent().build();
   }
+    @Operation(
+            summary = "템플릿 목록 조회",
+            description = "현재 로그인한 사용자가 접근 가능한 템플릿의 "
+                    + "제목과 변수화된 템플릿(parameterizedTemplate) 목록을 반환합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "템플릿 목록 조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (로그인 필요)"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping("/list")
+    public ResponseEntity<List<TemplateListResponseDto>> getTemplateList(
+            @Parameter(hidden = true) // Swagger UI에는 안 보이도록
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        List<TemplateListResponseDto> templates = templateService.getTemlpateList(principal);
+        return ResponseEntity.ok(templates);
+    }
 }

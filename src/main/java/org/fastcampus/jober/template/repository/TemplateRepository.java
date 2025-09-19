@@ -3,15 +3,15 @@ package org.fastcampus.jober.template.repository;
 import java.util.List;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.fastcampus.jober.template.dto.response.TemplateListResponseDto;
+import org.fastcampus.jober.template.entity.Template;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-
-import org.fastcampus.jober.template.entity.Template;
 
 /** 템플릿 데이터 접근을 위한 Repository */
 @Repository
@@ -30,27 +30,25 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
 
   Optional<Template> findByIdAndSpaceId(Long id, Long spaceId);
 
-  /**
-   * 특정 spaceId와 templateId의 템플릿을 조회
-   *
-   * @param spaceId 스페이스 ID
-   * @param templateId 템플릿 ID
-   * @return 템플릿 엔티티
-   */
-  @Query("SELECT t FROM Template t WHERE t.spaceId = :spaceId AND t.id = :templateId")
-  Template findBySpaceIdAndTemplateId(
-      @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
-      @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId);
+    /**
+     * 특정 spaceId와 templateId의 템플릿을 조회 (completedAt(생성일시) 제외 모든 필드 조회)
+     * @param spaceId 스페이스 ID
+     * @param templateId 템플릿 ID
+     * @return 템플릿 엔티티
+     */
+    @Query("SELECT t FROM Template t WHERE t.spaceId = :spaceId AND t.id = :templateId")
+    Template findBySpaceIdAndTemplateIdWithAllFields(
+        @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
+        @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId
+    );
 
-  /**
-   * 특정 spaceId와 templateId의 템플릿을 조회 (completedAt(생성일시) 제외 모든 필드 조회)
-   *
-   * @param spaceId 스페이스 ID
-   * @param templateId 템플릿 ID
-   * @return 템플릿 엔티티
-   */
-  @Query("SELECT t FROM Template t WHERE t.spaceId = :spaceId AND t.id = :templateId")
-  Template findBySpaceIdAndTemplateIdWithAllFields(
-      @Parameter(description = "스페이스 ID", required = true) @Param("spaceId") Long spaceId,
-      @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId);
+    @Query(value = """
+                SELECT t.title, t.template
+                FROM template t
+                JOIN space s ON t.space_id = s.id
+                JOIN space_member sm ON sm.space_id = s.id
+                WHERE sm.user_id = :userId
+                AND t.is_deleted = false
+            """, nativeQuery = true)
+    List<TemplateListResponseDto> findTemplateByUserId(@Param("userId") Long userId);
 }

@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.error.BusinessException;
+import org.fastcampus.jober.error.ErrorCode;
 
 @Entity
 @Getter
@@ -95,25 +97,43 @@ public class SpaceContacts extends BaseEntity {
   /** 연락처 정보 유효성 검증 */
   public void validateContactInfo() {
     if (name == null || name.trim().isEmpty()) {
-      throw new IllegalArgumentException("이름은 필수입니다.");
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "이름은 필수입니다.");
     }
     if (phoneNum == null || phoneNum.trim().isEmpty()) {
-      throw new IllegalArgumentException("전화번호는 필수입니다.");
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "전화번호는 필수입니다.");
     }
     if (email == null || email.trim().isEmpty()) {
-      throw new IllegalArgumentException("이메일은 필수입니다.");
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "이메일은 필수입니다.");
+    }
+    if (!name.matches("^.{2,}$")) {
+      throw new BusinessException(ErrorCode.INVALID_NAME);
+    }
+    if (!phoneNum.matches("^010-[0-9]{4}-[0-9]{4}$")) {
+      throw new BusinessException(ErrorCode.INVALID_PHONE_NUMBER);
+    }
+    if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+      throw new BusinessException(ErrorCode.INVALID_EMAIL);
     }
   }
 
   /** 연락처 정보 수정 */
   public void updateContactInfo(String name, String phoneNumber, String email, String tag) {
     if (name != null && !name.trim().isEmpty()) {
+      if (!name.matches("^.{2,}$")) {
+        throw new BusinessException(ErrorCode.INVALID_NAME);
+      }
       this.name = name;
     }
     if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+      if (!phoneNumber.matches("^010-[0-9]{4}-[0-9]{4}$")) {
+        throw new BusinessException(ErrorCode.INVALID_PHONE_NUMBER);
+      }
       this.phoneNum = phoneNumber;
     }
     if (email != null && !email.trim().isEmpty()) {
+      if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+        throw new BusinessException(ErrorCode.INVALID_EMAIL);
+      }
       this.email = email;
     }
     if (tag != null && !tag.trim().isEmpty()) {
@@ -129,7 +149,7 @@ public class SpaceContacts extends BaseEntity {
    */
   public void validateDeletePermission(Long spaceId) {
     if (!this.spaceId.equals(spaceId)) {
-      throw new IllegalArgumentException("해당 스페이스에서 연락처를 삭제할 권한이 없습니다.");
+      throw new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스에서 연락처를 삭제할 권한이 없습니다.");
     }
   }
 

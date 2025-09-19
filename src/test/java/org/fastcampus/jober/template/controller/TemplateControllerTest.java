@@ -34,7 +34,7 @@
 //import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 //import org.fastcampus.jober.template.service.TemplateService;
 //
-///** TemplateController의 MockMvc 테스트 클래스 모든 API 엔드포인트의 정상 작동을 검증합니다. */
+///** TemplateController의 MockMvc 테스트 클래스 현재 사용 가능한 API 엔드포인트의 정상 작동을 검증합니다. */
 //@WebMvcTest(TemplateController.class)
 //@DisplayName("TemplateController MockMvc 테스트")
 //class TemplateControllerTest {
@@ -91,10 +91,7 @@
 //    createRequestDto.setMessage("테스트 메시지");
 //    createRequestDto.setState(null); // state는 null로 설정
 //
-//    // 템플릿 저장 요청 DTO 설정
-//    // saveRequestDto = new TemplateSaveRequestDto();
-//    // TemplateSaveRequestDto는 @Getter만 있으므로 직접 필드 설정 불가
-//    // 대신 JSON으로 직렬화해서 테스트
+//    // 템플릿 저장 요청 DTO는 record 타입이므로 JSON으로 직접 생성하여 테스트
 //  }
 //
 //  @Test
@@ -208,8 +205,8 @@
 //
 //  @Test
 //  @WithMockUser
-//  @DisplayName("POST /template/create-template - AI 템플릿 생성 실패 (잘못된 요청)")
-//  void createTemplate_BadRequest() throws Exception {
+//  @DisplayName("POST /template/create-template - AI 템플릿 생성 실패 (빈 메시지)")
+//  void createTemplate_EmptyMessage() throws Exception {
 //    // Given
 //    TemplateCreateRequestDto invalidRequest = new TemplateCreateRequestDto();
 //    invalidRequest.setMessage(""); // 빈 메시지
@@ -266,8 +263,8 @@
 //
 //  @Test
 //  @WithMockUser
-//  @DisplayName("POST /template/save - 템플릿 저장 실패 (잘못된 요청)")
-//  void saveTemplate_BadRequest() throws Exception {
+//  @DisplayName("POST /template/save - 템플릿 저장 실패 (빈 요청)")
+//  void saveTemplate_EmptyRequest() throws Exception {
 //    // Given
 //    // 빈 JSON 요청
 //    String invalidRequestJson = "{}";
@@ -418,11 +415,11 @@
 //    // 500으로 처리
 //  }
 //
-//  /** 템플릿 삭제 실패 테스트 (잘못된 요청) 필수 필드가 누락된 요청으로 삭제를 시도할 때 에러가 발생하는지 검증 */
+//  /** 템플릿 삭제 실패 테스트 (필수 필드 누락) 필수 필드가 누락된 요청으로 삭제를 시도할 때 에러가 발생하는지 검증 */
 //  @Test
 //  @WithMockUser
-//  @DisplayName("DELETE /template/delete - 템플릿 삭제 실패 (잘못된 요청)")
-//  void deleteTemplate_BadRequest() throws Exception {
+//  @DisplayName("DELETE /template/delete - 템플릿 삭제 실패 (필수 필드 누락)")
+//  void deleteTemplate_MissingFields() throws Exception {
 //    // Given
 //    String invalidRequestJson =
 //        """
