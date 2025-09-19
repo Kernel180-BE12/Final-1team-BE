@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +21,11 @@ import org.fastcampus.jober.space.service.SpaceMemberService;
 @RequiredArgsConstructor
 public class SpaceMemberController {
   private final SpaceMemberService spaceMemberService;
-//
+
 //      @PostMapping("/{spaceId}/add")
 //      public ResponseEntity<Void> addSpaceMember(
-//              @PathVariable Long spaceId, @RequestBody List<SpaceMemberAddRequestDto> dtos) {
-//         spaceMemberService.addSpaceMember(spaceId, dtos);
+//              @PathVariable Long spaceId, @RequestBody List<SpaceMemberAddRequestDto> dtos, CustomUserDetails principal) {
+//         spaceMemberService.addSpaceMember(spaceId, dtos, principal);
 //         return ResponseEntity.status(HttpStatus.CREATED).build();
 //      }
 
