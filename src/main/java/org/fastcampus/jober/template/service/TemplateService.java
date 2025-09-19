@@ -246,7 +246,7 @@ public class TemplateService {
         template.softDelete();
     }
 
-    public List<TemplateListResponseDto> getTemlpateList(CustomUserDetails principal) {
-        return templateRepository.findTemplateByUserId(principal.getUserId());
+    public List<TemplateListResponseDto> getTemplateList(CustomUserDetails principal, Long spaceId) {
+        return templateRepository.findAllBySpaceIdAndUserId(principal.getUserId(), spaceId);
     }
 }
