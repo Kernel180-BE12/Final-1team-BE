@@ -1,6 +1,5 @@
 package org.fastcampus.jober.space.service;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +10,7 @@ import org.fastcampus.jober.space.entity.*;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.entity.Users;
+import org.fastcampus.jober.user.repository.InviteStatusRepository;
 import org.fastcampus.jober.user.repository.UserRepository;
 import org.fastcampus.jober.util.CustomMailSender;
 import org.springframework.stereotype.Service;
@@ -30,6 +30,7 @@ public class SpaceMemberService {
   private final SpaceRepository spaceRepository;
   private final UserRepository userRepository;
   private final CustomMailSender customMailSender;
+  private final InviteStatusRepository inviteStatusRepository;
 
 
   /**
@@ -40,50 +41,54 @@ public class SpaceMemberService {
     3-1) 가입한 회원 → 수락버튼 클릭 -> 스페이스 멤버에 추가
     3-2) 비회원 -> 회원가입 링크 전송 -> 가입 시 스페이스 멤버에 추가
  */
-//  public void addSpaceMember(Long spaceId, List<SpaceMemberAddRequestDto> dtos, CustomUserDetails principal) {
-//    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
-//
-//    // 관리자인지 검증
-//    existingSpace.validateAdminUser(principal.getUserId());
-//
-//    // 사용자 조회
-//    for (SpaceMemberAddRequestDto dto : dtos) {
-//      Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
-//
-//      if (userOpt.isPresent()) {
-//        Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
-//        // 회원 -> 중복초대 체크
-//        if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
-//          throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "이미 멤버인 회원입니다");
-//        }
-//        InviteStatus inviteMember = InviteStatus.builder()
-//                .userEmail(dto.getEmail())
-//                .status(InviteStatusType.PENDING)
-//                .build();
-//
-//        // 멤버 테이블에 추가 -> 이메일 수락 후로 옮기기!
+  public void inviteSpaceMember(Long spaceId, List<SpaceMemberAddRequestDto> dtos, CustomUserDetails principal) throws MessagingException {
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+
+    // 관리자인지 검증
+    existingSpace.validateAdminUser(principal.getUserId());
+
+    // 사용자 조회
+    for (SpaceMemberAddRequestDto dto : dtos) {
+      Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
+
+      if (userOpt.isPresent()) {
+        Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
+        // 회원 -> 중복초대 체크
+        if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
+          throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "이미 멤버인 회원입니다");
+        }
+        InviteStatus inviteMember = InviteStatus.builder()
+                .userEmail(dto.getEmail())
+                .status(InviteStatusType.PENDING)
+                .build();
+        inviteStatusRepository.save(inviteMember);
+
+        /**멤버 테이블에 추가 -> 이메일 수락 후로 옮기기! */
 //        SpaceMember member = SpaceMember.builder()
 //                .space(existingSpace)
 //                .authority(dto.getAuthority())
-//                .email(dto.getEmail())
 //                .user(user)
 //                .tag(dto.getTag())
 //                .build();
 //        spaceMemberRepository.save(member);
-//      }
-//      // 이메일 발송(토근 포함)
-//
-//        // 비회원 -> 로그인 화면 이동 -> 멤버 테이블에 추가
-//
-//      }
-//
-//  }
-//
-//  public void sendInviteEmail(Space){
-//    customMailSender.sendMail(
-//
-//    );
-//  }
+
+        // 이메일 발송(토근 추후 추가 예정)
+        sendInviteEmailToUser(spaceId, dto);
+        }
+      }
+  }
+
+  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
+          throws MessagingException {
+    String url = "https://www.jober-1team.com/spaces/" + spaceId;
+    customMailSender.sendMail(
+            dto.getEmail(),
+            url,
+            "[Jober] 스페이스 멤버 초대",
+            "mail/invite",
+            "초대 수락 링크"
+    );
+  }
 
 
   public List<SpaceMemberResponseDto>getSpaceMembers(Long spaceId) {
