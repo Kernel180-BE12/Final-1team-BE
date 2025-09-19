@@ -173,9 +173,10 @@ public class TemplateController {
     @GetMapping("/list")
     public ResponseEntity<List<TemplateListResponseDto>> getTemplateList(
             @Parameter(hidden = true) // Swagger UI에는 안 보이도록
-            @AuthenticationPrincipal CustomUserDetails principal
+            @AuthenticationPrincipal CustomUserDetails principal,
+            Long spaceId
     ) {
-        List<TemplateListResponseDto> templates = templateService.getTemlpateList(principal);
+        List<TemplateListResponseDto> templates = templateService.getTemplateList(principal,spaceId);
         return ResponseEntity.ok(templates);
     }
 }
