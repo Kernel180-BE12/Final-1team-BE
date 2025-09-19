@@ -85,8 +85,7 @@ public class SpaceMemberService {
 //    );
 //  }
 
-
-  public List<SpaceMemberResponseDto>getSpaceMembers(Long spaceId) {
+  public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toResponseDtoList(spaceMembers);
   }
