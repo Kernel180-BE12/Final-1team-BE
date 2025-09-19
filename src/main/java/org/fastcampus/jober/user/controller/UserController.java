@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -231,6 +233,31 @@ public class UserController {
       @Parameter(description = "이메일 중복 체크 요청 데이터", required = true) @RequestBody
           CheckEmailRequestDto checkEmailRequestDto) {
     userService.isEmailExists(checkEmailRequestDto.getEmail());
+    return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 회원 탈퇴
+   *
+   * @param principal 현재 로그인된 사용자 정보
+   * @param request 요청 정보
+   * @param response 응답 정보
+   * @param authentication 인증 정보
+   * @return 회원 탈퇴 성공
+   */
+  @DeleteMapping("/delete")
+  @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 합니다.")
+  @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공")
+  @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
+  public ResponseEntity<Void> delete(@AuthenticationPrincipal CustomUserDetails principal, HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    userService.delete(principal);
+
+    SecurityContextLogoutHandler sclh = new SecurityContextLogoutHandler();
+    sclh.setInvalidateHttpSession(true); // 세션 제거
+    sclh.setClearAuthentication(true);   // 인증 제거
+    sclh.logout(request, response, authentication);
+    
+    
     return ResponseEntity.ok().build();
   }
 
