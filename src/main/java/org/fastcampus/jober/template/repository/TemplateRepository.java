@@ -41,13 +41,13 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
         @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId
     );
 
-    @Query(value = """
-                SELECT t.title, t.template
-                FROM template t
-                JOIN space s ON t.space_id = s.id
-                JOIN space_member sm ON sm.space_id = s.id
-                WHERE sm.user_id = :userId
-                AND t.is_deleted = false
-            """, nativeQuery = true)
-    List<TemplateListResponseDto> findTemplateByUserId(@Param("userId") Long userId);
+  @Query("""
+SELECT t.title, t.template
+FROM Template t
+JOIN SpaceMember sm ON t.spaceId = sm.space.spaceId
+WHERE t.spaceId = :spaceId
+AND sm.user.userId = :userId
+AND t.isDeleted = false
+""")
+  List<TemplateListResponseDto> findAllBySpaceIdAndUserId(@Param("userId") Long userId, @Param("spaceId") Long spaceId);
 }
