@@ -41,6 +41,7 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
         @Parameter(description = "템플릿 ID", required = true) @Param("templateId") Long templateId
     );
 
+
   @Query("""
 SELECT t.title, t.template
 FROM Template t
