@@ -21,7 +21,6 @@ public class TemplateDetailResponseDto {
     private String status;
     private String sessionId;
     private Integer totalAttempts;
-    private Boolean isSaved;
     private Boolean isAccepted;
     private Boolean hasImage; // hasImage 필드 추가
 
@@ -49,7 +48,6 @@ public class TemplateDetailResponseDto {
                 .status(template.getStatus() != null ? template.getStatus().name() : null)
                 .sessionId(template.getSessionId())
                 .totalAttempts(template.getTotalAttempts())
-                .isSaved(template.getIsSaved())
                 .isAccepted(template.getIsAccepted())
                 .hasImage(template.getHasImage()) // hasImage 추가
                 .template(template.getTemplate()) // 필드명 변경

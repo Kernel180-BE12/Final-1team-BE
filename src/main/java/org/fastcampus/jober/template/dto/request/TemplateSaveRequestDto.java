@@ -48,7 +48,6 @@ public class TemplateSaveRequestDto {
                 .structuredTemplate(structuredTemplate) // 필드명 변경: finalTemplate -> structuredTemplate
                 .editableVariables(editableVariables) // 필드명 변경: extractedVariables -> editableVariables
                 .hasImage(hasImage) // 'hasImage' 필드 추가
-                .isSaved(true) // 저장 요청이므로 isSaved 상태를 true로 설정
                 .build();
     }
 }
