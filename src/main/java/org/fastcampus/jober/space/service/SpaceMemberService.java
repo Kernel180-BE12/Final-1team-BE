@@ -40,6 +40,7 @@ public class SpaceMemberService {
     3-1) 가입한 회원 → 수락버튼 클릭 -> 스페이스 멤버에 추가
     3-2) 비회원 -> 회원가입 링크 전송 -> 가입 시 스페이스 멤버에 추가
  */
+
 //  public void addSpaceMember(Long spaceId, List<SpaceMemberAddRequestDto> dtos, CustomUserDetails principal) {
 //    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 //
