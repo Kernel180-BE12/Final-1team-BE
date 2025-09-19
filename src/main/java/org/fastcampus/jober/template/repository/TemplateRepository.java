@@ -42,7 +42,7 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
     );
 
   @Query("""
-SELECT t.title, t.template
+SELECT t.id templateId, t.title, t.template
 FROM Template t
 JOIN SpaceMember sm ON t.spaceId = sm.space.spaceId
 WHERE t.spaceId = :spaceId
