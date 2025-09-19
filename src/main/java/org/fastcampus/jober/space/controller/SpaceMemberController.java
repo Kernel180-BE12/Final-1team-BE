@@ -20,13 +20,13 @@ import org.fastcampus.jober.space.service.SpaceMemberService;
 @RequiredArgsConstructor
 public class SpaceMemberController {
   private final SpaceMemberService spaceMemberService;
-
-      @PostMapping("/{spaceId}/add")
-      public ResponseEntity<Void> addSpaceMember(
-              @PathVariable Long spaceId, @RequestBody List<SpaceMemberAddRequestDto> dtos) {
-         spaceMemberService.addSpaceMember(spaceId, dtos);
-         return ResponseEntity.status(HttpStatus.CREATED).build();
-      }
+//
+//      @PostMapping("/{spaceId}/add")
+//      public ResponseEntity<Void> addSpaceMember(
+//              @PathVariable Long spaceId, @RequestBody List<SpaceMemberAddRequestDto> dtos) {
+//         spaceMemberService.addSpaceMember(spaceId, dtos);
+//         return ResponseEntity.status(HttpStatus.CREATED).build();
+//      }
 
   //    @DeleteMapping("/{spaceId}/members/{userId}")
   //    public ResponseEntity<Void> deleteSpaceMember(
