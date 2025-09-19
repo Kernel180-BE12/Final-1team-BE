@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TemplateListResponseDto {
+  private Long templateId;
   private String title;
   private String parameterizedTemplate;
 }
