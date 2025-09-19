@@ -41,12 +41,16 @@ public class ContactRequestDto {
     @Schema(description = "이메일", example = "kim@example.com")
     private String email;
 
+    @Schema(description = "태그", example = "프리랜서")
+    private String tag;
+
     /** ContactInfo를 SpaceContacts 엔티티로 변환 */
     public SpaceContacts toEntity(Long spaceId) {
       return SpaceContacts.builder()
           .name(this.name)
           .phoneNum(this.phoneNum)
           .email(this.email)
+          .tag(this.tag)
           .spaceId(spaceId)
           .build();
     }
