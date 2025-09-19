@@ -89,6 +89,9 @@ public class Users extends BaseEntity {
     return this.userId.equals(userId);
   }
 
+  /**
+   * 사용자 탈퇴
+   */
   public void deleteUser() {
     this.isDeleted = true;
   }

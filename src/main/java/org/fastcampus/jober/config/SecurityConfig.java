@@ -31,7 +31,6 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.common.SecurityProps;
-import org.fastcampus.jober.common.service.LogoutService;
 import org.fastcampus.jober.error.RestInvalidSessionStrategy;
 import org.fastcampus.jober.error.RestSessionExpiredStrategy;
 import org.fastcampus.jober.filter.CsrfCookieFilter;
@@ -52,7 +51,6 @@ public class SecurityConfig {
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
   }
-
 
   @Bean
   public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
@@ -108,8 +106,7 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       RestInvalidSessionStrategy invalidSessionStrategy,
-      RestSessionExpiredStrategy expiredStrategy,
-      LogoutService logoutService)
+      RestSessionExpiredStrategy expiredStrategy)
       throws Exception {
     //        CsrfTokenRequestAttributeHandler requestHandler = new
     // CsrfTokenRequestAttributeHandler();
@@ -139,11 +136,18 @@ public class SecurityConfig {
         .logout(
             l ->
                 l.logoutUrl("/user/logout") // POST
-                    // LogoutService를 사용하여 중앙화된 로그아웃 처리
+                    // 1) 세션레지스트리에서 제거
                     .addLogoutHandler(
                         (request, response, auth) -> {
-                          logoutService.performLogout(request, response);
+                          var session = request.getSession(false);
+                          if (session != null) {
+                            sessionRegistry().removeSessionInformation(session.getId());
+                          }
                         })
+                    // 2) 표준 처리
+                    .deleteCookies("JSESSIONID")
+                    .clearAuthentication(true)
+                    .invalidateHttpSession(true)
                     // 3) JSON 응답
                     .logoutSuccessHandler(
                         (req, res, auth) -> {

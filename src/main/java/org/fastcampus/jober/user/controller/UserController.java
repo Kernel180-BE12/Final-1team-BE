@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
-import org.fastcampus.jober.common.service.LogoutService;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.dto.request.*;
 import org.fastcampus.jober.user.dto.response.LoginResponseDto;
@@ -53,7 +53,6 @@ public class UserController {
   private final AuthenticationManager authenticationManager;
   private final SessionRegistry sessionRegistry;
   private final ClientIpResolver ipResolver;
-  private final LogoutService logoutService;
 
   @PostMapping("/register")
   @Operation(
@@ -237,17 +236,27 @@ public class UserController {
     return ResponseEntity.ok().build();
   }
 
+  /**
+   * 회원 탈퇴
+   *
+   * @param principal 현재 로그인된 사용자 정보
+   * @param request 요청 정보
+   * @param response 응답 정보
+   * @param authentication 인증 정보
+   * @return 회원 탈퇴 성공
+   */
   @DeleteMapping("/delete")
   @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 합니다.")
   @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공")
   @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
-  public ResponseEntity<Void> delete(@AuthenticationPrincipal CustomUserDetails principal, 
-                                   HttpServletRequest request, HttpServletResponse response) {
-    // 1. 회원 탈퇴 처리
+  public ResponseEntity<Void> delete(@AuthenticationPrincipal CustomUserDetails principal, HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
     userService.delete(principal);
+
+    SecurityContextLogoutHandler sclh = new SecurityContextLogoutHandler();
+    sclh.setInvalidateHttpSession(true); // 세션 제거
+    sclh.setClearAuthentication(true);   // 인증 제거
+    sclh.logout(request, response, authentication);
     
-    // 2. 중앙화된 로그아웃 서비스 사용 (SecurityConfig와 동일한 로직)
-    logoutService.performLogout(request, response);
     
     return ResponseEntity.ok().build();
   }
