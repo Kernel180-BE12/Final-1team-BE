@@ -1,21 +1,38 @@
 package org.fastcampus.jober.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 /** 외부 API 호출을 위한 유틸리티 클래스 HTTP 통신, 로깅, 에러 처리를 담당합니다. */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ExternalApiUtil {
 
   private final RestTemplate restTemplate;
+  private final WebClient webClient;
+
+    public ExternalApiUtil(WebClient.Builder builder, RestTemplate restTemplate, @Value("${ai.flask.base-url}") String aiFlaskBaseUrl) {
+        this.webClient = builder.baseUrl(aiFlaskBaseUrl).build();
+        this.restTemplate = restTemplate;
+    }
+
+    public Flux<String> stream(Object requestBody, String url) {
+        return webClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToFlux(String.class);
+    }
 
   /**
    * 외부 API로 JSON POST 요청을 전송합니다.

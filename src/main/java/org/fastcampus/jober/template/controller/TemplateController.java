@@ -32,6 +32,7 @@ import org.fastcampus.jober.template.dto.response.TemplateDetailResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateSaveResponseDto;
 import org.fastcampus.jober.template.dto.response.TemplateTitleResponseDto;
 import org.fastcampus.jober.template.service.TemplateService;
+import reactor.core.publisher.Flux;
 
 /** 템플릿 관련 REST API를 제공하는 컨트롤러 클래스 템플릿 생성, 조회, 수정, 삭제 등의 기능을 처리합니다. */
 @Slf4j
@@ -69,6 +70,11 @@ public class TemplateController {
     log.info("AI Flask 서버로부터 응답 수신 완료");
 
     return ResponseEntity.ok(aiResponse);
+  }
+
+  @PostMapping("/sse")
+  public Flux<String> templateSSE(@RequestBody TemplateCreateRequestDto templateCreateRequestDto) {
+      return templateService.templateSSE(templateCreateRequestDto);
   }
 
   /**

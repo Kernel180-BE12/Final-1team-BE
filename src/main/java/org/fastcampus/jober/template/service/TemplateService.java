@@ -27,6 +27,7 @@ import org.fastcampus.jober.template.dto.request.TemplateState;
 import org.fastcampus.jober.template.entity.Template;
 import org.fastcampus.jober.template.repository.TemplateRepository;
 import org.fastcampus.jober.util.ExternalApiUtil;
+import reactor.core.publisher.Flux;
 
 /** 템플릿 관련 비즈니스 로직을 처리하는 서비스 클래스 AI Flask 서버와의 통신을 통해 템플릿 생성 등의 기능을 제공합니다. */
 @Slf4j
@@ -47,6 +48,12 @@ public class TemplateService {
     /** AI Flask 서버의 채팅 API 엔드포인트 application.yml의 ai.flask.chat-endpoint 값을 주입받습니다. */
     @Value("${ai.flask.chat-endpoint}")
     private String aiFlaskChatEndpoint;
+
+    public Flux<String> templateSSE(TemplateCreateRequestDto templateCreateRequestDto) {
+        Map<String, Object> requestBody = templateCreateRequestDto.toRequestBody();
+        log.info("requestBody {}", requestBody);
+        return externalApiUtil.stream(templateCreateRequestDto.toRequestBody(), aiFlaskChatEndpoint);
+    }
 
     /**
      * 템플릿 생성 요청을 기반으로 AI가 템플릿을 생성하도록 요청합니다.
