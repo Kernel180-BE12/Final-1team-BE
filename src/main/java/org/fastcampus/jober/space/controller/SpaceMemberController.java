@@ -10,6 +10,7 @@ import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +38,7 @@ public class SpaceMemberController {
             @Parameter(description = "초대할 멤버 이메일·권한 정보 목록", required = true)
             @RequestBody List<SpaceMemberAddRequestDto> dtos,
             @Parameter(hidden = true) // 로그인 사용자 정보는 Swagger에 노출 안 함
-            CustomUserDetails principal) throws MessagingException {
+            @AuthenticationPrincipal CustomUserDetails principal) throws MessagingException {
          spaceMemberService.inviteSpaceMember(spaceId, dtos, principal);
          return ResponseEntity.ok("초대 메일 발송 완료");
       }
