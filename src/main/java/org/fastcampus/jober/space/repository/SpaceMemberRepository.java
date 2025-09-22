@@ -15,6 +15,7 @@ public interface SpaceMemberRepository extends JpaRepository<SpaceMember, Long> 
 SELECT sm
 FROM SpaceMember sm
 WHERE sm.space.spaceId = :spaceId
+AND sm.isDeleted = false
 """)
   List<SpaceMember> findBySpaceId(Long spaceId);
 
@@ -26,18 +27,4 @@ AND sm.user.userId = :userId
 AND sm.isDeleted = false
 """)
   Optional<SpaceMember> findBySpaceIdAndUserId(Long spaceId, Long userId);
-
-  // 대기 중인 초대만 조회
-//  List<SpaceMember> findBySpaceIdAndInviteStatusAndIsDeleted(Long spaceId, InviteStatus status, Boolean isDeleted);
-
-  @Query("""
-        SELECT sm
-        FROM SpaceMember sm
-        WHERE sm.user.email = :email
-          AND sm.space.spaceId = :spaceId
-          AND sm.status = :status
-    """)
-   Optional<SpaceMember> findByUserEmailAndSpaceIdAndStatus(String email,
-                                                                  Long spaceId,
-                                                                  InviteStatusType status);
 }
