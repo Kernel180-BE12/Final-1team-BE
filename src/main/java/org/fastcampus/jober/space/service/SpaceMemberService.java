@@ -57,24 +57,26 @@ public class SpaceMemberService {
         if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
           throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "이미 멤버인 회원입니다");
         }
-        InviteStatus inviteMember = InviteStatus.builder()
-                .userEmail(dto.getEmail())
-                .status(InviteStatusType.PENDING)
-                .build();
-        inviteStatusRepository.save(inviteMember);
-
-        /**멤버 테이블에 추가 -> 이메일 수락 후로 옮기기! */
-//        SpaceMember member = SpaceMember.builder()
-//                .space(existingSpace)
-//                .authority(dto.getAuthority())
-//                .user(user)
-//                .tag(dto.getTag())
+//        InviteStatus inviteMember = InviteStatus.builder()
+//                .userEmail(dto.getEmail())
+//                .status(InviteStatusType.PENDING)
 //                .build();
-//        spaceMemberRepository.save(member);
+//        inviteStatusRepository.save(inviteMember);
+        SpaceMember pendingMember = SpaceMember.builder()
+                .space(existingSpace)
+                .email(dto.getEmail())
+                .authority(dto.getAuthority())
+                .user(user)
+                .tag(dto.getTag())
+                .build();
+        spaceMemberRepository.save(pendingMember);
 
         // 이메일 발송(토근 추후 추가 예정)
         sendInviteEmailToUser(spaceId, dto);
         }
+
+      // 비회원 이메일 발송 (토큰 추후 추가 예정)
+      sendInviteEmailToSingUp(spaceId, dto);
       }
   }
 
@@ -90,6 +92,32 @@ public class SpaceMemberService {
     );
   }
 
+  private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
+    String url = "https://www.jober-1team.com/register" + spaceId;
+    customMailSender.sendMail(
+            dto.getEmail(),
+            url,
+            "[Jober] 스페이스 멤버 초대",
+            "mail/signup-invite",
+            "회원가입 후 참여하기"
+    );
+  }
+
+  /** 초대 메일 수락 */
+  public String acceptInvitationByEmail(Long spaceId, String email) {
+    Users user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
+
+    // InviteStatus에서 초대 정보 찾기
+    SpaceMember pendingMember = spaceMemberRepository.findByUsersEmailAndSpaceIdAndStatus(email, spaceId, InviteStatusType.PENDING)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "유효하지 않은 초대입니다."));
+
+    pendingMember.assignUser(user);
+    pendingMember.acceptInvite(); // 수락상태로 변경
+    spaceMemberRepository.save(pendingMember);
+
+    return "https://www.jober-1team.com/spaces/" + spaceId;
+  }
 
   public List<SpaceMemberResponseDto>getSpaceMembers(Long spaceId) {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);

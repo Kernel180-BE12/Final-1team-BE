@@ -3,11 +3,13 @@ package org.fastcampus.jober.space.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.fastcampus.jober.common.entity.BaseEntity;
 
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class InviteStatus extends BaseEntity {
