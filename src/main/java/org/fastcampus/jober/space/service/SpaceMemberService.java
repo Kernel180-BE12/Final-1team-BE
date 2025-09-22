@@ -30,7 +30,6 @@ public class SpaceMemberService {
   private final SpaceRepository spaceRepository;
   private final UserRepository userRepository;
   private final CustomMailSender customMailSender;
-  private final InviteStatusRepository inviteStatusRepository;
 
 
   /**
@@ -119,7 +118,7 @@ public class SpaceMemberService {
     return "https://www.jober-1team.com/spaces/" + spaceId;
   }
 
-  public List<SpaceMemberResponseDto>getSpaceMembers(Long spaceId) {
+  public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toResponseDtoList(spaceMembers);
   }

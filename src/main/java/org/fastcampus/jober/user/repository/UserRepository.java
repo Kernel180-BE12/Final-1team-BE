@@ -7,12 +7,13 @@ import org.springframework.data.repository.CrudRepository;
 import org.fastcampus.jober.user.entity.Users;
 
 public interface UserRepository extends CrudRepository<Users, Long> {
-  Optional<Users> findByUsername(String username);
+  Optional<Users> findByUsernameAndIsDeletedFalse(String username);
 
-  Optional<Users> findByEmail(String email);
+  Optional<Users> findByEmailAndIsDeletedFalse(String email);
 
-  boolean existsByUsername(String username);
+  Optional<Users> findByUserIdAndIsDeletedFalse(Long userId);
 
-  boolean existsByEmail(String email);
+  boolean existsByUsernameAndIsDeletedFalse(String username);
 
+  boolean existsByEmailAndIsDeletedFalse(String email);
 }

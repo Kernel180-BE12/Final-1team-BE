@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) {
     Users u =
         userRepository
-            .findByUsername(username)
+            .findByUsernameAndIsDeletedFalse(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
     return new CustomUserDetails(
