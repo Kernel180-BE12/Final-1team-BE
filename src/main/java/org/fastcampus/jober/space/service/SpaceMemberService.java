@@ -10,7 +10,6 @@ import org.fastcampus.jober.space.entity.*;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.entity.Users;
-import org.fastcampus.jober.user.repository.InviteStatusRepository;
 import org.fastcampus.jober.user.repository.UserRepository;
 import org.fastcampus.jober.util.CustomMailSender;
 import org.springframework.stereotype.Service;
