@@ -107,7 +107,7 @@ public class SpaceMemberService {
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
 
     // InviteStatus에서 초대 정보 찾기
-    SpaceMember pendingMember = spaceMemberRepository.findByUsersEmailAndSpaceIdAndStatus(email, spaceId, InviteStatusType.PENDING)
+    SpaceMember pendingMember = spaceMemberRepository.findByUserEmailAndSpaceIdAndStatus(email, spaceId, InviteStatusType.PENDING)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "유효하지 않은 초대입니다."));
 
     pendingMember.assignUser(user);
