@@ -1,8 +1,6 @@
 package org.fastcampus.jober.space.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,8 +8,6 @@ import lombok.NoArgsConstructor;
 
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.entity.Users;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -36,5 +32,6 @@ public class SpaceMember extends BaseEntity {
   @JoinColumn(name = "userId")
   private Users user;
 
+  @Column(nullable = false) // 이거 바꾸기
   private Boolean isDeleted = false; // 멤버 논리삭제 유무
 }

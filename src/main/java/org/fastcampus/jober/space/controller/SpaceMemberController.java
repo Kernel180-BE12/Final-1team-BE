@@ -1,11 +1,16 @@
 package org.fastcampus.jober.space.controller;
 
+import java.net.URI;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.mail.MessagingException;
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
-import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
+import org.fastcampus.jober.user.dto.CustomUserDetails;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,13 +25,41 @@ import org.fastcampus.jober.space.service.SpaceMemberService;
 @RequiredArgsConstructor
 public class SpaceMemberController {
   private final SpaceMemberService spaceMemberService;
-//
-//      @PostMapping("/{spaceId}/add")
-//      public ResponseEntity<Void> addSpaceMember(
-//              @PathVariable Long spaceId, @RequestBody List<SpaceMemberAddRequestDto> dtos) {
-//         spaceMemberService.addSpaceMember(spaceId, dtos);
-//         return ResponseEntity.status(HttpStatus.CREATED).build();
-//      }
+
+    @Operation(
+            summary = "스페이스 멤버 초대",
+            description = "특정 스페이스에 멤버 초대 메일을 발송합니다."
+    )
+    @ApiResponse(responseCode = "200", description = "초대 메일 발송 완료")
+      @PostMapping("/{spaceId}/invitations")
+      public ResponseEntity<String> inviteSpaceMember(
+            @Parameter(description = "초대할 스페이스 ID", required = true)
+            @PathVariable Long spaceId,
+            @Parameter(description = "초대할 멤버 이메일·권한 정보 목록", required = true)
+            @RequestBody List<SpaceMemberAddRequestDto> dtos,
+            @Parameter(hidden = true) // 로그인 사용자 정보는 Swagger에 노출 안 함
+            @AuthenticationPrincipal CustomUserDetails principal) throws MessagingException {
+         spaceMemberService.inviteSpaceMember(spaceId, dtos, principal);
+         return ResponseEntity.ok("초대 메일 발송 완료");
+      }
+
+    @Operation(
+            summary = "스페이스 초대 수락",
+            description = "초대 메일 링크를 통해 스페이스 가입을 완료하고 지정된 URL로 리다이렉트합니다."
+    )
+    @ApiResponse(responseCode = "302", description = "수락 후 지정된 페이지로 리다이렉트")
+    @GetMapping("/{spaceId}/accept")
+    public ResponseEntity<Void> acceptInvitation(
+            @PathVariable Long spaceId,
+            @RequestParam String email) {
+
+        String redirectUrl = spaceMemberService.acceptInvitationByEmail(spaceId, email);
+
+        // 리다이렉트 처리
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND); // 302 리다이렉트
+    }
 
   //    @DeleteMapping("/{spaceId}/members/{userId}")
   //    public ResponseEntity<Void> deleteSpaceMember(
