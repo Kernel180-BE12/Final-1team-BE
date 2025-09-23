@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,6 @@ public class TemplateService {
 
     private final ExternalApiUtil externalApiUtil;
     private final TemplateRepository templateRepository;
-    private final ObjectMapper objectMapper;
     private final SpaceRepository spaceRepository;
 
     /** AI Flask 서버의 기본 URL application.yml의 ai.flask.base-url 값을 주입받습니다. */

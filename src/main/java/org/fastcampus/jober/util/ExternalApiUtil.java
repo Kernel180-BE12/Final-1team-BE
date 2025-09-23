@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /** 외부 API 호출을 위한 유틸리티 클래스 HTTP 통신, 로깅, 에러 처리를 담당합니다. */
 @Slf4j
@@ -42,7 +43,7 @@ public class ExternalApiUtil {
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToFlux(Object.class)
-                .filter(p -> p != null)
+                .filter(Objects::nonNull)
                 .map(this::parseAiResponse);
     }
 
@@ -105,9 +106,9 @@ public class ExternalApiUtil {
             responseDto.setSuccess(safeGetBoolean(responseMap, "success"));
             responseDto.setResponse(safeGetString(responseMap, "response"));
             responseDto.setTemplate(safeGetString(responseMap, "template"));
-            responseDto.setOptions(safeGetList(responseMap, "options", String.class));
+            responseDto.setOptions(safeGetList(responseMap, "options"));
             responseDto.setStructuredTemplate(responseMap.get("structured_template"));
-            responseDto.setStructuredTemplates(safeGetList(responseMap, "structured_templates", Object.class));
+            responseDto.setStructuredTemplates(safeGetList(responseMap, "structured_templates"));
             responseDto.setEditableVariables(safeGetMap(responseMap, "editable_variables"));
             responseDto.setHasImage(safeGetBoolean(responseMap, "hasImage"));
             responseDto.setState(safeParseState(responseMap, "state"));
@@ -137,7 +138,7 @@ public class ExternalApiUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<T> safeGetList(Map<String, Object> map, String key, Class<T> elementType) {
+    private <T> List<T> safeGetList(Map<String, Object> map, String key) {
         Object value = map.get(key);
         if (value instanceof List) {
             try {
