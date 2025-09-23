@@ -3,11 +3,16 @@ package org.fastcampus.jober.space.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.user.entity.Users;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class InviteStatus extends BaseEntity {
@@ -16,6 +21,35 @@ public class InviteStatus extends BaseEntity {
     @Column(name = "id")
     private Long statusId;
 
-    private String userEmail;
+    private Long spaceId;
+
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
+
+    private String email;
+    private String tag;
+
+    @Enumerated(EnumType.STRING)
     private InviteStatusType status;
+
+    private LocalDateTime expireDate; // 초대 만료일
+
+    /** 저장 이후 만료일 갱신/연장/단축을 위한 메서드 */
+    public InviteStatus expire(int days) {
+        this.expireDate = LocalDateTime.now().plusDays(days);
+        return this;
+    }
+
+    public void updateStatus(InviteStatusType status) {
+        this.status = status;
+    }
+
+    public SpaceMember toSpaceMember(Space space, Users user) {
+        return SpaceMember.builder()
+                .space(space)
+                .user(user)
+                .tag(this.tag)
+                .authority(this.authority)
+                .build();
+    }
 }

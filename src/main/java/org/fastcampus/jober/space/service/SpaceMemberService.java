@@ -1,6 +1,6 @@
 package org.fastcampus.jober.space.service;
 
-import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +8,7 @@ import jakarta.mail.MessagingException;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.entity.*;
+import org.fastcampus.jober.space.repository.InviteStatusRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.fastcampus.jober.user.entity.Users;
@@ -21,6 +22,7 @@ import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class SpaceMemberService {
   private final SpaceRepository spaceRepository;
   private final UserRepository userRepository;
   private final CustomMailSender customMailSender;
+  private final InviteStatusRepository inviteStatusRepository;
 
 
   /**
@@ -40,51 +43,103 @@ public class SpaceMemberService {
     3-1) 가입한 회원 → 수락버튼 클릭 -> 스페이스 멤버에 추가
     3-2) 비회원 -> 회원가입 링크 전송 -> 가입 시 스페이스 멤버에 추가
  */
+  @Transactional
+  public void inviteSpaceMember(Long spaceId, List<SpaceMemberAddRequestDto> dtos, CustomUserDetails principal) throws MessagingException {
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 
-//  public void addSpaceMember(Long spaceId, List<SpaceMemberAddRequestDto> dtos, CustomUserDetails principal) {
-//    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
-//
-//    // 관리자인지 검증
-//    existingSpace.validateAdminUser(principal.getUserId());
-//
-//    // 사용자 조회
-//    for (SpaceMemberAddRequestDto dto : dtos) {
-//      Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
-//
-//      if (userOpt.isPresent()) {
-//        Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
-//        // 회원 -> 중복초대 체크
-//        if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
-//          throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "이미 멤버인 회원입니다");
-//        }
-//        InviteStatus inviteMember = InviteStatus.builder()
-//                .userEmail(dto.getEmail())
-//                .status(InviteStatusType.PENDING)
-//                .build();
-//
-//        // 멤버 테이블에 추가 -> 이메일 수락 후로 옮기기!
-//        SpaceMember member = SpaceMember.builder()
-//                .space(existingSpace)
-//                .authority(dto.getAuthority())
-//                .email(dto.getEmail())
-//                .user(user)
-//                .tag(dto.getTag())
-//                .build();
-//        spaceMemberRepository.save(member);
-//      }
-//      // 이메일 발송(토근 포함)
-//
-//        // 비회원 -> 로그인 화면 이동 -> 멤버 테이블에 추가
-//
-//      }
-//
-//  }
-//
-//  public void sendInviteEmail(Space){
-//    customMailSender.sendMail(
-//
-//    );
-//  }
+    // 관리자인지 검증
+    existingSpace.validateAdminUser(principal.getUserId());
+
+    // 사용자 조회
+    for (SpaceMemberAddRequestDto dto : dtos) {
+      Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
+      boolean isExistingUser = userOpt.isPresent();
+
+      if (isExistingUser) {
+        Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
+        // 회원 -> 중복초대 체크
+        if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
+          throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "이미 멤버인 회원입니다");
+        }
+      }
+
+      InviteStatus inviteMember = InviteStatus.builder()
+              .authority(dto.getAuthority())
+              .tag(dto.getTag())
+              .email(dto.getEmail())
+              .status(InviteStatusType.PENDING)
+              .spaceId(spaceId)
+              .expireDate(LocalDateTime.now().plusDays(10))
+              .build();
+      inviteStatusRepository.save(inviteMember);
+
+      // 이메일 발송(토근 추후 추가 예정)
+      if (isExistingUser) {
+        sendInviteEmailToUser(spaceId, dto);
+      } else {
+        sendInviteEmailToSingUp(spaceId, dto);
+      }
+    }
+  }
+
+  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
+          throws MessagingException {
+    String url = "https://www.jober-1team.com/spaces/" + spaceId;
+    customMailSender.sendMail(
+            dto.getEmail(),
+            url,
+            "[Jober] 스페이스 멤버 초대",
+            "mail/invite",
+            "초대 수락 링크"
+    );
+  }
+
+  private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
+    String url = "https://www.jober-1team.com/register" + spaceId;
+    customMailSender.sendMail(
+            dto.getEmail(),
+            url,
+            "[Jober] 스페이스 멤버 초대",
+            "mail/signup-invite",
+            "회원가입 후 참여하기"
+    );
+  }
+
+  /** 초대 메일 수락 */
+  public String acceptInvitationByEmail(Long spaceId, String email) {
+    Users user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
+
+    // InviteStatus에서 초대 정보 찾기
+    Optional<InviteStatus> pendingMemberOpt = inviteStatusRepository.findByEmailAndSpaceId(email, spaceId);
+    InviteStatus pendingMember = pendingMemberOpt.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "존재하지 않는 초대입니다."));
+
+    if (pendingMember.getStatus() == InviteStatusType.ACCEPTED) {
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 초대가 완료된 회원입니다.");
+    } else if (pendingMember.getStatus() == InviteStatusType.DECLINED) {
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "초대를 거절한 회원입니다.");
+    }
+/** 위에랑 아래 중에 뭐가 더 나은지 궁금
+    // 2. 해당 스페이스의 PENDING 상태 초대 찾기
+    InviteStatus pendingMember = inviteStatusRepository
+            .findByEmailAndSpaceIdAndStatus(email, spaceId, InviteStatusType.PENDING)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "유효하지 않은 초대입니다."));
+
+    // 3. 이미 스페이스 멤버인지 확인 (중복 방지)
+    if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 스페이스 멤버입니다.");
+    }
+    */
+
+    pendingMember.updateStatus(InviteStatusType.ACCEPTED);
+    inviteStatusRepository.save(pendingMember);
+
+    Space space = spaceRepository.findByIdOrThrow(spaceId);
+    SpaceMember spaceMember = pendingMember.toSpaceMember(space, user);
+    spaceMemberRepository.save(spaceMember);
+
+    return "https://www.jober-1team.com/spaces/" + spaceId;
+  }
 
   public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
