@@ -8,7 +8,9 @@ import org.fastcampus.jober.user.dto.CustomUserDetails;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,9 +74,10 @@ public class TemplateController {
     return ResponseEntity.ok(aiResponse);
   }
 
-  @PostMapping("/sse")
-  public Flux<String> templateSSE(@RequestBody TemplateCreateRequestDto templateCreateRequestDto) {
-      return templateService.templateSSE(templateCreateRequestDto);
+  @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public Flux<ServerSentEvent<TemplateCreateResponseDto>> templateSSE(@RequestBody TemplateCreateRequestDto templateCreateRequestDto) {
+      return templateService.templateSSE(templateCreateRequestDto)
+              .map(data -> ServerSentEvent.builder(data).build());
   }
 
   /**
