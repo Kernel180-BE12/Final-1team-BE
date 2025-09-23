@@ -22,6 +22,7 @@ import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
 import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +43,7 @@ public class SpaceMemberService {
     3-1) 가입한 회원 → 수락버튼 클릭 -> 스페이스 멤버에 추가
     3-2) 비회원 -> 회원가입 링크 전송 -> 가입 시 스페이스 멤버에 추가
  */
+  @Transactional
   public void inviteSpaceMember(Long spaceId, List<SpaceMemberAddRequestDto> dtos, CustomUserDetails principal) throws MessagingException {
     Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
 
@@ -51,30 +53,33 @@ public class SpaceMemberService {
     // 사용자 조회
     for (SpaceMemberAddRequestDto dto : dtos) {
       Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
+      boolean isExistingUser = userOpt.isPresent();
 
-      if (userOpt.isPresent()) {
+      if (isExistingUser) {
         Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
         // 회원 -> 중복초대 체크
         if (spaceMemberRepository.findBySpaceIdAndUserId(spaceId, user.getUserId()).isPresent()) {
           throw new BusinessException(ErrorCode.DUPLICATE_RESOURCE, "이미 멤버인 회원입니다");
         }
-        InviteStatus inviteMember = InviteStatus.builder()
-                .authority(dto.getAuthority())
-                .tag(dto.getTag())
-                .email(dto.getEmail())
-                .status(InviteStatusType.PENDING)
-                .spaceId(spaceId)
-                .expireDate(LocalDateTime.now().plusDays(10))
-                .build();
-        inviteStatusRepository.save(inviteMember);
-
-        // 이메일 발송(토근 추후 추가 예정)
-        sendInviteEmailToUser(spaceId, dto);
-        }
-
-      // 비회원 이메일 발송 (토큰 추후 추가 예정)
-      sendInviteEmailToSingUp(spaceId, dto);
       }
+
+      InviteStatus inviteMember = InviteStatus.builder()
+              .authority(dto.getAuthority())
+              .tag(dto.getTag())
+              .email(dto.getEmail())
+              .status(InviteStatusType.PENDING)
+              .spaceId(spaceId)
+              .expireDate(LocalDateTime.now().plusDays(10))
+              .build();
+      inviteStatusRepository.save(inviteMember);
+
+      // 이메일 발송(토근 추후 추가 예정)
+      if (isExistingUser) {
+        sendInviteEmailToUser(spaceId, dto);
+      } else {
+        sendInviteEmailToSingUp(spaceId, dto);
+      }
+    }
   }
 
   private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
