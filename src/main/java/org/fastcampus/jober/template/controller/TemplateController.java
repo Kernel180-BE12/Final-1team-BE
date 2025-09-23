@@ -1,6 +1,7 @@
 package org.fastcampus.jober.template.controller;
 
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import lombok.extern.slf4j.Slf4j;
 import org.fastcampus.jober.template.dto.request.TemplateCreateRequestDto;
 import org.fastcampus.jober.template.dto.response.TemplateListResponseDto;
@@ -74,13 +75,35 @@ public class TemplateController {
     return ResponseEntity.ok(aiResponse);
   }
 
-  @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<ServerSentEvent<TemplateCreateResponseDto>> templateSSE(@RequestBody TemplateCreateRequestDto templateCreateRequestDto) {
-      return templateService.templateSSE(templateCreateRequestDto)
-              .map(data -> ServerSentEvent.builder(data).build());
-  }
+    @Operation(
+            summary = "템플릿 생성 SSE 스트리밍",
+            description = """
+                    TemplateCreateRequestDto 요청을 받아 서버가 템플릿 생성 진행 상황과 결과를 \
+                    Server-Sent Events(SSE) 방식으로 지속적으로 전송합니다.
+                    
+                    응답 Content-Type: `text/event-stream`
+                    클라이언트는 연결을 유지하면서 이벤트를 순차적으로 수신할 수 있습니다."""
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "SSE 연결 성공 - TemplateCreateResponseDto 이벤트 스트림",
+                    content = @Content(
+                            mediaType = MediaType.TEXT_EVENT_STREAM_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = TemplateCreateResponseDto.class))
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<TemplateCreateResponseDto>> templateSSE(
+            @RequestBody TemplateCreateRequestDto templateCreateRequestDto) {
+        return templateService.templateSSE(templateCreateRequestDto)
+                .map(data -> ServerSentEvent.builder(data).build());
+    }
 
-  /**
+
+    /**
    * GET 방식으로 spaceId를 받아서 해당 spaceId의 템플릿 title들을 조회하는 API
    *
    * @param spaceId 스페이스 ID
