@@ -1,10 +1,18 @@
 package org.fastcampus.jober.config;
 
+import java.io.IOException;
 import java.util.List;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,9 +39,9 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.common.SecurityProps;
-import org.fastcampus.jober.error.RestInvalidSessionStrategy;
 import org.fastcampus.jober.error.RestSessionExpiredStrategy;
 import org.fastcampus.jober.filter.CsrfCookieFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -105,7 +113,6 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
-      RestInvalidSessionStrategy invalidSessionStrategy,
       RestSessionExpiredStrategy expiredStrategy)
       throws Exception {
     //        CsrfTokenRequestAttributeHandler requestHandler = new
@@ -131,6 +138,18 @@ public class SecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated())
+        .exceptionHandling(e -> e
+                .authenticationEntryPoint((req, res, ex) -> {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setContentType("application/json;charset=UTF-8");
+                    res.getWriter()
+                            .write(
+                                    """
+                                {"code":"SESSION_INVALID","message":"세션이 유효하지 않거나(타임아웃) 종료되었습니다.","path":"%s"}
+                                """
+                                            .formatted(req.getRequestURI()));
+                })
+        )
         .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 사용 안 함(우리는 JSON 엔드포인트 사용)
         .httpBasic(AbstractHttpConfigurer::disable) // 테스트용/간단 API에서는 유용하지만, 여기선 세션 기반을 쓰므로 꺼둠
         .logout(
@@ -160,7 +179,6 @@ public class SecurityConfig {
                 session
                     // 필요시 세션 정책도 지정:
                     // .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                    .invalidSessionStrategy(invalidSessionStrategy)
                     .sessionFixation(
                         SessionManagementConfigurer.SessionFixationConfigurer::migrateSession)
                     .sessionConcurrency(
@@ -174,4 +192,25 @@ public class SecurityConfig {
 
     return http.build();
   }
+
+    @Bean
+    public FilterRegistrationBean<OncePerRequestFilter> clearInvalidSessionCookieFilter() {
+        OncePerRequestFilter filter = new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+                    throws ServletException, IOException {
+                if (request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid()) {
+                    Cookie cookie = new Cookie("JSESSIONID", null);
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    cookie.setHttpOnly(true);
+                    response.addCookie(cookie);
+                }
+                chain.doFilter(request, response);
+            }
+        };
+        FilterRegistrationBean<OncePerRequestFilter> reg = new FilterRegistrationBean<>(filter);
+        reg.setOrder(Ordered.HIGHEST_PRECEDENCE); // SecurityFilterChain보다 앞서 실행
+        return reg;
+    }
 }
