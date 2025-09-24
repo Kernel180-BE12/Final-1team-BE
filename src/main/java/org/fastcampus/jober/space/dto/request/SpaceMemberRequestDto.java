@@ -26,4 +26,7 @@ public class SpaceMemberRequestDto {
 
   @Schema(description = "사용자 ID", example = "2002")
   private Long userId;
+
+  @Schema(description = "논리삭제 유무")
+  private Boolean isDeleted;
 }

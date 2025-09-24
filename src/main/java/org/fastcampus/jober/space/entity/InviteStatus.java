@@ -50,6 +50,7 @@ public class InviteStatus extends BaseEntity {
                 .user(user)
                 .tag(this.tag)
                 .authority(this.authority)
+                .isDeleted(false)
                 .build();
     }
 }
