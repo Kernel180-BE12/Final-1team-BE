@@ -95,7 +95,7 @@ public class TemplateController {
             ),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<TemplateCreateResponseDto>> templateSSE(
             @RequestBody TemplateCreateRequestDto templateCreateRequestDto) {
         return templateService.templateSSE(templateCreateRequestDto)
