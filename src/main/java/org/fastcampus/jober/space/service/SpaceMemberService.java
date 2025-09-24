@@ -75,7 +75,7 @@ public class SpaceMemberService {
     }
   }
 
-  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto, String email)
+  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
           throws MessagingException {
     String url = "https://www.jober-1team.com/spaceMembers/" + spaceId + "/accept?email=" + email;
     customMailSender.sendMail(
