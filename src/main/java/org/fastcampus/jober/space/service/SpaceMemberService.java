@@ -75,7 +75,7 @@ public class SpaceMemberService {
     }
   }
 
-  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
+  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto, String email)
           throws MessagingException {
     String url = "https://www.jober-1team.com/spaceMembers/" + spaceId + "/accept?email=" + email;
     customMailSender.sendMail(
@@ -88,7 +88,7 @@ public class SpaceMemberService {
   }
 
   private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
-    String url = "https://www.jober-1team.com/register"; // 여기도 회원가입 구현 후 수정해야 함
+    String url = "https://www.jober-1team.com/register" + spaceId; // 여기도 회원가입 구현 후 수정해야 함
     customMailSender.sendMail(
             dto.getEmail(),
             url,
