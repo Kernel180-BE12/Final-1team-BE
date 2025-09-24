@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.mail.MessagingException;
+import org.fastcampus.jober.space.dto.InviteResult;
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
@@ -24,20 +25,20 @@ public class SpaceMemberController {
   private final SpaceMemberService spaceMemberService;
 
     @Operation(
-            summary = "스페이스 멤버 초대",
+            summary = "스페이스 멤버 초대 메일 발송",
             description = "특정 스페이스에 멤버 초대 메일을 발송합니다."
     )
     @ApiResponse(responseCode = "200", description = "초대 메일 발송 완료")
       @PostMapping("/{spaceId}/invitations")
-      public ResponseEntity<String> inviteSpaceMember(
+      public ResponseEntity<InviteResult> inviteSpaceMember(
             @Parameter(description = "초대할 스페이스 ID", required = true)
             @PathVariable Long spaceId,
             @Parameter(description = "초대할 멤버 이메일·권한 정보 목록", required = true)
             @RequestBody List<SpaceMemberAddRequestDto> dtos,
             @Parameter(hidden = true) // 로그인 사용자 정보는 Swagger에 노출 안 함
             @AuthenticationPrincipal CustomUserDetails principal) throws MessagingException {
-         spaceMemberService.inviteSpaceMember(spaceId, dtos, principal);
-         return ResponseEntity.ok("초대 메일 발송 완료");
+        InviteResult result = spaceMemberService.inviteSpaceMember(spaceId, dtos, principal);
+        return ResponseEntity.ok(result);
       }
 
     @Operation(
