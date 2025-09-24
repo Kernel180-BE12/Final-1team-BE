@@ -3,7 +3,6 @@ package org.fastcampus.jober.space.repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.fastcampus.jober.space.entity.InviteStatusType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -30,15 +29,4 @@ AND sm.isDeleted = false
 
   // 대기 중인 초대만 조회
 //  List<SpaceMember> findBySpaceIdAndInviteStatusAndIsDeleted(Long spaceId, InviteStatus status, Boolean isDeleted);
-
-  @Query("""
-        SELECT sm
-        FROM SpaceMember sm
-        WHERE sm.user.email = :email
-          AND sm.space.spaceId = :spaceId
-          AND sm.status = :status
-    """)
-   Optional<SpaceMember> findByUserEmailAndSpaceIdAndStatus(String email,
-                                                                  Long spaceId,
-                                                                  InviteStatusType status);
 }
