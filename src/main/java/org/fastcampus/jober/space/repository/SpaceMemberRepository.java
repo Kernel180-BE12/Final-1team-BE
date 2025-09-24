@@ -15,6 +15,7 @@ public interface SpaceMemberRepository extends JpaRepository<SpaceMember, Long> 
 SELECT sm
 FROM SpaceMember sm
 WHERE sm.space.spaceId = :spaceId
+AND sm.isDeleted = false
 """)
   List<SpaceMember> findBySpaceId(Long spaceId);
 

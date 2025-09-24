@@ -1,8 +1,6 @@
 package org.fastcampus.jober.space.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,8 +8,6 @@ import lombok.NoArgsConstructor;
 
 import org.fastcampus.jober.common.entity.BaseEntity;
 import org.fastcampus.jober.user.entity.Users;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,10 +24,6 @@ public class SpaceMember extends BaseEntity {
 
   private String tag;
 
-  private InviteStatusType status;
-
-  private String email; // 이거 프론트가 빼달라고 했던거 같은데 이유 기억이 안남
-
   @ManyToOne
   @JoinColumn(name = "spaceId")
   private Space space;
@@ -42,16 +34,4 @@ public class SpaceMember extends BaseEntity {
 
   @Column(nullable = false) // 이거 바꾸기
   private Boolean isDeleted = false; // 멤버 논리삭제 유무
-
-  public void acceptInvite() {
-    this.status = InviteStatusType.ACCEPTED;
-  }
-
-  public void rejectInvite() {
-    this.status = InviteStatusType.DECLINED;
-  }
-
-  public void assignUser(Users user) {
-    this.user = user;
-  }
 }

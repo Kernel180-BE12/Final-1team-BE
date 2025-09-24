@@ -36,7 +36,7 @@ logging:
 ai:
   flask:
     base-url: http://13.209.3.58:8000  # AI Flask 서버 URL (추후 실제 URL로 변경)
-    chat-endpoint: /api/chat  # AI 채팅 API 엔드포인트
+    chat-endpoint: /api/chat/stream  # AI 채팅 API 엔드포인트
 
 security:
   permit-all:
