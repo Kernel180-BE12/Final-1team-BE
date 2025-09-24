@@ -1,4 +1,4 @@
-package org.fastcampus.jober.space.entity;
+package org.fastcampus.jober.space.dto;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.space.entity.Authority;
+import org.fastcampus.jober.space.entity.InviteStatusType;
+import org.fastcampus.jober.space.entity.Space;
+import org.fastcampus.jober.space.entity.SpaceMember;
 import org.fastcampus.jober.user.entity.Users;
 
 import java.time.LocalDateTime;
