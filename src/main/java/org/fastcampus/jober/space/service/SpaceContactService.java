@@ -79,7 +79,7 @@ public class SpaceContactService {
     // 연락처 ID로 연락처 조회
     SpaceContacts contact =
         spaceContactsRepository
-            .findById(requestDto.getContactId())
+            .findById(requestDto.getId())
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
 
     // DTO를 사용하여 엔티티 업데이트 및 검증
@@ -105,7 +105,7 @@ public class SpaceContactService {
     // 연락처 ID로 연락처 조회
     SpaceContacts contact =
         spaceContactsRepository
-            .findById(requestDto.getContactId())
+            .findById(requestDto.getId())
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
 
     // DTO를 통해 권한 검증 및 삭제 준비
