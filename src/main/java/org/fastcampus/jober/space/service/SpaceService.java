@@ -39,6 +39,7 @@ public class SpaceService {
             .spaceId(savedSpace.getSpaceId())
             .userId(principal.getUserId())
                 .authority(Authority.ADMIN)
+                .isDeleted(false)
             .build();
 
     SpaceMember spaceMember = spaceMemberMapper.toEntity(adminUser);
