@@ -68,7 +68,7 @@ public class SpaceMemberService {
           duplicateEmails.add(dto.getEmail());
           continue;
         }
-        sendInviteEmailToUser(spaceId, dto, dto.getEmail());
+        sendInviteEmailToUser(spaceId, dto);
       } else sendInviteEmailToSingUp(spaceId, dto);
       successEmails.add(dto.getEmail());
 
@@ -87,7 +87,7 @@ public class SpaceMemberService {
 
   private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto, String email)
           throws MessagingException {
-    String url = "https://www.jober-1team.com/spaceMembers/" + spaceId + "/accept?email=" + email;
+    String url = "https://www.jober-1team.com/spaceMembers/" + spaceId + "/accept?email=" + dto.getEmail();
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -98,7 +98,7 @@ public class SpaceMemberService {
   }
 
   private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
-    String url = "https://www.jober-1team.com/register" + spaceId; // 여기도 회원가입 구현 후 수정해야 함
+    String url = "https://www.jober-1team.com/register" + spaceId + "&email=" + dto.getEmail();
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -108,12 +108,16 @@ public class SpaceMemberService {
     );
   }
 
-  /** 초대 메일 수락 */
   @Transactional
   public void acceptInvitationByEmail(Long spaceId, String email) {
     Users user = userRepository.findByEmail(email)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
 
+    processSpaceInvitation(spaceId, email, user);
+  }
+
+  @Transactional
+  public void processSpaceInvitation(Long spaceId, String email, Users user) {
     Optional<InviteStatus> pendingMemberOpt = inviteStatusRepository
             .findByEmailAndSpaceIdAndStatus(email, spaceId, InviteStatusType.PENDING);
     InviteStatus pendingMember = pendingMemberOpt.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "존재하지 않는 초대입니다."));
