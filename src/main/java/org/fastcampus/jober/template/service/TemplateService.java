@@ -48,10 +48,6 @@ public class TemplateService {
         return externalApiUtil.stream(templateCreateRequestDto.toRequestBody(), aiFlaskChatStreamEndpoint);
     }
 
-    public Flux<TemplateCreateResponseDto> templateSSE(TemplateCreateRequestDto templateCreateRequestDto) {
-        return externalApiUtil.stream(templateCreateRequestDto.toRequestBody(), aiFlaskChatEndpoint);
-    }
-
     /**
      * 템플릿 생성 요청을 기반으로 AI가 템플릿을 생성하도록 요청합니다.
      *
