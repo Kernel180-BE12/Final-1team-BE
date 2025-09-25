@@ -20,7 +20,7 @@ public class SpaceContactsUpdateRequestDto {
   private Long spaceId;
 
   @Schema(description = "연락처 ID", example = "1")
-  private Long contactId;
+  private Long id;
 
   @Schema(description = "연락처 이름", example = "홍길동")
   private String name;
