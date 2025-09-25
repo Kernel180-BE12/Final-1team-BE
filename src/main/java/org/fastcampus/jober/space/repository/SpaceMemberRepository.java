@@ -26,4 +26,7 @@ AND sm.user.userId = :userId
 AND sm.isDeleted = false
 """)
   Optional<SpaceMember> findBySpaceIdAndUserId(Long spaceId, Long userId);
+
+  // 대기 중인 초대만 조회
+//  List<SpaceMember> findBySpaceIdAndInviteStatusAndIsDeleted(Long spaceId, InviteStatus status, Boolean isDeleted);
 }
