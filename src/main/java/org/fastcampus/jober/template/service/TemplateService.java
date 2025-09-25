@@ -41,6 +41,12 @@ public class TemplateService {
     /** AI Flask 서버의 채팅 API 엔드포인트 application.yml의 ai.flask.chat-endpoint 값을 주입받습니다. */
     @Value("${ai.flask.chat-endpoint}")
     private String aiFlaskChatEndpoint;
+    @Value("${ai.flask.chat-stream-endpoint}")
+    private String aiFlaskChatStreamEndpoint;
+
+    public Flux<TemplateCreateResponseDto> templateSSE(TemplateCreateRequestDto templateCreateRequestDto) {
+        return externalApiUtil.stream(templateCreateRequestDto.toRequestBody(), aiFlaskChatStreamEndpoint);
+    }
 
     public Flux<TemplateCreateResponseDto> templateSSE(TemplateCreateRequestDto templateCreateRequestDto) {
         return externalApiUtil.stream(templateCreateRequestDto.toRequestBody(), aiFlaskChatEndpoint);
