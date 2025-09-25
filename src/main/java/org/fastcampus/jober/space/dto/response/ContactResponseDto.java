@@ -45,7 +45,7 @@ public class ContactResponseDto {
     private String tag;
 
     @Schema(description = "휴대전화", example = "010-1234-5678")
-    private String phoneNum;
+    private String phoneNumber;
 
     @Schema(description = "이메일", example = "kim@example.com")
     private String email;
@@ -61,7 +61,7 @@ public class ContactResponseDto {
                         .id(contact.getId())
                         .name(contact.getName())
                         .tag(contact.getTag())
-                        .phoneNum(contact.getPhoneNum())
+                        .phoneNumber(contact.getPhoneNum())
                         .email(contact.getEmail())
                         .build())
             .collect(Collectors.toList());

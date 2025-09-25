@@ -36,7 +36,7 @@ public class ContactRequestDto {
     private String name;
 
     @Schema(description = "휴대전화", example = "010-1234-5678")
-    private String phoneNum;
+    private String phoneNumber;
 
     @Schema(description = "이메일", example = "kim@example.com")
     private String email;
@@ -48,7 +48,7 @@ public class ContactRequestDto {
     public SpaceContacts toEntity(Long spaceId) {
       return SpaceContacts.builder()
           .name(this.name)
-          .phoneNum(this.phoneNum)
+          .phoneNum(this.phoneNumber)
           .email(this.email)
           .tag(this.tag)
           .spaceId(spaceId)

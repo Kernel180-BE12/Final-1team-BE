@@ -19,7 +19,7 @@ public class ContactDeleteRequestDto {
   private Long spaceId;
 
   @Schema(description = "삭제할 연락처 ID", example = "1")
-  private Long contactId;
+  private Long id;
 
   @Schema(description = "삭제할 연락처 ", example = "홍길동")
 
