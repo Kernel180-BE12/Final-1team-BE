@@ -46,19 +46,12 @@ public class UserService {
     spaceMemberService.processSpaceInvitation(spaceId, req.email(), savedUser);
   }
 
-  /**
-   * 이메일로 초대받아 진행되는 회원가입
-   */
-  @Transactional
-  public void register(RegisterRequestDto req) {
-   register(req, null);
-  }
 
   /**
    * 이메일로 초대받아 진행되는 회원가입
    */
   @Transactional
-  public void register(RegisterRequestDto req, Long spaceId) {
+  public void register(RegisterRequestDto req) {
     // 입력값 형식 검증
     if (!req.username().matches("^[a-z0-9]{5,15}$")) {
       throw new BusinessException(ErrorCode.INVALID_USERNAME);
@@ -77,12 +70,7 @@ public class UserService {
     isUsernameExists(req.username());
     isEmailExists(req.email());
 
-    Users savedUser = userRepository.save(req.toEntity());
-
-    // 스페이스 초대가 있는 경우 자동으로 스페이스 멤버로 추가
-    if (spaceId != null) {
-      spaceMemberService.processSpaceInvitation(spaceId, req.email(), savedUser);
-    }
+    userRepository.save(req.toEntity());
   }
 
   /**
