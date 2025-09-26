@@ -85,23 +85,6 @@ public class UserController {
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping("/space-member-register")
-  @Operation(
-          summary = "회원가입",
-          description = "신규 사용자를 등록합니다. 아이디(username)와 비밀번호(password), 기타 정보를 전달하면 계정이 생성됩니다. " +
-                  "스페이스 초대를 통한 회원가입인 경우 spaceId를 함께 전달하면 회원가입 후 자동으로 해당 스페이스 멤버로 추가됩니다.")
-  @ApiResponse(responseCode = "200", description = "회원가입 성공")
-  @ApiResponse(responseCode = "400", description = "요청 데이터가 잘못되었거나 이미 존재하는 사용자")
-  @ApiResponse(responseCode = "404", description = "존재하지 않는 초대 또는 스페이스")
-  public ResponseEntity<Void> spaceMemberRegister(
-          @RequestBody RegisterRequestDto req,
-          @Parameter(description = "스페이스 초대를 통한 회원가입 시 스페이스 ID (선택사항)", example = "123")
-          @RequestParam(required = false) Long spaceId) {
-
-    userService.register(req, spaceId);
-    return ResponseEntity.ok().build();
-  }
-
   @PostMapping("/login")
   @Operation(summary = "로그인", description = "사용자 이름과 비밀번호로 인증을 수행합니다. 성공 시 세션이 생성되어 로그인 상태가 유지됩니다.")
   @ApiResponse(responseCode = "200", description = "로그인 성공 및 사용자 ID/이름 반환")
