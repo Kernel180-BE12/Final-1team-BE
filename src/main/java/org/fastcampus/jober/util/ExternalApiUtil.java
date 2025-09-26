@@ -38,13 +38,18 @@ public class ExternalApiUtil {
     public Flux<TemplateCreateResponseDto> stream(Object requestBody, String url) {
         return webClient.post()
                 .uri(url)
-                .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.TEXT_EVENT_STREAM)
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
-                .bodyToFlux(Object.class)
-                .filter(Objects::nonNull)
-                .map(this::parseAiResponse);
+                // 1. bodyToFlux가 자동으로 JSON을 DTO로 변환해줍니다.
+                //    Object.class 대신 정확한 DTO 타입을 명시합니다.
+                .bodyToFlux(TemplateCreateResponseDto.class)
+                // 2. 복잡한 수동 파싱(.map(this::parseAiResponse)) 로직을 제거합니다.
+                // 3. doOnNext를 사용하여 스트림 중간에 로그만 기록하고, 데이터는 그대로 통과시킵니다.
+                .doOnNext(dto -> log.info("[STREAM] AI 서버 데이터 수신: {}", dto.getResponse()))
+                .doOnError(error -> log.error("[STREAM] AI 서버 스트림 오류: {}", error.getMessage()));
+        // --- ▲▲▲ 여기까지 수정된 핵심 로직입니다 ▲▲▲ ---
     }
 
   /**
