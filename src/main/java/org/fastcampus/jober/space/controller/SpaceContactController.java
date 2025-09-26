@@ -72,17 +72,18 @@ public class SpaceContactController {
   }
 
   /**
-   * 연락처 삭제 API
+   * 연락처 삭제 API (단일 또는 여러 연락처)
    *
-   * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
+   * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID 목록)
    * @return 삭제 성공 응답
    */
-  @Operation(summary = "연락처 삭제", description = "스페이스 ID와 연락처 ID를 받아 해당 연락처를 삭제합니다.")
+  @Operation(summary = "연락처 삭제", description = "스페이스 ID와 연락처 ID 목록을 받아 연락처를 삭제합니다. 단일 또는 여러 연락처 삭제가 가능합니다.")
   @DeleteMapping("/contact")
   @ApiResponse(responseCode = "204", description = "성공적으로 연락처가 삭제됨")
-  @ApiResponse(responseCode = "404", description = "연락처를 찾을 수 없음")
-  public ResponseEntity<Void> deleteContact(@RequestBody ContactDeleteRequestDto requestDto) {
-    spaceContactService.deleteContact(requestDto);
+  @ApiResponse(responseCode = "404", description = "일부 연락처를 찾을 수 없음")
+  @ApiResponse(responseCode = "403", description = "삭제 권한이 없음")
+  public ResponseEntity<Void> deleteContacts(@RequestBody ContactDeleteRequestDto requestDto) {
+    spaceContactService.deleteContacts(requestDto);
     return ResponseEntity.noContent().build();
   }
 
