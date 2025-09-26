@@ -15,9 +15,6 @@ public class SpaceMemberRequestDto {
   @Schema(description = "구성원 권한", example = "ADMIN")
   private Authority authority;
 
-  @Schema(description = "구성원 상태", example = "초대완료")
-  private String status;
-
   @Schema(description = "구성원 태그", example = "재직자")
   private String tag;
 

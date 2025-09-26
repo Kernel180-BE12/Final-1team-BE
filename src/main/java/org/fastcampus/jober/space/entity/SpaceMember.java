@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import org.fastcampus.jober.common.entity.BaseEntity;
+import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
 import org.fastcampus.jober.user.entity.Users;
 
 @Entity
@@ -32,7 +33,18 @@ public class SpaceMember extends BaseEntity {
   @JoinColumn(name = "userId")
   private Users user;
 
-  @Column(nullable = false) // 이거 바꾸기
+  @Column(nullable = false)
   @Builder.Default
   private Boolean isDeleted = false; // 멤버 논리삭제 유무
+
+  public void softDelete() {isDeleted = true;}
+
+  public void updateMember(MemberUpdateRequestDto dto) {
+    if (dto.getAuthority() != null) {
+      this.authority = dto.getAuthority();
+    }
+    if (dto.getTag() != null && !dto.getTag().isBlank()) {
+      this.tag = dto.getTag();
+    }
+  }
 }

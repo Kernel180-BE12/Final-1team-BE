@@ -10,6 +10,8 @@ import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.InviteResult;
 import org.fastcampus.jober.space.dto.InviteStatus;
+import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
+import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
 import org.fastcampus.jober.space.entity.*;
 import org.fastcampus.jober.space.repository.InviteStatusRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
@@ -87,7 +89,8 @@ public class SpaceMemberService {
 
   private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
           throws MessagingException {
-    String url = "https://www.jober-1team.com/spaceMembers/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+    String url = "https://www.jober-1team.com/invite-member/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -98,7 +101,8 @@ public class SpaceMemberService {
   }
 
   private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
-    String url = "https://www.jober-1team.com/register/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+    String url = "https://www.jober-1team.com/space-member-register/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -115,7 +119,7 @@ public class SpaceMemberService {
     
     processSpaceInvitation(spaceId, email, user);
   }
-
+  
   @Transactional
   public void processSpaceInvitation(Long spaceId, String email, Users user) {
     Optional<InviteStatus> pendingMemberOpt = inviteStatusRepository
@@ -140,4 +144,25 @@ public class SpaceMemberService {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toResponseDtoList(spaceMembers);
   }
+
+  @Transactional
+  public void deleteSpaceMember(Long memberId, Long spaceId, CustomUserDetails principal) {
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+    existingSpace.validateAdminUser(principal.getUserId());
+    SpaceMember member = spaceMemberRepository.findById(memberId)
+                    .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND, "멤버를 찾을 수 없습니다."));
+    member.softDelete();
+  }
+
+
+  @Transactional
+  public MemberUpdateResponseDto updateMember(Long memberId, Long spaceId, MemberUpdateRequestDto dto, CustomUserDetails principal) {
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+    existingSpace.validateAdminUser(principal.getUserId());
+    SpaceMember member = spaceMemberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND, "멤버를 찾을 수 없습니다."));
+    member.updateMember(dto);
+    return spaceMemberMapper.toMemberUpdateResponseDto(member);
+  }
+
 }
