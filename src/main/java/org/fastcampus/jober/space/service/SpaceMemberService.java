@@ -116,7 +116,7 @@ public class SpaceMemberService {
   public void acceptInvitationByEmail(Long spaceId, String email) {
     Users user = userRepository.findByEmail(email)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
-    
+
     processSpaceInvitation(spaceId, email, user);
   }
   
@@ -146,12 +146,19 @@ public class SpaceMemberService {
   }
 
   @Transactional
-  public void deleteSpaceMember(Long memberId, Long spaceId, CustomUserDetails principal) {
+  public void deleteSpaceMember(List<Long> memberIds, Long spaceId, CustomUserDetails principal) {
     Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
     existingSpace.validateAdminUser(principal.getUserId());
-    SpaceMember member = spaceMemberRepository.findById(memberId)
-                    .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND, "멤버를 찾을 수 없습니다."));
-    member.softDelete();
+
+    List<SpaceMember> members = spaceMemberRepository.findAllByIdInAndSpaceId(memberIds, spaceId);
+
+    if (members.size() != memberIds.size()) {
+      throw new BusinessException(ErrorCode.NOT_FOUND, "해당하는 멤버가 없습니다.");}
+
+    members.forEach(SpaceMember::softDelete);
+
+    // 3. 명시적 저장 (혹시 모를 Dirty Checking 문제 방지)
+    spaceMemberRepository.saveAll(members);
   }
 
 
