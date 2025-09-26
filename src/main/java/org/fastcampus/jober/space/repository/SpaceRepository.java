@@ -18,12 +18,11 @@ public interface SpaceRepository extends JpaRepository<Space, Long> {
         .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "존재하지 않는 스페이스입니다."));
   }
 
-  @Query("""
-       SELECT new org.fastcampus.jober.space.dto.response.SpaceListResponseDto(s.spaceId, s.spaceName, sm.authority)
-       FROM Space s
-       JOIN s.spaceMembers sm
-       JOIN sm.user u
-       WHERE u.userId = :userId
-       """)
+    @Query(
+            """
+                  SELECT new org.fastcampus.jober.space.dto.response.SpaceListResponseDto(s.spaceId, s.spaceName, sm.authority)
+                  FROM Space s LEFT JOIN s.spaceMembers sm
+                  WHERE sm.user.userId = :userId
+                  """)
     List<SpaceListResponseDto> findSpacesByUserId(@Param("userId") Long userId);
 }
