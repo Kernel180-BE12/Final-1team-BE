@@ -81,19 +81,45 @@ public class SpaceMemberController {
 
     @Operation(
             summary = "스페이스 멤버 논리 삭제",
-            description = "특정 스페이스의 멤버를 논리적으로 삭제(soft delete)합니다."
+
+            description = """
+        특정 스페이스에서 여러 멤버를 **논리 삭제**합니다.  
+        - `memberIds` : 삭제할 멤버 ID들의 리스트(예: `1,2,3`)  
+        - `spaceId` : 해당 스페이스 ID
+        """,
+            parameters = {
+                    @Parameter(
+                            name = "memberIds",
+                            description = "삭제할 스페이스 멤버 ID 목록 (콤마로 구분된 경로 변수)",
+                            required = true
+                    ),
+                    @Parameter(
+                            name = "spaceId",
+                            description = "해당 스페이스 ID (쿼리 파라미터)",
+                            required = true
+                    )
+            }
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음"),
-            @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "삭제 성공 (내용 없음)"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "권한 없음 또는 관리자 아님"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "스페이스 또는 멤버를 찾을 수 없음"
+            )
     })
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping("/{memberIds}")
     public ResponseEntity<Void> deleteSpaceMember(
-            @PathVariable Long memberId,
-            Long spaceId,
+            @PathVariable List<Long> memberIds,
+            @RequestParam Long spaceId,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        spaceMemberService.deleteSpaceMember(memberId, spaceId, principal);
+        spaceMemberService.deleteSpaceMember(memberIds, spaceId, principal);
         return ResponseEntity.noContent().build();
     }
 
