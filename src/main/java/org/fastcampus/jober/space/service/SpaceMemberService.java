@@ -87,7 +87,7 @@ public class SpaceMemberService {
 
   private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto, String email)
           throws MessagingException {
-    String url = "https://www.jober-1team.com/spaceMembers/" + spaceId + "/accept?email=" + dto.getEmail();
+    String url = "https://www.jober-1team.com/spaceMembers/?spaceId=" + spaceId + "&email=" + dto.getEmail();
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -98,7 +98,7 @@ public class SpaceMemberService {
   }
 
   private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
-    String url = "https://www.jober-1team.com/register" + spaceId + "&email=" + dto.getEmail();
+    String url = "https://www.jober-1team.com/register/?spaceId=" + spaceId + "&email=" + dto.getEmail();
     customMailSender.sendMail(
             dto.getEmail(),
             url,
