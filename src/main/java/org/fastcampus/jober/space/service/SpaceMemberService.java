@@ -87,9 +87,10 @@ public class SpaceMemberService {
     return new InviteResult(successEmails, duplicateEmails);
   }
 
-  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto, String email)
+  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
           throws MessagingException {
     String url = "https://www.jober-1team.com/invite-member/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -101,6 +102,7 @@ public class SpaceMemberService {
 
   private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
     String url = "https://www.jober-1team.com/space-member-register/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -114,10 +116,10 @@ public class SpaceMemberService {
   public void acceptInvitationByEmail(Long spaceId, String email) {
     Users user = userRepository.findByEmail(email)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
-
+    
     processSpaceInvitation(spaceId, email, user);
   }
-
+  
   @Transactional
   public void processSpaceInvitation(Long spaceId, String email, Users user) {
     Optional<InviteStatus> pendingMemberOpt = inviteStatusRepository
