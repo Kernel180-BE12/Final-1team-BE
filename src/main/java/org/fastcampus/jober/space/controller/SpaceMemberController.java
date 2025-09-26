@@ -2,11 +2,17 @@ package org.fastcampus.jober.space.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.mail.MessagingException;
 import org.fastcampus.jober.space.dto.InviteResult;
+import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
+import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +25,7 @@ import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.service.SpaceMemberService;
 
 @RestController
-@RequestMapping("/spaceMembers")
+@RequestMapping("/space-members")
 @RequiredArgsConstructor
 public class SpaceMemberController {
   private final SpaceMemberService spaceMemberService;
@@ -59,14 +65,6 @@ public class SpaceMemberController {
        return ResponseEntity.ok().build();
     }
 
-  //    @DeleteMapping("/{spaceId}/members/{userId}")
-  //    public ResponseEntity<Void> deleteSpaceMember(
-  //            @PathVariable Long spaceId,
-  //            @PathVariable Long userId) {
-  //        spaceService.deleteSpaceMember(spaceId, userId);
-  //        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-  //    }
-  //
   /**
    * 특정 스페이스의 모든 멤버를 조회합니다.
    *
@@ -80,4 +78,43 @@ public class SpaceMemberController {
     List<SpaceMemberResponseDto> result = spaceMemberService.getSpaceMembers(spaceId);
     return ResponseEntity.ok(result);
   }
+
+    @Operation(
+            summary = "스페이스 멤버 논리 삭제",
+            description = "특정 스페이스의 멤버를 논리적으로 삭제(soft delete)합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "삭제 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음")
+    })
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<Void> deleteSpaceMember(
+            @PathVariable Long memberId,
+            Long spaceId,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        spaceMemberService.deleteSpaceMember(memberId, spaceId, principal);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "스페이스 멤버 정보 수정",
+            description = "특정 스페이스의 멤버 권한(Authority 등)을 수정합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공",
+                    content = @Content(schema = @Schema(implementation = SpaceMemberResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음")
+    })
+    @PatchMapping("/{memberId}")
+    public ResponseEntity<MemberUpdateResponseDto> updateSpaceMember(
+            @PathVariable Long memberId,
+            Long spaceId,
+            @Parameter(description = "멤버 수정 요청 DTO", required = true)
+            @RequestBody MemberUpdateRequestDto dto,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        MemberUpdateResponseDto result = spaceMemberService.updateMember(memberId, spaceId, dto, principal);
+      return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 }

@@ -3,6 +3,7 @@ package org.fastcampus.jober.user.service;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 
+import org.fastcampus.jober.space.service.SpaceMemberService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final CustomMailSender customMailSender;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
+  private final SpaceMemberService spaceMemberService;
 
   @Value("${app.reset.url}")
   private String frontUrl;
@@ -36,6 +38,18 @@ public class UserService {
     return userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow().getUserId();
   }
 
+  @Transactional
+  public void register(RegisterRequestDto req, Long spaceId) {
+    register(req);
+    Users savedUser = userRepository.findByEmail(req.email())
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    spaceMemberService.processSpaceInvitation(spaceId, req.email(), savedUser);
+  }
+
+
+  /**
+   * 이메일로 초대받아 진행되는 회원가입
+   */
   @Transactional
   public void register(RegisterRequestDto req) {
     // 입력값 형식 검증

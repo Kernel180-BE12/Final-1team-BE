@@ -10,6 +10,8 @@ import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.InviteResult;
 import org.fastcampus.jober.space.dto.InviteStatus;
+import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
+import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
 import org.fastcampus.jober.space.entity.*;
 import org.fastcampus.jober.space.repository.InviteStatusRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
@@ -68,7 +70,7 @@ public class SpaceMemberService {
           duplicateEmails.add(dto.getEmail());
           continue;
         }
-        sendInviteEmailToUser(spaceId, dto, dto.getEmail());
+        sendInviteEmailToUser(spaceId, dto);
       } else sendInviteEmailToSingUp(spaceId, dto);
       successEmails.add(dto.getEmail());
 
@@ -85,9 +87,10 @@ public class SpaceMemberService {
     return new InviteResult(successEmails, duplicateEmails);
   }
 
-  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto, String email)
+  private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
           throws MessagingException {
-    String url = "https://www.jober-1team.com/spaceMembers/" + spaceId + "/accept?email=" + email;
+    String url = "https://www.jober-1team.com/invite-member/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -98,7 +101,8 @@ public class SpaceMemberService {
   }
 
   private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
-    String url = "https://www.jober-1team.com/register" + spaceId; // 여기도 회원가입 구현 후 수정해야 함
+    String url = "https://www.jober-1team.com/space-member-register/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -108,12 +112,16 @@ public class SpaceMemberService {
     );
   }
 
-  /** 초대 메일 수락 */
   @Transactional
   public void acceptInvitationByEmail(Long spaceId, String email) {
     Users user = userRepository.findByEmail(email)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
-
+    
+    processSpaceInvitation(spaceId, email, user);
+  }
+  
+  @Transactional
+  public void processSpaceInvitation(Long spaceId, String email, Users user) {
     Optional<InviteStatus> pendingMemberOpt = inviteStatusRepository
             .findByEmailAndSpaceIdAndStatus(email, spaceId, InviteStatusType.PENDING);
     InviteStatus pendingMember = pendingMemberOpt.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "존재하지 않는 초대입니다."));
@@ -136,4 +144,25 @@ public class SpaceMemberService {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toResponseDtoList(spaceMembers);
   }
+
+  @Transactional
+  public void deleteSpaceMember(Long memberId, Long spaceId, CustomUserDetails principal) {
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+    existingSpace.validateAdminUser(principal.getUserId());
+    SpaceMember member = spaceMemberRepository.findById(memberId)
+                    .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND, "멤버를 찾을 수 없습니다."));
+    member.softDelete();
+  }
+
+
+  @Transactional
+  public MemberUpdateResponseDto updateMember(Long memberId, Long spaceId, MemberUpdateRequestDto dto, CustomUserDetails principal) {
+    Space existingSpace = spaceRepository.findByIdOrThrow(spaceId);
+    existingSpace.validateAdminUser(principal.getUserId());
+    SpaceMember member = spaceMemberRepository.findById(memberId)
+            .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND, "멤버를 찾을 수 없습니다."));
+    member.updateMember(dto);
+    return spaceMemberMapper.toMemberUpdateResponseDto(member);
+  }
+
 }

@@ -2,6 +2,7 @@ package org.fastcampus.jober.space.mapper;
 
 import java.util.List;
 
+import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -18,6 +19,8 @@ import org.fastcampus.jober.user.entity.Users;
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SpaceMemberMapper {
   SpaceMemberMapper INSTANCE = Mappers.getMapper(SpaceMemberMapper.class);
+
+  MemberUpdateResponseDto toMemberUpdateResponseDto(SpaceMember member);
 
   @Mapping(source = "user.userId", target = "userId")
   SpaceMemberResponseDto toResponseDto(SpaceMember member);
