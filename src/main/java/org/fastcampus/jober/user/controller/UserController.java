@@ -56,12 +56,15 @@ public class UserController {
 
   @PostMapping("/register")
   @Operation(
-      summary = "회원가입",
-      description = "신규 사용자를 등록합니다. 아이디(username)와 비밀번호(password), 기타 정보를 전달하면 계정이 생성됩니다.")
+          summary = "회원가입",
+          description = "신규 사용자를 등록합니다. 아이디(username)와 비밀번호(password), 기타 정보를 전달하면 계정이 생성됩니다. " +
+                  "스페이스 초대를 통한 회원가입인 경우 spaceId를 함께 전달하면 회원가입 후 자동으로 해당 스페이스 멤버로 추가됩니다.")
   @ApiResponse(responseCode = "200", description = "회원가입 성공")
   @ApiResponse(responseCode = "400", description = "요청 데이터가 잘못되었거나 이미 존재하는 사용자")
-  public ResponseEntity<Void> register(@RequestBody RegisterRequestDto req) {
-    userService.register(req);
+  @ApiResponse(responseCode = "404", description = "존재하지 않는 초대 또는 스페이스")
+  public ResponseEntity<Void> register(
+          @RequestBody RegisterRequestDto req) {
+      userService.register(req);
     return ResponseEntity.ok().build();
   }
 
