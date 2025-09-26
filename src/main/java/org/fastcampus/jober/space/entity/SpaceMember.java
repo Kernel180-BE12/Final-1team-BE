@@ -33,5 +33,6 @@ public class SpaceMember extends BaseEntity {
   private Users user;
 
   @Column(nullable = false) // 이거 바꾸기
+  @Builder.Default
   private Boolean isDeleted = false; // 멤버 논리삭제 유무
 }
