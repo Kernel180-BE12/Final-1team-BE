@@ -199,18 +199,23 @@ public class SecurityConfig {
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
+
                 if (request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid()) {
-                    Cookie cookie = new Cookie("JSESSIONID", null);
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    cookie.setHttpOnly(true);
-                    response.addCookie(cookie);
+                    if (!response.isCommitted()) {
+                        Cookie cookie = new Cookie("JSESSIONID", ""); // ← null 금지
+                        String ctx = request.getContextPath();
+                        cookie.setPath((ctx == null || ctx.isEmpty()) ? "/" : ctx);
+                        cookie.setMaxAge(0);         // 삭제
+                        cookie.setHttpOnly(true);
+                        cookie.setSecure(true);
+                        response.addCookie(cookie);
+                    }
                 }
                 chain.doFilter(request, response);
             }
         };
         FilterRegistrationBean<OncePerRequestFilter> reg = new FilterRegistrationBean<>(filter);
-        reg.setOrder(Ordered.HIGHEST_PRECEDENCE); // SecurityFilterChain보다 앞서 실행
+        reg.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return reg;
     }
 }

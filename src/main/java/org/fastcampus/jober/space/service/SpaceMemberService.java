@@ -90,6 +90,7 @@ public class SpaceMemberService {
   private void sendInviteEmailToUser(Long spaceId, SpaceMemberAddRequestDto dto)
           throws MessagingException {
     String url = "https://www.jober-1team.com/invite-member/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,
@@ -101,6 +102,7 @@ public class SpaceMemberService {
 
   private void sendInviteEmailToSingUp(Long spaceId, SpaceMemberAddRequestDto dto) throws MessagingException {
     String url = "https://www.jober-1team.com/space-member-register/?spaceId=" + spaceId + "&email=" + dto.getEmail();
+
     customMailSender.sendMail(
             dto.getEmail(),
             url,

@@ -46,6 +46,7 @@ public class UserService {
     spaceMemberService.processSpaceInvitation(spaceId, req.email(), savedUser);
   }
 
+
   /**
    * 이메일로 초대받아 진행되는 회원가입
    */
