@@ -112,7 +112,7 @@ public class SpaceMemberService {
   public void acceptInvitationByEmail(Long spaceId, String email) {
     Users user = userRepository.findByEmail(email)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "가입되지 않은 회원입니다."));
-
+    
     processSpaceInvitation(spaceId, email, user);
   }
 
