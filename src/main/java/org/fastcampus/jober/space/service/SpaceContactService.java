@@ -93,27 +93,28 @@ public class SpaceContactService {
   }
 
   /**
-   * 연락처를 논리삭제하는 비즈니스 로직
+   * 연락처를 논리삭제하는 비즈니스 로직 (단일 또는 여러 연락처)
    *
-   * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID)
+   * @param requestDto 삭제할 연락처 정보 (스페이스 ID, 연락처 ID 목록)
    */
   @Transactional
-  public void deleteContact(ContactDeleteRequestDto requestDto) {
+  public void deleteContacts(ContactDeleteRequestDto requestDto) {
     // Space 존재 여부 검증
     spaceRepository.findByIdOrThrow(requestDto.getSpaceId());
 
-    // 연락처 ID로 연락처 조회
-    SpaceContacts contact =
-        spaceContactsRepository
-            .findById(requestDto.getId())
-            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "연락처를 찾을 수 없습니다."));
+    // 연락처 ID 목록으로 연락처들 조회
+    List<SpaceContacts> contacts = spaceContactsRepository.findAllById(requestDto.getIds());
+    
+    // 요청된 ID와 조회된 연락처 수가 일치하지 않으면 예외 발생
+    if (contacts.size() != requestDto.getIds().size()) {
+      throw new BusinessException(ErrorCode.NOT_FOUND, "일부 연락처를 찾을 수 없습니다.");
+    }
 
     // DTO를 통해 권한 검증 및 삭제 준비
-    requestDto.validateAndPrepareForDeletion(contact);
+    requestDto.validateAndPrepareForDeletion(contacts);
 
-    // 연락처 논리삭제 (isDeleted를 true로 설정)
-    contact.softDelete();
-    spaceContactsRepository.save(contact);
+    // 모든 연락처 논리삭제 (isDeleted를 true로 설정)
+    contacts.forEach(SpaceContacts::softDelete);
   }
 
   /**
