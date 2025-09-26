@@ -88,12 +88,12 @@ public class SpaceMemberController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "해당 멤버를 찾을 수 없음")
     })
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping("/{memberIds}")
     public ResponseEntity<Void> deleteSpaceMember(
-            @PathVariable Long memberId,
-            Long spaceId,
+            @PathVariable List<Long> memberIds,
+            @RequestParam Long spaceId,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        spaceMemberService.deleteSpaceMember(memberId, spaceId, principal);
+        spaceMemberService.deleteSpaceMember(memberIds, spaceId, principal);
         return ResponseEntity.noContent().build();
     }
 
