@@ -119,7 +119,7 @@ public class SpaceMemberService {
 
     processSpaceInvitation(spaceId, email, user);
   }
-
+  
   @Transactional
   public void processSpaceInvitation(Long spaceId, String email, Users user) {
     Optional<InviteStatus> pendingMemberOpt = inviteStatusRepository
