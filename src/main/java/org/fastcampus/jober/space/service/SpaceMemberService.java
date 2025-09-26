@@ -152,6 +152,9 @@ public class SpaceMemberService {
 
     List<SpaceMember> members = spaceMemberRepository.findAllByIdInAndSpaceId(memberIds, spaceId);
 
+    if (members.size() != memberIds.size()) {
+      throw new BusinessException(ErrorCode.NOT_FOUND, "해당하는 멤버가 없습니다.");}
+
     members.forEach(SpaceMember::softDelete);
 
     // 3. 명시적 저장 (혹시 모를 Dirty Checking 문제 방지)
