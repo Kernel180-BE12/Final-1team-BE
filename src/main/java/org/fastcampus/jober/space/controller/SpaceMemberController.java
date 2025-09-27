@@ -83,6 +83,7 @@ public class SpaceMemberController {
             summary = "스페이스 멤버 논리 삭제",
 
             description = """
+
         특정 스페이스에서 여러 멤버를 논리 삭제합니다.  
         - `memberIds` : 삭제할 멤버 ID들의 리스트(예: `1,2,3`)  
         - `spaceId` : 해당 스페이스 ID
