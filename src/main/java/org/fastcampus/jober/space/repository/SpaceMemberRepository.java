@@ -36,6 +36,15 @@ AND sm.space.spaceId = :spaceId
 """)
   List<SpaceMember> findAllByIdInAndSpaceId(@Param("memberIds") List<Long> memberIds, @Param("spaceId") Long spaceId);
 
+@Query("""
+SELECT sm
+FROM SpaceMember sm
+WHERE sm.space.spaceId = :spaceId
+AND sm.tag = :tag
+AND sm.isDeleted = false
+""")
+  List<SpaceMember> findBySpaceIdAndTag(Long spaceId, String tag);
+
   // 대기 중인 초대만 조회
 //  List<SpaceMember> findBySpaceIdAndInviteStatusAndIsDeleted(Long spaceId, InviteStatus status, Boolean isDeleted);
 }
