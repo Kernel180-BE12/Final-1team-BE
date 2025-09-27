@@ -83,7 +83,8 @@ public class SpaceMemberController {
             summary = "스페이스 멤버 논리 삭제",
 
             description = """
-        특정 스페이스에서 여러 멤버를 **논리 삭제**합니다.  
+
+        특정 스페이스에서 여러 멤버를 논리 삭제합니다.  
         - `memberIds` : 삭제할 멤버 ID들의 리스트(예: `1,2,3`)  
         - `spaceId` : 해당 스페이스 ID
         """,
@@ -142,5 +143,26 @@ public class SpaceMemberController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         MemberUpdateResponseDto result = spaceMemberService.updateMember(memberId, spaceId, dto, principal);
       return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @Operation(
+            summary = "태그별 스페이스 멤버 조회",
+            description = "특정 스페이스에서 지정한 태그를 가진 멤버 목록을 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "403", description = "해당 스페이스 멤버가 아님")
+    })
+    @GetMapping("/{spaceId}/tag")
+    public ResponseEntity<List<SpaceMemberResponseDto>> getMemberByTag(
+            @Parameter(description = "조회할 스페이스 ID", required = true)
+            @PathVariable Long spaceId,
+            @Parameter(description = "조회할 멤버의 태그", required = true)
+            @RequestParam String tag,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        List<SpaceMemberResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal.getUserId());
+        return ResponseEntity.ok(result);
     }
 }
