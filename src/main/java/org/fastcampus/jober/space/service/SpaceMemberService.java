@@ -140,7 +140,10 @@ public class SpaceMemberService {
     spaceMemberRepository.save(spaceMember);
   }
 
-  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId) {
+  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId, CustomUserDetails principal) {
+    spaceMemberRepository.findBySpaceIdAndUserId(spaceId, principal.getUserId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
+
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toMemberResponseDtoList(spaceMembers);
   }
