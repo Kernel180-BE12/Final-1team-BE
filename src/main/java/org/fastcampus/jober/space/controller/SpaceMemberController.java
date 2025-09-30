@@ -71,8 +71,9 @@ public class SpaceMemberController {
     @ApiResponse(responseCode = "200", description = "멤버 조회 성공")
     @ApiResponse(responseCode = "403", description = "해당 스페이스 멤버가 아닌 경우")
   @GetMapping("/{spaceId}/members")
-  public ResponseEntity<List<SpaceMemberListResponseDto>> getSpaceMembers(@PathVariable Long spaceId) {
-    List<SpaceMemberListResponseDto> result = spaceMemberService.getSpaceMembers(spaceId);
+  public ResponseEntity<List<SpaceMemberListResponseDto>> getSpaceMembers(@PathVariable Long spaceId,
+                                                                          @AuthenticationPrincipal CustomUserDetails principal) {
+    List<SpaceMemberListResponseDto> result = spaceMemberService.getSpaceMembers(spaceId, principal);
     return ResponseEntity.ok(result);
   }
 
@@ -156,7 +157,7 @@ public class SpaceMemberController {
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
-        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal.getUserId());
+        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal);
         return ResponseEntity.ok(result);
     }
 }
