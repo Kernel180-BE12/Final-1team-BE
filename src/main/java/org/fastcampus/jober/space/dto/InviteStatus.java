@@ -48,13 +48,17 @@ public class InviteStatus extends BaseEntity {
         this.status = status;
     }
 
+    /**
+     * 얘를 SpaceMemberMapper로 옮기면 this.tag, this.authority를 그대로 가져오지 못하는데
+     * SpaceMember toSpaceMember(InviteStatus inviteStatus, Space space, Users user); 처럼 파라미터를 늘리는게 나은지
+     * 아님 지금처럼 이 파일에 두는게 나은지?
+     */
     public SpaceMember toSpaceMember(Space space, Users user) {
         return SpaceMember.builder()
                 .space(space)
                 .user(user)
                 .tag(this.tag)
                 .authority(this.authority)
-                .isDeleted(false)
                 .build();
     }
 }

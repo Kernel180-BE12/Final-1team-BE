@@ -65,12 +65,6 @@ public class SpaceMemberController {
        return ResponseEntity.ok().build();
     }
 
-  /**
-   * 특정 스페이스의 모든 멤버를 조회합니다.
-   *
-   * @param spaceId 멤버를 조회할 스페이스 ID
-   * @return 스페이스 멤버 목록과 HTTP 상태 코드
-   */
   @Operation(summary = "스페이스 멤버 조회", description = "특정 spaceId에 속한 모든 멤버 정보를 가져옵니다.")
   @Parameter(name = "spaceId", description = "멤버를 조회할 스페이스의 ID", required = true)
   @GetMapping("/{spaceId}/members")

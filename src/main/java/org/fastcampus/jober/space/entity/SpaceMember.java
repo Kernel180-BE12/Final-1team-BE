@@ -33,8 +33,8 @@ public class SpaceMember extends BaseEntity {
   @JoinColumn(name = "userId")
   private Users user;
 
-  @Column(nullable = false)
-  @Builder.Default
+  @Column(nullable = false)   // DB 스키마의 제약조건
+  @Builder.Default            // 애플리케이션 레벨 기본값
   private Boolean isDeleted = false; // 멤버 논리삭제 유무
 
   public void softDelete() {isDeleted = true;}
