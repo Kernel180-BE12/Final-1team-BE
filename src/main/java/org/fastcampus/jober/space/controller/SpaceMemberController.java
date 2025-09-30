@@ -11,6 +11,7 @@ import org.fastcampus.jober.space.dto.InviteResult;
 import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
 import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberListResponseDto;
 import org.fastcampus.jober.user.dto.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,17 +75,14 @@ public class SpaceMemberController {
   @Operation(summary = "스페이스 멤버 조회", description = "특정 spaceId에 속한 모든 멤버 정보를 가져옵니다.")
   @Parameter(name = "spaceId", description = "멤버를 조회할 스페이스의 ID", required = true)
   @GetMapping("/{spaceId}/members")
-  public ResponseEntity<List<SpaceMemberResponseDto>> getSpaceMembers(@PathVariable Long spaceId) {
-    List<SpaceMemberResponseDto> result = spaceMemberService.getSpaceMembers(spaceId);
+  public ResponseEntity<List<SpaceMemberListResponseDto>> getSpaceMembers(@PathVariable Long spaceId) {
+    List<SpaceMemberListResponseDto> result = spaceMemberService.getSpaceMembers(spaceId);
     return ResponseEntity.ok(result);
   }
 
     @Operation(
             summary = "스페이스 멤버 논리 삭제",
-
             description = """
-
-        특정 스페이스에서 여러 멤버를 논리 삭제합니다.  
         - `memberIds` : 삭제할 멤버 ID들의 리스트(예: `1,2,3`)  
         - `spaceId` : 해당 스페이스 ID
         """,
@@ -154,7 +152,7 @@ public class SpaceMemberController {
             @ApiResponse(responseCode = "403", description = "해당 스페이스 멤버가 아님")
     })
     @GetMapping("/{spaceId}/tag")
-    public ResponseEntity<List<SpaceMemberResponseDto>> getMemberByTag(
+    public ResponseEntity<List<SpaceMemberListResponseDto>> getMemberByTag(
             @Parameter(description = "조회할 스페이스 ID", required = true)
             @PathVariable Long spaceId,
             @Parameter(description = "조회할 멤버의 태그", required = true)
@@ -162,7 +160,7 @@ public class SpaceMemberController {
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
-        List<SpaceMemberResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal.getUserId());
+        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal.getUserId());
         return ResponseEntity.ok(result);
     }
 }

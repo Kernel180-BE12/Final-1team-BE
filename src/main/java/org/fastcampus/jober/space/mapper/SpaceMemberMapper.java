@@ -3,13 +3,14 @@ package org.fastcampus.jober.space.mapper;
 import java.util.List;
 
 import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberListResponseDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 import org.fastcampus.jober.space.dto.request.SpaceMemberRequestDto;
-import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.entity.SpaceMember;
 import org.fastcampus.jober.user.entity.Users;
@@ -22,10 +23,15 @@ public interface SpaceMemberMapper {
 
   MemberUpdateResponseDto toMemberUpdateResponseDto(SpaceMember member);
 
+  @Mapping(source = "user.name", target = "name")
+  @Mapping(source = "user.email", target = "email")
+  SpaceMemberListResponseDto toMemberResponseDto(SpaceMember member);
+
+  List<SpaceMemberListResponseDto> toMemberResponseDtoList(List<SpaceMember> spaceMembers);
+
   @Mapping(source = "user.userId", target = "userId")
   SpaceMemberResponseDto toResponseDto(SpaceMember member);
-
-  List<SpaceMemberResponseDto> toResponseDtoList(List<SpaceMember> spaceMembers);
+  List<SpaceMemberResponseDto> toResponseDtoList(List<SpaceMember> member);
 
   @Mapping(
       target = "space",
