@@ -152,7 +152,7 @@ public class SpaceMemberController {
             @ApiResponse(responseCode = "403", description = "해당 스페이스 멤버가 아님")
     })
     @GetMapping("/{spaceId}/tag")
-    public ResponseEntity<List<SpaceMemberResponseDto>> getMemberByTag(
+    public ResponseEntity<List<SpaceMemberListResponseDto>> getMemberByTag(
             @Parameter(description = "조회할 스페이스 ID", required = true)
             @PathVariable Long spaceId,
             @Parameter(description = "조회할 멤버의 태그", required = true)
@@ -160,7 +160,7 @@ public class SpaceMemberController {
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
-        List<SpaceMemberResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal.getUserId());
+        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal.getUserId());
         return ResponseEntity.ok(result);
     }
 }

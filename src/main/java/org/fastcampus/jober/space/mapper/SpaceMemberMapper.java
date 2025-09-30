@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceMemberListResponseDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -24,9 +25,13 @@ public interface SpaceMemberMapper {
 
   @Mapping(source = "user.name", target = "name")
   @Mapping(source = "user.email", target = "email")
-  SpaceMemberListResponseDto toResponseDto(SpaceMember member);
+  SpaceMemberListResponseDto toMemberResponseDto(SpaceMember member);
 
-  List<SpaceMemberListResponseDto> toResponseDtoList(List<SpaceMember> spaceMembers);
+  List<SpaceMemberListResponseDto> toMemberResponseDtoList(List<SpaceMember> spaceMembers);
+
+  @Mapping(source = "user.userId", target = "userId")
+  SpaceMemberResponseDto toResponseDto(SpaceMember member);
+  List<SpaceMemberResponseDto> toResponseDtoList(List<SpaceMember> member);
 
   @Mapping(
       target = "space",
