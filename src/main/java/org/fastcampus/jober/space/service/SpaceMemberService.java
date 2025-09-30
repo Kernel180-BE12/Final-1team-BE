@@ -12,6 +12,7 @@ import org.fastcampus.jober.space.dto.InviteResult;
 import org.fastcampus.jober.space.dto.InviteStatus;
 import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberListResponseDto;
 import org.fastcampus.jober.space.entity.*;
 import org.fastcampus.jober.space.repository.InviteStatusRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
-import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,9 +140,9 @@ public class SpaceMemberService {
     spaceMemberRepository.save(spaceMember);
   }
 
-  public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
+  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId) {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
-    return spaceMemberMapper.toResponseDtoList(spaceMembers);
+    return spaceMemberMapper.toMemberResponseDtoList(spaceMembers);
   }
 
   @Transactional
@@ -172,14 +172,17 @@ public class SpaceMemberService {
     return spaceMemberMapper.toMemberUpdateResponseDto(member);
   }
 
-  public List<SpaceMemberResponseDto> getMemberByTag(Long spaceId, String tag, Long userId) {
+  public List<SpaceMemberListResponseDto> getMemberByTag(Long spaceId, String tag, Long userId) {
+
     spaceRepository.findByIdOrThrow(spaceId);
 
     spaceMemberRepository.findBySpaceIdAndUserId(spaceId, userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
 
     List<SpaceMember> members = spaceMemberRepository.findBySpaceIdAndTag(spaceId, tag);
-    return spaceMemberMapper.toResponseDtoList(members);
+
+    return spaceMemberMapper.toMemberResponseDtoList(members);
+
   }
 
 }
