@@ -12,6 +12,7 @@ import org.fastcampus.jober.space.dto.InviteResult;
 import org.fastcampus.jober.space.dto.InviteStatus;
 import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
+import org.fastcampus.jober.space.dto.response.SpaceMemberListResponseDto;
 import org.fastcampus.jober.space.entity.*;
 import org.fastcampus.jober.space.repository.InviteStatusRepository;
 import org.fastcampus.jober.space.repository.SpaceRepository;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 import org.fastcampus.jober.space.dto.request.SpaceMemberAddRequestDto;
-import org.fastcampus.jober.space.dto.response.SpaceMemberResponseDto;
 import org.fastcampus.jober.space.mapper.SpaceMemberMapper;
 import org.fastcampus.jober.space.repository.SpaceMemberRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,7 +140,7 @@ public class SpaceMemberService {
     spaceMemberRepository.save(spaceMember);
   }
 
-  public List<SpaceMemberResponseDto> getSpaceMembers(Long spaceId) {
+  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId) {
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toResponseDtoList(spaceMembers);
   }
