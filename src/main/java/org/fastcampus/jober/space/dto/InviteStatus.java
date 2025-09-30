@@ -11,6 +11,7 @@ import org.fastcampus.jober.space.entity.InviteStatusType;
 import org.fastcampus.jober.space.entity.Space;
 import org.fastcampus.jober.space.entity.SpaceMember;
 import org.fastcampus.jober.user.entity.Users;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
 public class InviteStatus extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
