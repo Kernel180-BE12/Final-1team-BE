@@ -38,6 +38,11 @@ public class UserService {
     return userRepository.findByUsernameAndIsDeletedFalse(username).orElseThrow().getUserId();
   }
 
+  /**
+   * 이메일로 초대받아 진행되는 회원가입
+   * @param req
+   * @param spaceId
+   */
   @Transactional
   public void register(RegisterRequestDto req, Long spaceId) {
     register(req);
@@ -47,9 +52,6 @@ public class UserService {
   }
 
 
-  /**
-   * 이메일로 초대받아 진행되는 회원가입
-   */
   @Transactional
   public void register(RegisterRequestDto req) {
     // 입력값 형식 검증

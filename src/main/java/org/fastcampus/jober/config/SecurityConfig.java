@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -132,7 +133,13 @@ public class SecurityConfig {
         .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(props.getPermitAll().toArray(String[]::new))
+                auth
+                        .requestMatchers("/register", "/user/register")
+                        .access((authentication, context) -> {
+                            boolean noSession = authentication.get().getPrincipal().equals("anonymousUser");
+                            return new AuthorizationDecision(noSession);
+                        })
+                    .requestMatchers(props.getPermitAll().toArray(String[]::new))
                     .permitAll()
                     .requestMatchers(props.getPermitUser().toArray(String[]::new))
                     .permitAll()
