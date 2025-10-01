@@ -74,7 +74,6 @@ public class SpaceMemberController {
   public ResponseEntity<List<SpaceMemberListResponseDto>> getSpaceMembers(@PathVariable Long spaceId,
                                                                           @AuthenticationPrincipal CustomUserDetails principal) {
     List<SpaceMemberListResponseDto> result = spaceMemberService.getSpaceMembers(spaceId, principal);
-
     return ResponseEntity.ok(result);
   }
 

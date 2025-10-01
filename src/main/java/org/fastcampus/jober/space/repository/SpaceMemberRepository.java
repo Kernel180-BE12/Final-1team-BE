@@ -15,6 +15,7 @@ public interface SpaceMemberRepository extends JpaRepository<SpaceMember, Long> 
 SELECT sm
 FROM SpaceMember sm
 WHERE sm.space.spaceId = :spaceId
+AND sm.user.isDeleted = false
 AND sm.isDeleted = false
 """)
   List<SpaceMember> findBySpaceId(Long spaceId);
@@ -24,6 +25,7 @@ SELECT sm
 FROM SpaceMember sm
 WHERE sm.space.spaceId = :spaceId
 AND sm.user.userId = :userId
+AND sm.user.isDeleted = false
 AND sm.isDeleted = false
 """)
   Optional<SpaceMember> findBySpaceIdAndUserId(Long spaceId, Long userId);
@@ -33,6 +35,7 @@ SELECT sm
 FROM SpaceMember sm
 WHERE sm.id IN :memberIds
 AND sm.space.spaceId = :spaceId
+AND sm.user.isDeleted = false
 """)
   List<SpaceMember> findAllByIdInAndSpaceId(@Param("memberIds") List<Long> memberIds, @Param("spaceId") Long spaceId);
 
@@ -43,6 +46,7 @@ FROM SpaceMember sm
 WHERE sm.space.spaceId = :spaceId
 AND sm.tag = :tag
 AND sm.isDeleted = false
+AND sm.user.isDeleted = false
 """)
   List<SpaceMember> findBySpaceIdAndTag(Long spaceId, String tag);
 
