@@ -61,7 +61,7 @@ public class SpaceMemberService {
 
     // 사용자 조회
     for (SpaceMemberAddRequestDto dto : dtos) {
-      Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
+      Optional<Users> userOpt = userRepository.findByEmailAndIsDeletedFalse(dto.getEmail());
 
       if (userOpt.isPresent()) {
         Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
