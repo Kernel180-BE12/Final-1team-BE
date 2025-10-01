@@ -12,6 +12,9 @@ import org.fastcampus.jober.space.entity.Authority;
 @AllArgsConstructor
 @Builder
 public class SpaceMemberListResponseDto {
+    @Schema(description = "구성원 아이디", example = "1")
+    private Long id;
+
   @Schema(description = "구성원 이름", example = "홍길동")
   private String name;
 
