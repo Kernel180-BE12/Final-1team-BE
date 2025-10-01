@@ -75,7 +75,7 @@ public class SpaceMemberService {
       successEmails.add(dto.getEmail());
 
       InviteStatus inviteMember = InviteStatus.builder()
-              .authority(dto.getAuthority())
+              .authority(Authority.MEMBER) // 일단 멤버로만 추가 가능하게 수정
               .tag(dto.getTag())
               .email(dto.getEmail())
               .status(InviteStatusType.PENDING)
@@ -154,6 +154,13 @@ public class SpaceMemberService {
 
     if (members.size() != memberIds.size()) {
       throw new BusinessException(ErrorCode.NOT_FOUND, "해당하는 멤버가 없습니다.");}
+
+    boolean containsAdmin = members.stream()
+            .anyMatch(m -> m.getAuthority() == Authority.ADMIN);
+
+    if (containsAdmin) {
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "관리자는 삭제할 수 없습니다.");
+    }
 
     members.forEach(SpaceMember::softDelete);
 
