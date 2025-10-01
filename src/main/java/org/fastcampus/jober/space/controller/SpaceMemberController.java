@@ -66,17 +66,14 @@ public class SpaceMemberController {
        return ResponseEntity.ok().build();
     }
 
-  /**
-   * 특정 스페이스의 모든 멤버를 조회합니다.
-   *
-   * @param spaceId 멤버를 조회할 스페이스 ID
-   * @return 스페이스 멤버 목록과 HTTP 상태 코드
-   */
-  @Operation(summary = "스페이스 멤버 조회", description = "특정 spaceId에 속한 모든 멤버 정보를 가져옵니다.")
-  @Parameter(name = "spaceId", description = "멤버를 조회할 스페이스의 ID", required = true)
+    @Operation(summary = "스페이스 멤버 조회", description = "특정 스페이스에 속한 모든 멤버 정보를 조회합니다. 해당 스페이스의 멤버만 조회할 수 있습니다.")
+    @Parameter(name = "spaceId", description = "멤버를 조회할 스페이스의 ID", required = true)
+    @ApiResponse(responseCode = "200", description = "멤버 조회 성공")
+    @ApiResponse(responseCode = "403", description = "해당 스페이스 멤버가 아닌 경우")
   @GetMapping("/{spaceId}/members")
-  public ResponseEntity<List<SpaceMemberListResponseDto>> getSpaceMembers(@PathVariable Long spaceId) {
-    List<SpaceMemberListResponseDto> result = spaceMemberService.getSpaceMembers(spaceId);
+  public ResponseEntity<List<SpaceMemberListResponseDto>> getSpaceMembers(@PathVariable Long spaceId,
+                                                                          @AuthenticationPrincipal CustomUserDetails principal) {
+    List<SpaceMemberListResponseDto> result = spaceMemberService.getSpaceMembers(spaceId, principal);
     return ResponseEntity.ok(result);
   }
 
@@ -160,7 +157,7 @@ public class SpaceMemberController {
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
-        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal.getUserId());
+        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal);
         return ResponseEntity.ok(result);
     }
 }

@@ -140,7 +140,10 @@ public class SpaceMemberService {
     spaceMemberRepository.save(spaceMember);
   }
 
-  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId) {
+  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId, CustomUserDetails principal) {
+    spaceMemberRepository.findBySpaceIdAndUserId(spaceId, principal.getUserId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
+
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toMemberResponseDtoList(spaceMembers);
   }
@@ -179,12 +182,11 @@ public class SpaceMemberService {
     return spaceMemberMapper.toMemberUpdateResponseDto(member);
   }
 
-  public List<SpaceMemberListResponseDto> getMemberByTag(Long spaceId, String tag, Long userId) {
-    spaceRepository.findByIdOrThrow(spaceId);
-
-    spaceMemberRepository.findBySpaceIdAndUserId(spaceId, userId)
+  public List<SpaceMemberListResponseDto> getMemberByTag(Long spaceId, String tag, CustomUserDetails principal) {
+    spaceMemberRepository.findBySpaceIdAndUserId(spaceId, principal.getUserId())
             .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
 
+    spaceRepository.findByIdOrThrow(spaceId);
     List<SpaceMember> members = spaceMemberRepository.findBySpaceIdAndTag(spaceId, tag);
     return spaceMemberMapper.toMemberResponseDtoList(members);
   }
