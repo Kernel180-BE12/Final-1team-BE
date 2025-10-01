@@ -61,7 +61,7 @@ public class SpaceMemberService {
 
     // 사용자 조회
     for (SpaceMemberAddRequestDto dto : dtos) {
-      Optional<Users> userOpt = userRepository.findByEmail(dto.getEmail());
+      Optional<Users> userOpt = userRepository.findByEmailAndIsDeletedFalse(dto.getEmail());
 
       if (userOpt.isPresent()) {
         Users user = userOpt.get(); // Optional 안에 있는 Users 꺼냄 ....예외처리?
@@ -184,12 +184,10 @@ public class SpaceMemberService {
 
   public List<SpaceMemberListResponseDto> getMemberByTag(Long spaceId, String tag, CustomUserDetails principal) {
     spaceMemberRepository.findBySpaceIdAndUserId(spaceId, principal.getUserId())
-
             .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
 
     spaceRepository.findByIdOrThrow(spaceId);
     List<SpaceMember> members = spaceMemberRepository.findBySpaceIdAndTag(spaceId, tag);
-
     return spaceMemberMapper.toMemberResponseDtoList(members);
 
   }
