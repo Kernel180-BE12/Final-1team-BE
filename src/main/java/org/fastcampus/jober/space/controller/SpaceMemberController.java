@@ -74,6 +74,7 @@ public class SpaceMemberController {
   public ResponseEntity<List<SpaceMemberListResponseDto>> getSpaceMembers(@PathVariable Long spaceId,
                                                                           @AuthenticationPrincipal CustomUserDetails principal) {
     List<SpaceMemberListResponseDto> result = spaceMemberService.getSpaceMembers(spaceId, principal);
+
     return ResponseEntity.ok(result);
   }
 
@@ -158,8 +159,8 @@ public class SpaceMemberController {
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
-        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal);
 
+        List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal);
         return ResponseEntity.ok(result);
     }
 }

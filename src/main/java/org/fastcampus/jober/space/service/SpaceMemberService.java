@@ -184,10 +184,12 @@ public class SpaceMemberService {
 
   public List<SpaceMemberListResponseDto> getMemberByTag(Long spaceId, String tag, CustomUserDetails principal) {
     spaceMemberRepository.findBySpaceIdAndUserId(spaceId, principal.getUserId())
+
             .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
 
     spaceRepository.findByIdOrThrow(spaceId);
     List<SpaceMember> members = spaceMemberRepository.findBySpaceIdAndTag(spaceId, tag);
+
     return spaceMemberMapper.toMemberResponseDtoList(members);
 
   }
