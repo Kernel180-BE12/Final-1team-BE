@@ -134,7 +134,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth
-                        .requestMatchers("/register", "/user/register")
+                        .requestMatchers("/user/space-member-register", "/user/register")
                         .access((authentication, context) -> {
                             boolean noSession = authentication.get().getPrincipal().equals("anonymousUser");
                             return new AuthorizationDecision(noSession);
