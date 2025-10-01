@@ -75,7 +75,7 @@ public class SpaceMemberService {
       successEmails.add(dto.getEmail());
 
       InviteStatus inviteMember = InviteStatus.builder()
-              .authority(dto.getAuthority())
+              .authority(Authority.MEMBER) // 일단 멤버로만 추가 가능하게 수정
               .tag(dto.getTag())
               .email(dto.getEmail())
               .status(InviteStatusType.PENDING)
@@ -140,7 +140,10 @@ public class SpaceMemberService {
     spaceMemberRepository.save(spaceMember);
   }
 
-  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId) {
+  public List<SpaceMemberListResponseDto> getSpaceMembers(Long spaceId, CustomUserDetails principal) {
+    spaceMemberRepository.findBySpaceIdAndUserId(spaceId, principal.getUserId())
+            .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
+
     List<SpaceMember> spaceMembers = spaceMemberRepository.findBySpaceId(spaceId);
     return spaceMemberMapper.toMemberResponseDtoList(spaceMembers);
   }
@@ -154,6 +157,13 @@ public class SpaceMemberService {
 
     if (members.size() != memberIds.size()) {
       throw new BusinessException(ErrorCode.NOT_FOUND, "해당하는 멤버가 없습니다.");}
+
+    boolean containsAdmin = members.stream()
+            .anyMatch(m -> m.getAuthority() == Authority.ADMIN);
+
+    if (containsAdmin) {
+      throw new BusinessException(ErrorCode.BAD_REQUEST, "관리자는 삭제할 수 없습니다.");
+    }
 
     members.forEach(SpaceMember::softDelete);
 
@@ -172,13 +182,12 @@ public class SpaceMemberService {
     return spaceMemberMapper.toMemberUpdateResponseDto(member);
   }
 
-  public List<SpaceMemberListResponseDto> getMemberByTag(Long spaceId, String tag, Long userId) {
+  public List<SpaceMemberListResponseDto> getMemberByTag(Long spaceId, String tag, CustomUserDetails principal) {
+    spaceMemberRepository.findBySpaceIdAndUserId(spaceId, principal.getUserId())
 
-    spaceRepository.findByIdOrThrow(spaceId);
-
-    spaceMemberRepository.findBySpaceIdAndUserId(spaceId, userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.FORBIDDEN, "해당 스페이스 멤버만 조회할 수 있습니다."));
 
+    spaceRepository.findByIdOrThrow(spaceId);
     List<SpaceMember> members = spaceMemberRepository.findBySpaceIdAndTag(spaceId, tag);
 
     return spaceMemberMapper.toMemberResponseDtoList(members);
