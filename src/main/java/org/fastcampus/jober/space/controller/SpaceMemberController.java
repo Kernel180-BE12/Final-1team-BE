@@ -150,6 +150,7 @@ public class SpaceMemberController {
     })
     @GetMapping("/{spaceId}/tag")
     public ResponseEntity<List<SpaceMemberListResponseDto>> getMemberByTag(
+
             @Parameter(description = "조회할 스페이스 ID", required = true)
             @PathVariable Long spaceId,
             @Parameter(description = "조회할 멤버의 태그", required = true)
@@ -158,6 +159,7 @@ public class SpaceMemberController {
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
         List<SpaceMemberListResponseDto> result = spaceMemberService.getMemberByTag(spaceId, tag, principal);
+
         return ResponseEntity.ok(result);
     }
 }

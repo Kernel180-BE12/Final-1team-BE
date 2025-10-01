@@ -189,6 +189,7 @@ public class SpaceMemberService {
     spaceRepository.findByIdOrThrow(spaceId);
     List<SpaceMember> members = spaceMemberRepository.findBySpaceIdAndTag(spaceId, tag);
     return spaceMemberMapper.toMemberResponseDtoList(members);
+
   }
 
 }
