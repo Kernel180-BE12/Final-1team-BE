@@ -56,6 +56,13 @@ public class InviteStatus extends BaseEntity {
         return LocalDateTime.now().isAfter(this.expireDate);
     }
 
+    /** 만료 처리 */
+    public void markAsExpired() {
+        if (this.status == InviteStatusType.PENDING) {
+            this.status = InviteStatusType.EXPIRED;
+        }
+    }
+
     /** 저장 이후 만료일 갱신/연장/단축을 위한 메서드 */
     public InviteStatus expire(int days) {
         this.expireDate = LocalDateTime.now().plusDays(days);
