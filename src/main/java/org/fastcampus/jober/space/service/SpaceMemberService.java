@@ -80,7 +80,7 @@ public class SpaceMemberService {
               .email(dto.getEmail())
               .status(InviteStatusType.PENDING)
               .spaceId(spaceId)
-              .expireDate(LocalDateTime.now().plusDays(10))
+//              .expireDate(LocalDateTime.now().plusDays(10)) // 커스텀 할 경우만 사용
               .build();
       inviteStatusRepository.save(inviteMember);
     }

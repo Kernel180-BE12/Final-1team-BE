@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @DynamicUpdate
 public class InviteStatus extends BaseEntity {
+
+    private final static int DEFAULT_EXPIRED_DATE = 7;  // 기본 만료일
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -39,6 +42,26 @@ public class InviteStatus extends BaseEntity {
     private InviteStatusType status;
 
     private LocalDateTime expireDate; // 초대 만료일
+
+    /** 엔티티 생성 시 기본 만료일 설정 */
+    @PrePersist
+    public void setDefaultExpiredDate() {
+        if (this.expireDate == null) {
+            this.expireDate = LocalDateTime.now().plusDays(DEFAULT_EXPIRED_DATE);
+        }
+    }
+
+    /** 만료 여부 확인 */
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expireDate);
+    }
+
+    /** 만료 처리 */
+    public void markAsExpired() {
+        if (this.status == InviteStatusType.PENDING) {
+            this.status = InviteStatusType.EXPIRED;
+        }
+    }
 
     /** 저장 이후 만료일 갱신/연장/단축을 위한 메서드 */
     public InviteStatus expire(int days) {
