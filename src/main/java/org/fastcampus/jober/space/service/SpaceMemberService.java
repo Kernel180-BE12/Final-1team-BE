@@ -1,6 +1,5 @@
 package org.fastcampus.jober.space.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +8,7 @@ import jakarta.mail.MessagingException;
 import org.fastcampus.jober.error.BusinessException;
 import org.fastcampus.jober.error.ErrorCode;
 import org.fastcampus.jober.space.dto.InviteResult;
-import org.fastcampus.jober.space.dto.InviteStatus;
+import org.fastcampus.jober.space.entity.InviteStatus;
 import org.fastcampus.jober.space.dto.request.MemberUpdateRequestDto;
 import org.fastcampus.jober.space.dto.response.MemberUpdateResponseDto;
 import org.fastcampus.jober.space.dto.response.SpaceMemberListResponseDto;
@@ -130,7 +129,7 @@ public class SpaceMemberService {
       throw new BusinessException(ErrorCode.BAD_REQUEST, "이미 스페이스 멤버입니다.");
     }
 
-    if (pendingMember.getExpireDate().isBefore(LocalDateTime.now())) {
+    if (pendingMember.isExpired()) {
       throw new BusinessException(ErrorCode.BAD_REQUEST, "만료된 초대입니다.");
     }
 

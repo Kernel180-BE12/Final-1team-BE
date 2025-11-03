@@ -1,11 +1,13 @@
 package org.fastcampus.jober.space.repository;
 
-import org.fastcampus.jober.space.dto.InviteStatus;
+import org.fastcampus.jober.space.entity.InviteStatus;
 import org.fastcampus.jober.space.entity.InviteStatusType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,4 +23,6 @@ AND is.spaceId = :spaceId
 AND is.status = :status
 """)
     Optional<InviteStatus> findByEmailAndSpaceIdAndStatus(String email, Long spaceId, InviteStatusType status);
+
+    List<InviteStatus> findByStatusAndExpireDateBefore(InviteStatusType status, LocalDateTime expireDateBefore);
 }
